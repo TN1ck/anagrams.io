@@ -1,0 +1,11 @@
+hs_err_pid*.log
+pom.xml
+pom.xml.asc
+**/gen
+**/target
+.*
+!.gitignore
+cljs.js
+frontend/node_modules
+frontend/build
+frontend/yarn.lock
