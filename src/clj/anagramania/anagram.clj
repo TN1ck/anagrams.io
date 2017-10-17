@@ -124,27 +124,27 @@
       (println "found" (count @solution-atom) "solutions")
       @solution-atom)))
 
-(def s (find-anagram-sentences parsed-wordlist3000 "angelamerkel"))
-s
-
 ;; Playground
 
-(def parsed-wordlist3000 (parsed-3000-wordlist))
-parsed-wordlist3000
-(def parsed-wordlist (parsed-en-wordlist))
+;; (def s (find-anagram-sentences parsed-wordlist3000 "angelamerkel"))
+;; s
 
-(def subanagrams (find-subanagrams parsed-wordlist "motherthermo"))
+;; (def parsed-wordlist3000 (parsed-3000-wordlist))
+;; parsed-wordlist3000
+;; (def parsed-wordlist (parsed-en-wordlist))
 
-(def goodness-list (calculate-goodness subanagrams))
-(def parsed-query (word-to-set "motherthermo"))
+;; (def subanagrams (find-subanagrams parsed-wordlist "motherthermo"))
 
-(def counter-atom (atom 1))
-(def solution-atom (atom '()))
-(def small-gd-list goodness-list)
-(def initial-stack (create-initial-stack small-gd-list))
-initial-stack
+;; (def goodness-list (calculate-goodness subanagrams))
+;; (def parsed-query (word-to-set "motherthermo"))
 
-(_find-anagram-sentences parsed-query small-gd-list initial-stack counter-atom solution-atom)
+;; (def counter-atom (atom 1))
+;; (def solution-atom (atom '()))
+;; (def small-gd-list goodness-list)
+;; (def initial-stack (create-initial-stack small-gd-list))
+;; initial-stack
 
-(vec @solution-atom)
+;; (_find-anagram-sentences parsed-query small-gd-list initial-stack counter-atom solution-atom)
+
+;; (vec @solution-atom)
 
