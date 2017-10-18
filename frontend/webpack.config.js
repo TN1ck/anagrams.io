@@ -15,7 +15,11 @@ module.exports = {
     publicPath: '/build/'
   },
   resolve: {
-    extensions: ['.js', '.ts', '.tsx', '.css']
+    extensions: ['.js', '.ts', '.tsx', '.css'],
+    modules: [
+      'node_modules',
+      path.resolve('./'),
+    ]
   },
   module: {
     rules: [
@@ -31,6 +35,11 @@ module.exports = {
       {
         test: /\.css$/,
         use: [ 'style-loader', 'css-loader' ]
+      },
+      {
+        test: /\.csv$/,
+        use: ['raw-loader'],
+        include: path.join(__dirname, 'dictionaries')
       }
     ]
   }

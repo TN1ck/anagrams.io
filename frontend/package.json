@@ -28,8 +28,10 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "file-loader": "^1.1.5",
     "keymaster": "^1.6.2",
     "lodash": "^4.17.4",
+    "raw-loader": "^0.5.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "styled-components": "^2.2.1"

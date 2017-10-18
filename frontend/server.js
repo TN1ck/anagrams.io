@@ -4,8 +4,10 @@ var config = require('./webpack.config');
 
 new WebpackDevServer(webpack(config), {
   publicPath: config.output.publicPath,
-  hot: false,
-  historyApiFallback: true
+  hot: true,
+  historyApiFallback: true,
+  stats: {colors: true},
+  inline: true,
 }).listen(3001, 'localhost', function (err, result) {
   if (err) {
     console.log(err);

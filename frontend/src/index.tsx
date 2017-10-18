@@ -5,6 +5,11 @@ import styled from 'styled-components';
 import {random, range, sample, throttle} from 'lodash';
 import axios, {AxiosPromise} from 'axios';
 
+import * as anagram from 'src/anagram';
+
+console.log(anagram, 'hey');
+
+
 const BACKEND_URL = 'http://localhost:3000';
 const DARK_BLUE = '#34495e';
 const GREY = '#95a5a6';
