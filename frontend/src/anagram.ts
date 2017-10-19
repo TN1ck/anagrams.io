@@ -108,25 +108,35 @@ export function sortWordList(wordList: Word[]) {
   return sortBy(wordList, w => -w.word.length);
 }
 
+
+interface IndexedWord {
+  word: Word;
+  index: number;
+}
+
+interface StackItem {
+  list: IndexedWord[];
+  set: NString;
+  goodness: number;
+}
+
 export function findAnagramSentences(query: string, dictionary: Word[]): any {
   const nQuery = stringToWord(query);
-  const subanagrams = findSubAnagrams(query, dictionary);
+  const _subanagrams = findSubAnagrams(query, dictionary);
   // we like long words more
-  const sorted = sortWordList(subanagrams);
-  console.log(sorted);
-
-  interface StackItem {
-    index: number;
-    list: Word[];
-    set: NString;
-    goodness: number;
-  }
+  const sorted = sortWordList(_subanagrams);
+  const subanagrams: IndexedWord[] = sorted.map((word, index) => {
+    return {
+      word: word,
+      index,
+    };
+  });
   
-  const initialStack = sorted.map((w, index) => {
+  const initialStack = subanagrams.map((w, index) => {
     return {
       index,
       list: [w],
-      set: w.set,
+      set: w.word.set,
       goodness: 0,
     }
   });
@@ -151,17 +161,17 @@ export function findAnagramSentences(query: string, dictionary: Word[]): any {
         const charsMissing = queryLength - current.set.length;
 
         // drop all subanagrams that were before index
-        const droppedSubanagrams = drop(subanagrams, current.index); 
+        const droppedSubanagrams = drop(subanagrams, current.list[0].index); 
 
         // first filter those out, that are two big
         const possibleSubanagrams = droppedSubanagrams.filter(s => {
-          return s.word.length <= charsMissing;
+          return s.word.word.length <= charsMissing;
         });
 
         const combinedWords = possibleSubanagrams.map(w => {
           return {
             word: w,
-            combined: joinTwoNStrings(w.set, current.set)
+            combined: joinTwoNStrings(w.word.set, current.set)
           };
         });
 
@@ -172,8 +182,7 @@ export function findAnagramSentences(query: string, dictionary: Word[]): any {
 
         const newStackItems: StackItem[] = filterCombined.map(cw => {
           return {
-            list: current.list.concat(cw.word),
-            index: current.index,
+            list: [cw.word].concat(current.list),
             goodness: current.goodness,
             set: cw.combined,
           };
@@ -209,7 +218,7 @@ for (let i = 0; i < 10000; i++) {
   const current = generator.next();
   if (current) {
     if (current.value && current.value.solution) {
-      console.log('SOLUTION', current.value.current.list.map((w: any) => w.word).join(' '));
+      console.log('SOLUTION', current.value.current.list.map((w: any) => w.word.word).join(' '));
     } else if (!current.value) {
       console.log(current);
       break;
