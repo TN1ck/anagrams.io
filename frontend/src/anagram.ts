@@ -121,6 +121,9 @@ interface StackItem {
 }
 
 export function findAnagramSentences(query: string, dictionary: Word[]): any {
+
+  console.log('Finding anagrams for', query);
+
   const nQuery = stringToWord(query);
   const _subanagrams = findSubAnagrams(query, dictionary);
   // we like long words more
@@ -131,10 +134,11 @@ export function findAnagramSentences(query: string, dictionary: Word[]): any {
       index,
     };
   });
+
+  console.log(`There are ${subanagrams.length} subanagrams to start with`);
   
-  const initialStack = subanagrams.map((w, index) => {
+  const initialStack = subanagrams.map((w) => {
     return {
-      index,
       list: [w],
       set: w.word.set,
       goodness: 0,
@@ -210,17 +214,24 @@ const dict = parseDictionary(dictionary as any);
 console.log('anagrams', findAnagrams("mother", dict));
 console.log('anagrams', findSubAnagrams("mother", dict));
 console.log(joinTwoNStrings(stringToWord("mother").set, stringToWord('testmother').set));
-const generator = findAnagramSentences("taisiatikhnovetskaya", dict)();
+const generator = findAnagramSentences("angelamerkel", dict)();
 
-console.log(generator);
-
-for (let i = 0; i < 10000; i++) {
+let lastIndex = 0;
+for (let i = 0; i < 10000000; i++) {
   const current = generator.next();
   if (current) {
+    if (current.value) {
+      const list = current.value.current.list;
+      const newIndex = list[list.length - 1].index;
+      if (lastIndex !== newIndex) {
+        console.log(newIndex);
+        lastIndex = newIndex;
+      }
+    }
     if (current.value && current.value.solution) {
       console.log('SOLUTION', current.value.current.list.map((w: any) => w.word.word).join(' '));
     } else if (!current.value) {
-      console.log(current);
+      console.log(current, i);
       break;
     }
   } else {
