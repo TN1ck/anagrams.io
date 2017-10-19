@@ -1,5 +1,5 @@
 import * as dictionary from 'dictionaries/eng-us-1.csv';
-import {groupBy, sortBy, identity} from 'lodash';
+import {groupBy, sortBy, identity, drop} from 'lodash';
 
 type NString = string[];
 
@@ -30,6 +30,22 @@ function stringToWord (str: string): Word {
     word: str,
   };
 }
+
+function nStringToString(nString: NString): string {
+  let string = '';
+
+  for (let c of nString) {
+    string += c[0];
+  }
+  return string;
+}
+
+// todo: can be made faster, only one pass should be needed
+function joinTwoNStrings(w1: NString, w2: NString) {
+  const str1 = nStringToString(w1);
+  const str2 = nStringToString(w2);
+  return stringToWord(str1 + str2).set;
+} 
 
 function isSubset(nStr1: NString, nStr2: NString): boolean {
   const length1 = nStr1.length;
@@ -88,6 +104,119 @@ export function findSubAnagrams(query: string, dictionary: Word[]): Word[] {
   })
 }
 
+export function sortWordList(wordList: Word[]) {
+  return sortBy(wordList, w => -w.word.length);
+}
+
+export function findAnagramSentences(query: string, dictionary: Word[]): any {
+  const nQuery = stringToWord(query);
+  const subanagrams = findSubAnagrams(query, dictionary);
+  // we like long words more
+  const sorted = sortWordList(subanagrams);
+  console.log(sorted);
+
+  interface StackItem {
+    index: number;
+    list: Word[];
+    set: NString;
+    goodness: number;
+  }
+  
+  const initialStack = sorted.map((w, index) => {
+    return {
+      index,
+      list: [w],
+      set: w.set,
+      goodness: 0,
+    }
+  });
+  
+  
+  const queryLength = query.length;
+  
+  const generator = function* () {
+
+    let stack: StackItem[] = initialStack;
+    const solutions: StackItem[] = [];
+
+    while(stack.length !== 0) {
+      const current = stack.shift() as StackItem;
+      let solution = false;
+
+      if (isSame(nQuery.set, current.set)) {
+        solutions.push(current);
+        solution = true;
+      } else {
+
+        const charsMissing = queryLength - current.set.length;
+
+        // drop all subanagrams that were before index
+        const droppedSubanagrams = drop(subanagrams, current.index); 
+
+        // first filter those out, that are two big
+        const possibleSubanagrams = droppedSubanagrams.filter(s => {
+          return s.word.length <= charsMissing;
+        });
+
+        const combinedWords = possibleSubanagrams.map(w => {
+          return {
+            word: w,
+            combined: joinTwoNStrings(w.set, current.set)
+          };
+        });
+
+        // check if the result is still a subset
+        const filterCombined = combinedWords.filter(cw => {
+          return isSubset(cw.combined, nQuery.set);
+        });
+
+        const newStackItems: StackItem[] = filterCombined.map(cw => {
+          return {
+            list: current.list.concat(cw.word),
+            index: current.index,
+            goodness: current.goodness,
+            set: cw.combined,
+          };
+        });
+
+        for (let item of newStackItems) {
+          stack.unshift(item);
+        }
+
+      }
+
+      yield {
+        current,
+        solution,
+      };
+    }
+  
+    return solutions;
+  }
+
+  return generator;
+}
+
 const dict = parseDictionary(dictionary as any);
 console.log('anagrams', findAnagrams("mother", dict));
 console.log('anagrams', findSubAnagrams("mother", dict));
+console.log(joinTwoNStrings(stringToWord("mother").set, stringToWord('testmother').set));
+const generator = findAnagramSentences("taisiatikhnovetskaya", dict)();
+
+console.log(generator);
+
+for (let i = 0; i < 10000; i++) {
+  const current = generator.next();
+  if (current) {
+    if (current.value && current.value.solution) {
+      console.log('SOLUTION', current.value.current.list.map((w: any) => w.word).join(' '));
+    } else if (!current.value) {
+      console.log(current);
+      break;
+    }
+  } else {
+    console.log('stopped', i);
+    break;
+  }
+}
+
