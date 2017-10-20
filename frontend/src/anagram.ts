@@ -1,4 +1,4 @@
-import * as dictionary from 'dictionaries/eng-us-1.csv';
+import * as dictionaryEngUs1 from 'dictionaries/eng-us-1.csv';
 import {groupBy, sortBy, identity, drop} from 'lodash';
 
 type NString = string[];
@@ -7,6 +7,14 @@ interface Word {
   set: string[],
   word: string;
 };
+
+function sanitizeQuery(str: string): string {
+  return str.toLowerCase()
+    .replace('ü', 'ue')
+    .replace('ä', 'ae')
+    .replace('ö', 'oe')
+    .trim();
+}
 
 function stringToWord (str: string): Word {
   const sorted = sortBy([...str], identity);
@@ -109,19 +117,26 @@ export function sortWordList(wordList: Word[]) {
 }
 
 
-interface IndexedWord {
+export interface IndexedWord {
   word: Word;
   index: number;
 }
 
-interface StackItem {
+export interface AnagramSolution {
   list: IndexedWord[];
   set: NString;
   goodness: number;
 }
 
-export function findAnagramSentences(query: string, dictionary: Word[]): any {
+export function findAnagramSentences(input: string, dictionary: Word[]): {
+  subanagrams: IndexedWord[],
+  generator: () => IterableIterator<{
+    current: AnagramSolution,
+    solution: boolean,
+  }>
+} {
 
+  const query = sanitizeQuery(input);
   console.log('Finding anagrams for', query);
 
   const nQuery = stringToWord(query);
@@ -150,11 +165,11 @@ export function findAnagramSentences(query: string, dictionary: Word[]): any {
   
   const generator = function* () {
 
-    let stack: StackItem[] = initialStack;
-    const solutions: StackItem[] = [];
+    let stack: AnagramSolution[] = initialStack;
+    const solutions: AnagramSolution[] = [];
 
     while(stack.length !== 0) {
-      const current = stack.shift() as StackItem;
+      const current = stack.shift() as AnagramSolution;
       let solution = false;
 
       if (isSame(nQuery.set, current.set)) {
@@ -184,7 +199,7 @@ export function findAnagramSentences(query: string, dictionary: Word[]): any {
           return isSubset(cw.combined, nQuery.set);
         });
 
-        const newStackItems: StackItem[] = filterCombined.map(cw => {
+        const newStackItems: AnagramSolution[] = filterCombined.map(cw => {
           return {
             list: [cw.word].concat(current.list),
             goodness: current.goodness,
@@ -203,40 +218,38 @@ export function findAnagramSentences(query: string, dictionary: Word[]): any {
         solution,
       };
     }
-  
-    return solutions;
   }
 
-  return generator;
+  return {
+    generator,
+    subanagrams,
+  };
 }
 
-const dict = parseDictionary(dictionary as any);
-console.log('anagrams', findAnagrams("mother", dict));
-console.log('anagrams', findSubAnagrams("mother", dict));
-console.log(joinTwoNStrings(stringToWord("mother").set, stringToWord('testmother').set));
-const generator = findAnagramSentences("angelamerkel", dict)();
+export const dictionaries = {
+  engUS1: parseDictionary(dictionaryEngUs1 as any),
+};
 
-let lastIndex = 0;
-for (let i = 0; i < 10000000; i++) {
-  const current = generator.next();
-  if (current) {
-    if (current.value) {
-      const list = current.value.current.list;
-      const newIndex = list[list.length - 1].index;
-      if (lastIndex !== newIndex) {
-        console.log(newIndex);
-        lastIndex = newIndex;
-      }
-    }
-    if (current.value && current.value.solution) {
-      console.log('SOLUTION', current.value.current.list.map((w: any) => w.word.word).join(' '));
-    } else if (!current.value) {
-      console.log(current, i);
-      break;
-    }
-  } else {
-    console.log('stopped', i);
-    break;
-  }
-}
+// for (let i = 0; i < 10000000; i++) {
+//   const current = generator.next();
+//   if (current) {
+//     if (current.value && current.value.current) {
+//       const list = current.value.current.list;
+//       const newIndex = list[list.length - 1].index;
+//       if (lastIndex !== newIndex) {
+//         console.log(newIndex);
+//         lastIndex = newIndex;
+//       }
+//     }
+//     if (current.value && current.value.solution) {
+//       console.log('SOLUTION', current.value.current.list.map((w: any) => w.word.word).join(' '));
+//     } else if (!current.value) {
+//       console.log(current, i);
+//       break;
+//     }
+//   } else {
+//     console.log('stopped', i);
+//     break;
+//   }
+// }
 

@@ -7,9 +7,6 @@ import axios, {AxiosPromise} from 'axios';
 
 import * as anagram from 'src/anagram';
 
-console.log(anagram, 'hey');
-
-
 const BACKEND_URL = 'http://localhost:3000';
 const DARK_BLUE = '#34495e';
 const GREY = '#95a5a6';
@@ -52,6 +49,7 @@ const AnagramaniaContainer = styled.div`
   bottom: 0;
   right: 0;
   left: 0;
+  overflow: scroll;
   display: flex;
   justify-content: center;
   padding-top: 100px;
@@ -60,7 +58,6 @@ const AnagramaniaContainer = styled.div`
 const AnagramaniaFooter = styled.div`
   position: absolute;
   bottom: 20px;
-  left: 20px;
   right: 20px;
   color: white;
   display: flex;
@@ -75,17 +72,6 @@ enum RequestStatus {
   error = 'error',
 };
 
-interface AnagramResult {
-  word: string;
-  popularity: number;
-  set: string[];
-}
-
-interface AnagramSetResult {
-  set: string[];
-  list: AnagramResult[];
-}
-
 const ResultContainer = styled.div`
   color: white;
   width: 200px;
@@ -93,32 +79,22 @@ const ResultContainer = styled.div`
 `;
 
 const Result: React.StatelessComponent<{
-  result: AnagramResult;
+  result: anagram.AnagramSolution;
 }> = ({result}) => {
   return (
     <ResultContainer>
-      {result.word}
+      {[...result.list].reverse().map(w => {
+        return w.word.word;
+      }).join(' ')}
     </ResultContainer>
   );
 }
-
-const SetResult: React.StatelessComponent<{
-  result: AnagramSetResult;
-}> = ({result}) => {
-  return (
-    <ResultContainer>
-      {result.list.map(r => {
-        return r.word + ' ';
-      })}
-    </ResultContainer>
-  );
-}
-
 class Anagramania extends React.Component<{}, {
   queryStatus: RequestStatus;
   query: string;
   // anagrams: AnagramResult[];
-  anagrams: AnagramSetResult[];
+  subanagrams: anagram.IndexedWord[];
+  solutions: anagram.AnagramSolution[];
 }> {
   request: AxiosPromise;
   constructor(props: any) {
@@ -126,7 +102,8 @@ class Anagramania extends React.Component<{}, {
     this.state = {
       queryStatus: RequestStatus.none,
       query: '',
-      anagrams: [],
+      subanagrams: [],
+      solutions: [],
     };
   }
   onQueryChange(query: string) {
@@ -136,20 +113,37 @@ class Anagramania extends React.Component<{}, {
   }
   requestAnagram() {
     console.log('request anagram', this.state.query);
-    const request = getAnagramSentences(this.state.query);
-    this.request = request;
+
+    const {
+      subanagrams,
+      generator,
+    } = anagram.findAnagramSentences(this.state.query, anagram.dictionaries.engUS1);
+
     this.setState({
-      queryStatus: RequestStatus.loading,
+      subanagrams,
+      solutions: [],
     });
-    request.then(result => {
-      console.log(result);
-      this.setState({
-        queryStatus: RequestStatus.success,
-        anagrams: result.data,
-      });
-    });
+
+    console.log(subanagrams);
+    const solutions = [];
+    const gen = generator();
+    for (let i = 0; i < 100000; i++) {
+      const value = gen.next();
+      if (value.done) {
+        break;
+      }
+      if (value.value.solution) {
+        console.log('solution', value.value.current);
+        solutions.push(value.value.current);
+        this.setState({
+          solutions,
+        })
+      }
+    }
+
   }
   render() {
+    console.log(this.state.solutions);
     return (
       <div>
         <AnagramaniaContainer>
@@ -166,9 +160,9 @@ class Anagramania extends React.Component<{}, {
                 onChange={(e: any) => this.onQueryChange(e.target.value)}
               />
             </form>
-            {this.state.anagrams.map(a => {
+            {this.state.solutions.map(a => {
               return (
-                <SetResult result={a}/>
+                <Result result={a}/>
               )
             })}
           </AnagramaniaInnerContainer>
