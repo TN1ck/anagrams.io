@@ -10,10 +10,10 @@ interface Word {
 
 function sanitizeQuery(str: string): string {
   return str.toLowerCase()
-    .replace('ü', 'ue')
-    .replace('ä', 'ae')
-    .replace('ö', 'oe')
-    .trim();
+    .replace(/ü/g, 'ue')
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ /g, '');
 }
 
 function stringToWord (str: string): Word {

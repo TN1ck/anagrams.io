@@ -186,14 +186,17 @@ class Anagramania extends React.Component<{}, {
       const gen = generator();
       for (let i = 0; i < 100000; i++) {
         if (breakLoop) {
+          this.setState({
+            queryStatus: RequestStatus.success,
+          });
           break;
         }
         setTimeout(() => {
           const value = gen.next();
-          if (value.done) {
+          if (!value || value.done) {
             breakLoop = true;;
           }
-          if (value.value.solution) {
+          if (value.value && value.value.solution) {
             solutions.push(value.value.current);
             this.setState({
               solutions,
@@ -202,10 +205,6 @@ class Anagramania extends React.Component<{}, {
         })
       }
     })
-
-    this.setState({
-      queryStatus: RequestStatus.success,
-    });
 
   }
   render() {
@@ -241,12 +240,20 @@ class Anagramania extends React.Component<{}, {
                 <SubHeader>
                   {`I found ${this.state.subanagrams.length} subanagrams, checking up to ${possibilities} possibilities.`}
                 </SubHeader>
+                <strong style={{color: 'white'}}>{`Note: currently limiting to 10000 iterations`}</strong>
                 {this.state.solutions.map((a, i) => {
                   return (
                     <Result key={i} result={a} index={i} />
                   )
                 })}
               </div>
+            ) : null
+          }
+          {
+            isDone ? (
+              <strong style={{color: 'white'}}>
+                {`Found ${this.state.solutions.length} solutions.`}
+              </strong>
             ) : null
           }
         </AnagramaniaInnerContainer>

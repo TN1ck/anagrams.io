@@ -6,6 +6,6 @@ pom.xml.asc
 .*
 !.gitignore
 cljs.js
-frontend/node_modules
-frontend/build
-frontend/yarn.lock
+node_modules
+build
+yarn.lock
