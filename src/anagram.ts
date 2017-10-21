@@ -1,4 +1,5 @@
 import * as dictionaryEngUs1 from 'dictionaries/eng-us-1.csv';
+import * as dictionaryEngUs2 from 'dictionaries/eng-us-2.csv';
 import {groupBy, sortBy, identity, drop} from 'lodash';
 
 type NString = string[];
@@ -88,13 +89,56 @@ function isSame(nStr1: NString, nStr2: NString): boolean {
   return false;
 }
 
-// console.log('issubset', isSubset(stringToNstring('mother'), stringToNstring('thermo')));
+
+// 1 and 2 letter words are the most 'problematic', as they match easily
+// but do not look good. So we allow only specific words there
+const ALLOWED_WORDS_SMALLER_THAN_TWO = [
+  "a",
+  "ad",
+  "ah",
+  "am",
+  "as",
+  "at",
+  "be",
+  "by",
+  "do",
+  "go",
+  "he",
+  "hi",
+  "i",
+  "ie",
+  "if",
+  "in",
+  "it",
+  "me",
+  "mr",
+  "ms",
+  "my",
+  "no",
+  "of",
+  "oh",
+  "ok",
+  "on",
+  "or",
+  "pc",
+  "pm",
+  "so",
+  "to",
+  "tv",
+  "up",
+  "us",
+  "vs",
+  "we",
+];
 
 export function parseDictionary(rawDictionary: string): Word[] {
   const rows = rawDictionary.split('\n');
-  return rows.map(r => {
-    const nStr = stringToWord(r);
+  return rows.map(str => {
+    const lowercaseStr = str.toLowerCase();
+    const nStr = stringToWord(lowercaseStr);
     return nStr;
+  }).filter(str => {
+    return str.word.length > 2 || ALLOWED_WORDS_SMALLER_THAN_TWO.includes(str.word);
   });
 }
 
@@ -228,28 +272,7 @@ export function findAnagramSentences(input: string, dictionary: Word[]): {
 
 export const dictionaries = {
   engUS1: parseDictionary(dictionaryEngUs1 as any),
+  engUS2: parseDictionary(dictionaryEngUs2 as any),
 };
 
-// for (let i = 0; i < 10000000; i++) {
-//   const current = generator.next();
-//   if (current) {
-//     if (current.value && current.value.current) {
-//       const list = current.value.current.list;
-//       const newIndex = list[list.length - 1].index;
-//       if (lastIndex !== newIndex) {
-//         console.log(newIndex);
-//         lastIndex = newIndex;
-//       }
-//     }
-//     if (current.value && current.value.solution) {
-//       console.log('SOLUTION', current.value.current.list.map((w: any) => w.word.word).join(' '));
-//     } else if (!current.value) {
-//       console.log(current, i);
-//       break;
-//     }
-//   } else {
-//     console.log('stopped', i);
-//     break;
-//   }
-// }
-
+// console.log(dictionaries.engUS1.filter(w => w.word.length === 3).map(w => w.word));

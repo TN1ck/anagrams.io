@@ -50,11 +50,14 @@ const AnagramaniaForm = styled.form`
   display: flex;
   position: relative;
   width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
 `;
 
 const AnagramaniaTitle = styled.h1`
   color: white;
-  font-size: 4rem;
+  font-size: 2.5rem;
+  text-align: center;
   font-weight: 300;
   margin: 2.5rem;
   padding: 0;
@@ -62,9 +65,16 @@ const AnagramaniaTitle = styled.h1`
 
 const AnagramaniaInnerContainer = styled.div`
   max-width: 900px;
+  width: 100%;
   position: relative;
   margin-left: auto;
   margin-right: auto;
+
+  @media (max-width: 899px) {
+    max-width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
 `;
 
 const AnagramaniaHeader = styled.div`
@@ -105,7 +115,7 @@ const SearchButton = styled.button`
 `;
 
 const AnagramaniaFooter = styled.div`
-  position: absolute;
+  position: fixed;
   bottom: 20px;
   right: 20px;
   color: white;
