@@ -8,8 +8,18 @@ import axios, {AxiosPromise} from 'axios';
 import * as anagram from 'src/anagram';
 
 const BACKEND_URL = 'http://localhost:3000';
-const DARK_BLUE = '#34495e';
+const LIGHTER_COLOR = '#474ebd';
+const LIGHT_COLOR = '#371c84';
+const DARK_COLOR = '#271b68';
 const GREY = '#95a5a6';
+
+function sumFromTo(from: number, to: number) {
+  return to * (to + from) / 2 - ((from - 1) * from) / 2;
+}
+
+function triangularPyramidal(n: number) {
+  return n * (n + 1) * (n + 2)/6;
+}
 
 function getAnagram(query: string) {
   return axios.get(BACKEND_URL + '/anagram/' + query);
@@ -20,39 +30,78 @@ function getAnagramSentences(query: string) {
 }
 
 const AnagramaniaInput = styled.input`
-  border: 2px solid ${GREY};
-  height: 25px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  width: 100%;
+  background: rgba(0, 10, 25, 0.5);
+  box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.3);
+  font-size: 1.25rem;
+  padding: 0.75rem 1.5rem;
+  color: white;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+
+  &:focus {
+    border-color: #5cb3fd;
+    outline: 0;
+  }
+`;
+
+const AnagramaniaForm = styled.form`
+  display: flex;
+  position: relative;
   width: 100%;
 `;
 
-// const AnagramaniaForm = styled.form`
-//   display: flex;
-// `;
-
 const AnagramaniaTitle = styled.h1`
   color: white;
-  font-size: 40pt;
-  margin: 0;
+  font-size: 4rem;
+  font-weight: 300;
+  margin: 2.5rem;
   padding: 0;
 `
 
 const AnagramaniaInnerContainer = styled.div`
-  // display: flex;
-  // justify-content: center;
-  // flex-direction: column;
+  max-width: 900px;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
 `;
 
-const AnagramaniaContainer = styled.div`
-  background: ${DARK_BLUE};
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  overflow: scroll;
+const AnagramaniaHeader = styled.div`
+  background: radial-gradient(circle at 50% 1%, ${LIGHTER_COLOR}, ${LIGHT_COLOR});
+  box-shadow: 0 10px 80px -2px rgba(0, 0, 0, 0.4);
+  padding: 2rem 0 2rem;
   display: flex;
   justify-content: center;
-  padding-top: 100px;
+`;
+
+const AnagramaniaInputGroup = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;
+`
+
+const SearchButton = styled.button`
+  transition: all 300ms ease-out;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-left: none;
+  background: rgba(0, 10, 25, 0.5);
+  font-size: 1.25rem;
+  color: white;
+  box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.3);
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  padding: 0 1.5rem;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: 0;
+    box-shadow: 0 5px 12px -2px rgba(255, 255, 255, 0.3);
+  }
 `;
 
 const AnagramaniaFooter = styled.div`
@@ -63,6 +112,10 @@ const AnagramaniaFooter = styled.div`
   display: flex;
   justify-content: center;
   font-size: 10px;
+`;
+
+const SubHeader = styled.h2`
+  color: white;
 `;
 
 enum RequestStatus {
@@ -76,14 +129,16 @@ const ResultContainer = styled.div`
   color: white;
   width: 200px;
   margin: 5px;
+  white-space: nowrap;
 `;
 
 const Result: React.StatelessComponent<{
   result: anagram.AnagramSolution;
-}> = ({result}) => {
+  index: number;
+}> = ({result, index}) => {
   return (
     <ResultContainer>
-      {[...result.list].reverse().map(w => {
+      {(index + 1) + '. ' + [...result.list].reverse().map(w => {
         return w.word.word;
       }).join(' ')}
     </ResultContainer>
@@ -122,36 +177,50 @@ class Anagramania extends React.Component<{}, {
     this.setState({
       subanagrams,
       solutions: [],
+      queryStatus: RequestStatus.loading,
     });
 
-    console.log(subanagrams);
-    const solutions = [];
-    const gen = generator();
-    for (let i = 0; i < 100000; i++) {
-      const value = gen.next();
-      if (value.done) {
-        break;
-      }
-      if (value.value.solution) {
-        console.log('solution', value.value.current);
-        solutions.push(value.value.current);
-        this.setState({
-          solutions,
+    const solutions: anagram.AnagramSolution[] = [];
+    let breakLoop = false;
+    setTimeout(() => {
+      const gen = generator();
+      for (let i = 0; i < 100000; i++) {
+        if (breakLoop) {
+          break;
+        }
+        setTimeout(() => {
+          const value = gen.next();
+          if (value.done) {
+            breakLoop = true;;
+          }
+          if (value.value.solution) {
+            solutions.push(value.value.current);
+            this.setState({
+              solutions,
+            })
+          }
         })
       }
-    }
+    })
+
+    this.setState({
+      queryStatus: RequestStatus.success,
+    });
 
   }
   render() {
-    console.log(this.state.solutions);
+    const isLoading = this.state.queryStatus === RequestStatus.loading;
+    const isDone = this.state.queryStatus === RequestStatus.success;
+    const possibilities = triangularPyramidal(this.state.subanagrams.length);
+
     return (
       <div>
-        <AnagramaniaContainer>
+        <AnagramaniaHeader>
           <AnagramaniaInnerContainer>
             <AnagramaniaTitle>
-              {'Anagramania'}
+              {'Anagramania.io'}
             </AnagramaniaTitle>
-            <form onSubmit={(e) => {
+            <AnagramaniaForm onSubmit={(e) => {
               e.preventDefault();
               this.requestAnagram();
               }}>
@@ -159,14 +228,28 @@ class Anagramania extends React.Component<{}, {
                 type="text"
                 onChange={(e: any) => this.onQueryChange(e.target.value)}
               />
-            </form>
-            {this.state.solutions.map(a => {
-              return (
-                <Result result={a}/>
-              )
-            })}
+              <SearchButton>
+                {'Go!'}
+              </SearchButton>
+            </AnagramaniaForm>
           </AnagramaniaInnerContainer>
-        </AnagramaniaContainer>
+        </AnagramaniaHeader>
+        <AnagramaniaInnerContainer>
+          {
+            (isLoading || isDone) ? (
+              <div>
+                <SubHeader>
+                  {`I found ${this.state.subanagrams.length} subanagrams, checking up to ${possibilities} possibilities.`}
+                </SubHeader>
+                {this.state.solutions.map((a, i) => {
+                  return (
+                    <Result key={i} result={a} index={i} />
+                  )
+                })}
+              </div>
+            ) : null
+          }
+        </AnagramaniaInnerContainer>
         <AnagramaniaFooter>
           {'Made by Tom Nick & Taisia Tikhnovetskaya'}
         </AnagramaniaFooter>

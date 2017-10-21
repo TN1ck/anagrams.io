@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "bignumber.js": "^4.1.0",
     "file-loader": "^1.1.5",
     "keymaster": "^1.6.2",
     "lodash": "^4.17.4",
