@@ -61,6 +61,11 @@ const AnagramaniaTitle = styled.h1`
   font-weight: 300;
   margin: 2.5rem;
   padding: 0;
+
+  @media (max-width: 899px) {
+    margin: 0.5rem 0;
+    font-size: 1.5rem;
+  }
 `
 
 const AnagramaniaInnerContainer = styled.div`
@@ -115,6 +120,7 @@ const SearchButton = styled.button`
 `;
 
 const AnagramaniaFooter = styled.div`
+  opacity: 0.7;
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -328,10 +334,10 @@ class Anagramania extends React.Component<{}, {
               </div>
             ) : null
           }
+          <AnagramaniaFooter>
+            {'Made by Tom Nick & Taisia Tikhnovetskaya'}
+          </AnagramaniaFooter>
         </AnagramaniaInnerContainer>
-        <AnagramaniaFooter>
-          {'Made by Tom Nick & Taisia Tikhnovetskaya'}
-        </AnagramaniaFooter>
       </div>
     );
   }
