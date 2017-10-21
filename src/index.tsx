@@ -217,49 +217,66 @@ class Anagramania extends React.Component<{}, {
 
     const state = {
       breakLoop: false,
-      possibilitiesChecked: 0,
       counter: 0,
+      numberOfPossibilitiesChecked: 0,
     };
 
     const gen = generator();
 
-    const getNext = () => {
+    const CONCURRENT_GET_NEXT = 100;
+
+    const getNext = (startAgain: boolean) => {
       state.counter++;
-      
-      if (MAX_ITERATIONS === state.counter) {
-        this.setState({
-          solutions,
-          possibilitiesChecked: state.possibilitiesChecked,
-          iterations: state.counter,
-          queryStatus: RequestStatus.success,
-        });
-      }
 
       if (state.breakLoop) {
         return;
       }
+
       const value = gen.next();
-      if (!value || value.done || MAX_ITERATIONS < state.counter) {
+      if (!value || value.done || MAX_ITERATIONS <= state.counter) {
         state.breakLoop = true;
         // so we update the state after the others are finished
+        setTimeout(() => {
+          this.setState({
+            solutions,
+            iterations: state.counter,
+            queryStatus: RequestStatus.success,
+            possibilitiesChecked: state.numberOfPossibilitiesChecked,
+          });
+        });
         return;
       }
 
       if (value.value) {        
-        state.possibilitiesChecked += value.value.numberOfPossibilities;
         if (value.value.solution) {
           solutions.push(value.value.current);
+          state.numberOfPossibilitiesChecked = value.value.numberOfPossibilitiesChecked;
           this.setState({
             solutions,
-            possibilitiesChecked: state.possibilitiesChecked,
+            possibilitiesChecked: state.numberOfPossibilitiesChecked,
+            iterations: state.counter,
+          });
+        } else if (state.counter % 250 === 0 && value.value) {
+          state.numberOfPossibilitiesChecked = value.value.numberOfPossibilitiesChecked;
+          this.setState({
+            possibilitiesChecked: state.numberOfPossibilitiesChecked,
             iterations: state.counter,
           });
         }
       }
+
+      if (startAgain) {
+        setTimeout(() => {
+          for (let i = 0; i <= CONCURRENT_GET_NEXT; i++) {
+            getNext(false);
+          }
+        });
+        setTimeout(() => (getNext(true)));
+      }
     }
-    for (let i = 0; i < MAX_ITERATIONS; i++) {
-      setTimeout(getNext);
-    }
+
+    getNext(true);
+
 
   }
   render() {

@@ -177,7 +177,7 @@ export function findAnagramSentences(input: string, dictionary: Word[]): {
   generator: () => IterableIterator<{
     current: AnagramSolution,
     solution: boolean,
-    numberOfPossibilities: number,
+    numberOfPossibilitiesChecked: number,
   }>
 } {
 
@@ -213,11 +213,10 @@ export function findAnagramSentences(input: string, dictionary: Word[]): {
     let stack: AnagramSolution[] = initialStack;
     const solutions: AnagramSolution[] = [];
 
+    let numberOfPossibilitiesChecked = initialStack.length;
     while(stack.length !== 0) {
       const current = stack.shift() as AnagramSolution;
       let solution = false;
-
-      let numberOfPossibilities = 0;
 
       if (isSame(nQuery.set, current.set)) {
         solutions.push(current);
@@ -229,7 +228,7 @@ export function findAnagramSentences(input: string, dictionary: Word[]): {
         // drop all subanagrams that were before index
         const droppedSubanagrams = drop(subanagrams, current.list[0].index); 
 
-        numberOfPossibilities = droppedSubanagrams.length;
+        numberOfPossibilitiesChecked += droppedSubanagrams.length;
 
         // first filter those out, that are two big
         const possibleSubanagrams = droppedSubanagrams.filter(s => {
@@ -259,16 +258,17 @@ export function findAnagramSentences(input: string, dictionary: Word[]): {
         for (let item of newStackItems) {
           stack.unshift(item);
         }
-
       }
 
       yield {
         current,
         solution,
-        numberOfPossibilities,
+        numberOfPossibilitiesChecked,
       };
     }
   }
+
+
 
   return {
     generator,
