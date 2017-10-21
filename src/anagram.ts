@@ -1,6 +1,6 @@
 import * as dictionaryEngUs1 from 'dictionaries/eng-us-1.csv';
 import * as dictionaryEngUs2 from 'dictionaries/eng-us-2.csv';
-import {groupBy, sortBy, identity, drop} from 'lodash';
+import {groupBy, sortBy, identity, drop, last} from 'lodash';
 
 type NString = string[];
 
@@ -177,6 +177,7 @@ export function findAnagramSentences(input: string, dictionary: Word[]): {
   generator: () => IterableIterator<{
     current: AnagramSolution,
     solution: boolean,
+    numberOfPossibilities: number,
   }>
 } {
 
@@ -216,6 +217,8 @@ export function findAnagramSentences(input: string, dictionary: Word[]): {
       const current = stack.shift() as AnagramSolution;
       let solution = false;
 
+      let numberOfPossibilities = 0;
+
       if (isSame(nQuery.set, current.set)) {
         solutions.push(current);
         solution = true;
@@ -225,6 +228,8 @@ export function findAnagramSentences(input: string, dictionary: Word[]): {
 
         // drop all subanagrams that were before index
         const droppedSubanagrams = drop(subanagrams, current.list[0].index); 
+
+        numberOfPossibilities = droppedSubanagrams.length;
 
         // first filter those out, that are two big
         const possibleSubanagrams = droppedSubanagrams.filter(s => {
@@ -260,6 +265,7 @@ export function findAnagramSentences(input: string, dictionary: Word[]): {
       yield {
         current,
         solution,
+        numberOfPossibilities,
       };
     }
   }

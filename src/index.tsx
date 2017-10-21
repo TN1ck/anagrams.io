@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import * as keymaster from 'keymaster';
 import styled from 'styled-components';
-import {random, range, sample, throttle} from 'lodash';
+import {random, range, sample, throttle, groupBy} from 'lodash';
 import axios, {AxiosPromise} from 'axios';
 
 import * as anagram from 'src/anagram';
@@ -154,12 +154,31 @@ const Result: React.StatelessComponent<{
     </ResultContainer>
   );
 }
+
+const AnagramResults: React.StatelessComponent<{
+  anagrams: anagram.AnagramSolution[];
+}> = ({anagrams}) => {
+  return (
+    <div>
+      {anagrams.map((a, i) => {
+        return (
+          <Result key={i} result={a} index={i} />
+        )
+      })}
+    </div>
+  );
+};
+
+const MAX_ITERATIONS = 100000;
+
 class Anagramania extends React.Component<{}, {
   queryStatus: RequestStatus;
   query: string;
   // anagrams: AnagramResult[];
   subanagrams: anagram.IndexedWord[];
   solutions: anagram.AnagramSolution[];
+  possibilitiesChecked: number;
+  iterations: number;
 }> {
   request: AxiosPromise;
   constructor(props: any) {
@@ -169,6 +188,8 @@ class Anagramania extends React.Component<{}, {
       query: '',
       subanagrams: [],
       solutions: [],
+      possibilitiesChecked: 0,
+      iterations: 0,
     };
   }
   onQueryChange(query: string) {
@@ -188,33 +209,57 @@ class Anagramania extends React.Component<{}, {
       subanagrams,
       solutions: [],
       queryStatus: RequestStatus.loading,
+      possibilitiesChecked: 0,
+      iterations: 0,
     });
 
     const solutions: anagram.AnagramSolution[] = [];
-    let breakLoop = false;
-    setTimeout(() => {
-      const gen = generator();
-      for (let i = 0; i < 100000; i++) {
-        if (breakLoop) {
-          this.setState({
-            queryStatus: RequestStatus.success,
-          });
-          break;
-        }
-        setTimeout(() => {
-          const value = gen.next();
-          if (!value || value.done) {
-            breakLoop = true;;
-          }
-          if (value.value && value.value.solution) {
-            solutions.push(value.value.current);
-            this.setState({
-              solutions,
-            })
-          }
-        })
+
+    const state = {
+      breakLoop: false,
+      possibilitiesChecked: 0,
+      counter: 0,
+    };
+
+    const gen = generator();
+
+    const getNext = () => {
+      state.counter++;
+      
+      if (MAX_ITERATIONS === state.counter) {
+        this.setState({
+          solutions,
+          possibilitiesChecked: state.possibilitiesChecked,
+          iterations: state.counter,
+          queryStatus: RequestStatus.success,
+        });
       }
-    })
+
+      if (state.breakLoop) {
+        return;
+      }
+      const value = gen.next();
+      if (!value || value.done || MAX_ITERATIONS < state.counter) {
+        state.breakLoop = true;
+        // so we update the state after the others are finished
+        return;
+      }
+
+      if (value.value) {        
+        state.possibilitiesChecked += value.value.numberOfPossibilities;
+        if (value.value.solution) {
+          solutions.push(value.value.current);
+          this.setState({
+            solutions,
+            possibilitiesChecked: state.possibilitiesChecked,
+            iterations: state.counter,
+          });
+        }
+      }
+    }
+    for (let i = 0; i < MAX_ITERATIONS; i++) {
+      setTimeout(getNext);
+    }
 
   }
   render() {
@@ -250,20 +295,20 @@ class Anagramania extends React.Component<{}, {
                 <SubHeader>
                   {`I found ${this.state.subanagrams.length} subanagrams, checking up to ${possibilities} possibilities.`}
                 </SubHeader>
-                <strong style={{color: 'white'}}>{`Note: currently limiting to 10000 iterations`}</strong>
-                {this.state.solutions.map((a, i) => {
-                  return (
-                    <Result key={i} result={a} index={i} />
-                  )
-                })}
+                <strong style={{color: 'white'}}>{`Note: currently limiting to ${MAX_ITERATIONS} iterations`}</strong>
+                <br />
+                <strong style={{color: 'white'}}>{`Checked ${this.state.possibilitiesChecked} possibilities.`}</strong>
+                <strong style={{color: 'white'}}>{` ${this.state.iterations} iterations.`}</strong>
+                <br/>
+                {
+                  isDone ? (
+                    <strong style={{color: 'white'}}>
+                      {`Finished: found ${this.state.solutions.length} solutions.`}
+                    </strong>
+                  ) : null
+                }
+                <AnagramResults anagrams={this.state.solutions} />
               </div>
-            ) : null
-          }
-          {
-            isDone ? (
-              <strong style={{color: 'white'}}>
-                {`Found ${this.state.solutions.length} solutions.`}
-              </strong>
             ) : null
           }
         </AnagramaniaInnerContainer>
