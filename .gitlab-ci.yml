@@ -1,4 +1,9 @@
+image: node:8.7.0
+
 pages:
+  cache:
+    paths:
+    - node_modules/
   stage: deploy
   script:
   - npm install
