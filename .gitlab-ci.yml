@@ -9,9 +9,8 @@ pages:
   - npm install
   - npm run build
   - mkdir public
-  - mv build public/
+  - mv build/* public/
   - mkdir public/src
-  - cp index.html public/
   - cp src/styles.css public/src/styles.css
   artifacts:
     paths:
