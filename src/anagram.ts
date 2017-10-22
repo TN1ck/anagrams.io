@@ -9,7 +9,7 @@ interface Word {
   word: string;
 };
 
-function sanitizeQuery(str: string): string {
+export function sanitizeQuery(str: string): string {
   return str.toLowerCase()
     .replace(/ü/g, 'ue')
     .replace(/ä/g, 'ae')
@@ -172,7 +172,7 @@ export interface AnagramSolution {
   goodness: number;
 }
 
-export function findAnagramSentences(input: string, dictionary: Word[]): {
+export function findAnagramSentences(query: string, dictionary: Word[]): {
   subanagrams: IndexedWord[],
   generator: () => IterableIterator<{
     current: AnagramSolution,
@@ -180,8 +180,8 @@ export function findAnagramSentences(input: string, dictionary: Word[]): {
     numberOfPossibilitiesChecked: number,
   }>
 } {
-
-  const query = sanitizeQuery(input);
+  
+  // const query = sanitizeQuery(input);
   console.log('Finding anagrams for', query);
 
   const nQuery = stringToWord(query);

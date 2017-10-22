@@ -2,8 +2,16 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import * as keymaster from 'keymaster';
 import styled from 'styled-components';
-import {random, range, sample, throttle, groupBy} from 'lodash';
+import {random, range, sample, throttle, groupBy, last} from 'lodash';
 import axios, {AxiosPromise} from 'axios';
+import { ThemedStyledFunction, css } from 'styled-components';
+
+function withProps<U>() {
+  return <P, T, O>(
+      fn: ThemedStyledFunction<P, T, O>,
+  ): ThemedStyledFunction<P & U, T, O & U> => fn;
+}
+
 
 import * as anagram from 'src/anagram';
 
@@ -142,10 +150,9 @@ enum RequestStatus {
 };
 
 const ResultContainer = styled.div`
-  color: white;
-  width: 200px;
-  margin: 5px;
+  color: black;
   white-space: nowrap;
+  margin-top: 5px;
 `;
 
 const Result: React.StatelessComponent<{
@@ -161,17 +168,108 @@ const Result: React.StatelessComponent<{
   );
 }
 
+function groupAnagramsByStartWord(
+  subanagrams: anagram.IndexedWord[],
+  anagrams: anagram.AnagramSolution[]
+):
+Array<{list: anagram.AnagramSolution[], word: string, checked: boolean, counter: number}> {
+  const groups = subanagrams.map(a => {
+    return {
+      list: [] as anagram.AnagramSolution[],
+      word: a.word.word,
+      counter: 0,
+      checked: false,
+    };
+  });
+
+  let current = null;
+  let currentWord = '';
+  let currentWordIndex = 0;
+
+  for (let i = 0; i < anagrams.length; i++) {
+    const a = anagrams[i];
+    const newIndexdWord = last(a.list) as anagram.IndexedWord;
+    const newWord = newIndexdWord.word.word;
+    if (currentWord !== newWord) {
+      currentWordIndex = subanagrams.findIndex(a => a.word.word === newWord);
+      currentWord = newWord;
+    }
+    groups[currentWordIndex].list.push(a);
+    for (let subangram of a.list) {
+      const currentWordIndex = subanagrams.findIndex(a => a.word.word === subangram.word.word);
+      groups[currentWordIndex].counter += 1;
+    }
+  }
+  
+  // all anagrams that are less than the currentWordIndex and have an empty list have no solutino
+  for(let i = 0; i < groups.length; i++) {
+    const group = groups[i];
+    group.checked = i < currentWordIndex;
+  }
+
+  return groups;
+}
+
+const AnagramResultsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  margin-left: -10px;
+  margin-right: -10px;
+`;
+
+const AnagramResultGroup = withProps<{
+  loading: boolean,
+  hasNoSolution: boolean;
+}>()(styled.div)`
+  flex-grow: 0;
+  background: white;
+  margin: 10px;
+  padding: 10px;
+  box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  ${(props: any) => props.hasNoSolution && css`
+    opacity: 0.3;
+  `}
+  ${(props: any) => props.loading && css`
+    opacity: 0.7;
+  `}
+`;
+
 const AnagramResults: React.StatelessComponent<{
   anagrams: anagram.AnagramSolution[];
-}> = ({anagrams}) => {
+  subanagrams: anagram.IndexedWord[];
+  cleanedQuery: string;
+  isDone: boolean;
+}> = ({anagrams, subanagrams, cleanedQuery, isDone}) => {
+
+  const groupedAnagrams = groupAnagramsByStartWord(subanagrams, anagrams);
   return (
-    <div>
-      {anagrams.map((a, i) => {
+    <AnagramResultsContainer>
+      {groupedAnagrams.map((d,) => {
+        const {word, list, checked, counter} = d;
         return (
-          <Result key={i} result={a} index={i} />
+          <AnagramResultGroup
+            key={word}
+            loading={list.length === 0 && !checked && !isDone}
+            hasNoSolution={(checked || isDone) && counter === 0}
+          >
+            <span style={{whiteSpace: 'nowrap', opacity: 0, height: 0}}>
+              {cleanedQuery.split('').map(() => 'a').join(' ')}
+            </span>
+            <div style={{position: 'relative', top: -15, marginBottom: -15}}>
+              <strong>
+                {word}
+              </strong>
+              <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div>
+              {list.map((a, i) => {
+                return <Result key={i} result={a} index={i} />
+              })}
+            </div>
+          </AnagramResultGroup>
         )
       })}
-    </div>
+    </AnagramResultsContainer>
   );
 };
 
@@ -180,6 +278,7 @@ const MAX_ITERATIONS = 100000;
 class Anagramania extends React.Component<{}, {
   queryStatus: RequestStatus;
   query: string;
+  cleanedQuery: string;
   // anagrams: AnagramResult[];
   subanagrams: anagram.IndexedWord[];
   solutions: anagram.AnagramSolution[];
@@ -192,6 +291,7 @@ class Anagramania extends React.Component<{}, {
     this.state = {
       queryStatus: RequestStatus.none,
       query: '',
+      cleanedQuery: '',
       subanagrams: [],
       solutions: [],
       possibilitiesChecked: 0,
@@ -200,16 +300,18 @@ class Anagramania extends React.Component<{}, {
   }
   onQueryChange(query: string) {
     this.setState({
-      query
+      query,
     });
   }
   requestAnagram() {
-    console.log('request anagram', this.state.query);
+    console.log('request anagram', this.state.cleanedQuery);
+
+    const cleanedQuery = anagram.sanitizeQuery(this.state.query);
 
     const {
       subanagrams,
       generator,
-    } = anagram.findAnagramSentences(this.state.query, anagram.dictionaries.engUS1);
+    } = anagram.findAnagramSentences(cleanedQuery, anagram.dictionaries.engUS1);
 
     this.setState({
       subanagrams,
@@ -217,6 +319,7 @@ class Anagramania extends React.Component<{}, {
       queryStatus: RequestStatus.loading,
       possibilitiesChecked: 0,
       iterations: 0,
+      cleanedQuery,
     });
 
     const solutions: anagram.AnagramSolution[] = [];
@@ -316,10 +419,8 @@ class Anagramania extends React.Component<{}, {
             (isLoading || isDone) ? (
               <div>
                 <SubHeader>
-                  {`I found ${this.state.subanagrams.length} subanagrams, checking up to ${possibilities} possibilities.`}
+                  {`I found ${this.state.subanagrams.length} subanagrams.`}
                 </SubHeader>
-                <strong style={{color: 'white'}}>{`Note: currently limiting to ${MAX_ITERATIONS} iterations`}</strong>
-                <br />
                 <strong style={{color: 'white'}}>{`Checked ${this.state.possibilitiesChecked} possibilities.`}</strong>
                 <strong style={{color: 'white'}}>{` ${this.state.iterations} iterations.`}</strong>
                 <br/>
@@ -330,7 +431,12 @@ class Anagramania extends React.Component<{}, {
                     </strong>
                   ) : null
                 }
-                <AnagramResults anagrams={this.state.solutions} />
+                <AnagramResults
+                  subanagrams={this.state.subanagrams}
+                  anagrams={this.state.solutions}
+                  cleanedQuery={this.state.cleanedQuery}
+                  isDone={isDone}
+                />
               </div>
             ) : null
           }
