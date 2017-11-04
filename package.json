@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "build": "export NODE_ENV=production && webpack",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_PATH=./ jest --config .jestrc.json",
+    "test:watch": "NODE_PATH=./ jest --config .jestrc.json --watchAll"
   },
   "keywords": [
     "pixel",
@@ -27,15 +28,18 @@
     "webpack-dev-server": "2.8.0"
   },
   "dependencies": {
+    "@types/jest": "^21.1.5",
     "axios": "0.16.2",
     "bignumber.js": "4.1.0",
     "file-loader": "1.1.5",
     "html-webpack-plugin": "^2.30.1",
+    "jest": "^21.2.1",
     "keymaster": "1.6.2",
     "lodash": "4.17.4",
     "raw-loader": "0.5.1",
     "react": "15.6.1",
     "react-dom": "15.6.1",
-    "styled-components": "2.2.1"
+    "styled-components": "2.2.1",
+    "ts-jest": "^21.1.4"
   }
 }
