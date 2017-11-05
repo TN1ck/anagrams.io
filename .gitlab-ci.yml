@@ -24,9 +24,7 @@ pages:
   - npm install
   - npm run build
   - mkdir public
-  - mv build/* public/
-  - mkdir public/src
-  - cp src/styles.css public/src/styles.css
+  - mv dist/* public/
   artifacts:
     paths:
     - public
