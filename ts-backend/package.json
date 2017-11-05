@@ -12,6 +12,7 @@
     "@types/jest": "^21.1.5",
     "@types/node": "8.0.9",
     "jest": "^21.2.1",
+    "nodemon": "^1.12.1",
     "ts-jest": "^21.1.4",
     "ts-loader": "2.2.2",
     "tslint": "5.5.0",
@@ -26,10 +27,10 @@
   "name": "@anagramania/backend",
   "private": true,
   "scripts": {
-    "build": "export NODE_ENV=production && webpack",
-    "start": "webpack --watch && export APP_ENV=development NODE_PATH=./dist nodemon dist/src-backend/index.js",
-    "start-prod": "export NODE_PATH=./dist && node dist/main.js",
-    "start-tsc": "tsc -w & export NODE_PATH=./dist && nodemon dist/src-backend/src/index.js",
+    "build": "export NODE_ENV=production && tsc",
+    "start-tsc": "tsc -w & export NODE_PATH=./ && nodemon dist/ts-backend/src/index.js",
+    "start-prod": "export NODE_PATH=./ && node dist/ts-backend/src/index.js",
+    "start-tsc": "tsc -w & export NODE_PATH=./ && nodemon dist/ts-backend/src/index.js",
     "test": "export APP_ENV=testing NODE_PATH=./src && jest --config .jestrc.json",
     "test:watch": "export APP_ENV=testing NODE_PATH=./src && jest --config .jestrc.json --watchAll"
   },
