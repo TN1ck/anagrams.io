@@ -9,11 +9,12 @@ npm install
 # frontend
 cd ts-frontend
 npm install
+npm run build
 ```
 
 ## Deployment
 
-We use a max of gitlab + digital ocean for deployment.
+We use a mix of gitlab + digital ocean for deployment.
 
 1. Setup the machine according to https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04
 ```
