@@ -1,11 +1,26 @@
 image: node:8.7.0
 
-pages:
+stages:
+  - test
+  - deploy
+
+test-backend:
+  stage: test
   cache:
     paths:
-    - node_modules/
-  stage: deploy
+    - ts-backend/node_modules/
   script:
+  - cd ts-backend
+  - npm install
+  - npm test
+
+pages:
+  stage: deploy
+  cache:
+    paths:
+    - ts-frontend/node_modules/
+  script:
+  - cd ts-frontend
   - npm install
   - npm run build
   - mkdir public
