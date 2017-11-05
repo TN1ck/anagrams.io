@@ -1,7 +1,7 @@
 {
-  "name": "pixel-ocd",
+  "name": "@anagramania/frontend",
   "version": "0.0.1",
-  "description": "Some pixel ocd fun",
+  "description": "Building the most awesome angram solver",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",

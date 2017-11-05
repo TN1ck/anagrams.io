@@ -1,0 +1,37 @@
+{
+  "dependencies": {
+    "body-parser": "1.17.2",
+    "express": "4.15.3",
+    "source-map-support": "0.4.15",
+    "typescript": "2.4.1",
+    "webpack": "2.4.1"
+  },
+  "devDependencies": {
+    "@types/body-parser": "1.16.4",
+    "@types/express": "4.0.36",
+    "@types/jest": "^21.1.5",
+    "@types/node": "8.0.9",
+    "jest": "^21.2.1",
+    "ts-jest": "^21.1.4",
+    "ts-loader": "2.2.2",
+    "tslint": "5.5.0",
+    "tslint-loader": "3.5.3"
+  },
+  "engines": {
+    "node": "8.x.x"
+  },
+  "author": "Tom Nick, Taisia Tikhnovetskaya",
+  "license": "MIT",
+  "main": "index.js",
+  "name": "@anagramania/backend",
+  "private": true,
+  "scripts": {
+    "build": "export NODE_ENV=production && webpack",
+    "start": "webpack --watch && export APP_ENV=development NODE_PATH=./dist nodemon dist/src-backend/index.js",
+    "start-prod": "export NODE_PATH=./dist && node dist/main.js",
+    "start-tsc": "tsc -w & export NODE_PATH=./dist && nodemon dist/src-backend/src/index.js",
+    "test": "export APP_ENV=testing NODE_PATH=./src && jest --config .jestrc.json",
+    "test:watch": "export APP_ENV=testing NODE_PATH=./src && jest --config .jestrc.json --watchAll"
+  },
+  "version": "0.0.0"
+}

@@ -1,3 +1,12 @@
+
+export function sumFromTo(from: number, to: number): number {
+  return to * (to + from) / 2 - ((from - 1) * from) / 2;
+}
+
+export function triangularPyramidal(n: number): number {
+  return n * (n + 1) * (n + 2)/6;
+}
+
 import BigNumber from 'bignumber.js';
 
 var f = [new BigNumber("1"), new BigNumber("1")];

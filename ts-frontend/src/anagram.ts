@@ -1,10 +1,8 @@
-import * as dictionaryEngUs1 from 'dictionaries/eng-us-1.csv';
-import * as dictionaryEngUs2 from 'dictionaries/eng-us-2.csv';
-import {groupBy, sortBy, identity, drop, last} from 'lodash';
+import {sortBy, identity, drop, last} from 'lodash';
 
 type NString = string[];
 
-interface Word {
+export interface Word {
   set: string[],
   word: string;
 };
@@ -17,7 +15,7 @@ export function sanitizeQuery(str: string): string {
     .replace(/ /g, '');
 }
 
-function stringToWord (str: string): Word {
+export function stringToWord (str: string): Word {
   const sorted = sortBy([...str], identity);
   let i = 0;
   let j = 0;
@@ -89,59 +87,6 @@ function isSame(nStr1: NString, nStr2: NString): boolean {
   return false;
 }
 
-
-// 1 and 2 letter words are the most 'problematic', as they match easily
-// but do not look good. So we allow only specific words there
-const ALLOWED_WORDS_SMALLER_THAN_TWO = [
-  "a",
-  "ad",
-  "ah",
-  "am",
-  "as",
-  "at",
-  "be",
-  "by",
-  "do",
-  "go",
-  "he",
-  "hi",
-  "i",
-  "ie",
-  "if",
-  "in",
-  "it",
-  "me",
-  "mr",
-  "ms",
-  "my",
-  "no",
-  "of",
-  "oh",
-  "ok",
-  "on",
-  "or",
-  "pc",
-  "pm",
-  "so",
-  "to",
-  "tv",
-  "up",
-  "us",
-  "vs",
-  "we",
-];
-
-export function parseDictionary(rawDictionary: string): Word[] {
-  const rows = rawDictionary.split('\n');
-  return rows.map(str => {
-    const lowercaseStr = str.toLowerCase();
-    const nStr = stringToWord(lowercaseStr);
-    return nStr;
-  }).filter(str => {
-    return str.word.length > 2 || ALLOWED_WORDS_SMALLER_THAN_TWO.includes(str.word);
-  });
-}
-
 export function findAnagrams(query: string, dictionary: Word[]): Word[] {
   const nQuery = stringToWord(query);
   return dictionary.filter(nStr => {
@@ -172,18 +117,7 @@ export interface AnagramSolution {
   goodness: number;
 }
 
-export function findAnagramSentences(query: string, dictionary: Word[]): {
-  subanagrams: IndexedWord[],
-  generator: () => IterableIterator<{
-    current: AnagramSolution,
-    solution: boolean,
-    numberOfPossibilitiesChecked: number,
-  }>
-} {
-  
-  // const query = sanitizeQuery(input);
-  console.log('Finding anagrams for', query);
-
+export function findSortedSubAnagrmns(query: string, dictionary: Word[]): IndexedWord[] {
   const nQuery = stringToWord(query);
   const _subanagrams = findSubAnagrams(query, dictionary);
   // we like long words more
@@ -194,9 +128,20 @@ export function findAnagramSentences(query: string, dictionary: Word[]): {
       index,
     };
   });
+  return subanagrams;
+}
 
-  console.log(`There are ${subanagrams.length} subanagrams to start with`);
-  
+export function findAnagramSentences(query: string, subanagrams: IndexedWord[]): {
+  subanagrams: IndexedWord[],
+  generator: () => IterableIterator<{
+    current: AnagramSolution,
+    solution: boolean,
+    numberOfPossibilitiesChecked: number,
+  }>
+} {
+
+  const nQuery = stringToWord(query);
+
   const initialStack = subanagrams.map((w) => {
     return {
       list: [w],
@@ -276,9 +221,44 @@ export function findAnagramSentences(query: string, dictionary: Word[]): {
   };
 }
 
-export const dictionaries = {
-  engUS1: parseDictionary(dictionaryEngUs1 as any),
-  engUS2: parseDictionary(dictionaryEngUs2 as any),
-};
+export function groupAnagramsByStartWord(
+  subanagrams: IndexedWord[],
+  anagrams: AnagramSolution[]
+):
+Array<{list: AnagramSolution[], word: string, checked: boolean, counter: number}> {
+  const groups = subanagrams.map(a => {
+    return {
+      list: [] as AnagramSolution[],
+      word: a.word.word,
+      counter: 0,
+      checked: false,
+    };
+  });
 
-// console.log(dictionaries.engUS1.filter(w => w.word.length === 3).map(w => w.word));
+  let current = null;
+  let currentWord = '';
+  let currentWordIndex = 0;
+
+  for (let i = 0; i < anagrams.length; i++) {
+    const a = anagrams[i];
+    const newIndexdWord = last(a.list) as IndexedWord;
+    const newWord = newIndexdWord.word.word;
+    if (currentWord !== newWord) {
+      currentWordIndex = subanagrams.findIndex(a => a.word.word === newWord);
+      currentWord = newWord;
+    }
+    groups[currentWordIndex].list.push(a);
+    for (let subangram of a.list) {
+      const currentWordIndex = subanagrams.findIndex(a => a.word.word === subangram.word.word);
+      groups[currentWordIndex].counter += 1;
+    }
+  }
+  
+  // all anagrams that are less than the currentWordIndex and have an empty list have no solutino
+  for(let i = 0; i < groups.length; i++) {
+    const group = groups[i];
+    group.checked = i < currentWordIndex;
+  }
+
+  return groups;
+}
