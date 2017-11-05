@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {IndexedWord} from './anagram';
 
 import {BACKEND_URL} from './constants';
 
@@ -9,10 +10,9 @@ export enum RequestStatus {
   error = 'error',
 };
 
-export function getAnagram(query: string) {
-  return axios.get(BACKEND_URL + '/anagram/' + query);
-}
-
-export function getAnagramSentences(query: string) {
-  return axios.get(BACKEND_URL + '/anagram-sentences/' + query);
+export function getSubAnagrams(query: string)  {
+  return axios.get<{
+    success: boolean;
+    anagrams: IndexedWord[];
+  }>(BACKEND_URL + '/anagram/' + query);
 }

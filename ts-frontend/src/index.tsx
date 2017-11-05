@@ -16,22 +16,11 @@ import SubTitle from './components/SubTitle';
 import Title from './components/Title';
 
 import {withProps} from 'src/utility';
-import {RequestStatus} from 'src/api';
-
-//
-// TODO: remove later
-//
-
-import * as dictionaryEngUs1 from 'src/../../dictionaries/eng-us-1.csv';
-import * as dictionaryEngUs2 from 'src/../../dictionaries/eng-us-2.csv';
+import {RequestStatus, getSubAnagrams} from 'src/api';
 
 import * as anagram from 'src/anagram';
-import {parseDictionary} from 'src/dictionaries';
 
-export const dictionaries = {
-  engUS1: parseDictionary(dictionaryEngUs1 as any),
-  engUS2: parseDictionary(dictionaryEngUs2 as any),
-};
+import './styles.css';
 
 const ResultContainer = styled.div`
   color: black;
@@ -145,11 +134,13 @@ class Anagramania extends React.Component<{}, {
       query,
     });
   }
-  requestAnagram() {
+  async requestAnagram() {
     console.log('request anagram', this.state.cleanedQuery);
 
     const cleanedQuery = anagram.sanitizeQuery(this.state.query);
-    const subanagrams = anagram.findSortedSubAnagrmns(cleanedQuery, dictionaries.engUS2);
+
+    const result = await getSubAnagrams(cleanedQuery);
+    const {anagrams: subanagrams} = result.data;
 
     const {
       generator,

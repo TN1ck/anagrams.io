@@ -1,8 +1,16 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+const extractCss = new ExtractTextPlugin({
+  filename: 'style.css',
+  allChunks: true,
+  disable: !IS_PRODUCTION
+});
 
 const basePlugins = [
   new webpack.DefinePlugin({
@@ -14,6 +22,7 @@ const basePlugins = [
     template: './index.html',
     inject: 'body'
   }),
+  extractCss,
 ];
 
 const prodPlugins = [
@@ -39,7 +48,6 @@ const plugins = basePlugins.concat(
 );
 
 console.log('IS PRODUCTION', IS_PRODUCTION);
-console.log(plugins);
 
 module.exports = {
   devtool: 'eval',
@@ -48,7 +56,7 @@ module.exports = {
     './src/index'
   ],
   output: {
-    path: path.join(__dirname, 'build'),
+    path: path.join(__dirname, 'dist'),
     filename: '[name].[hash].js',
     publicPath: '/'
   },
@@ -73,7 +81,10 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [ 'style-loader', 'css-loader' ]
+        use: extractCss.extract({
+          use: 'css-loader',
+          fallback: 'style-loader',
+        }),
       },
       {
         test: /\.csv$/,
