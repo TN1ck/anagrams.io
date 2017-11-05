@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@types/cors": "^2.8.1",
     "body-parser": "1.17.2",
+    "cors": "^2.8.4",
     "express": "4.15.3",
     "source-map-support": "0.4.15",
     "typescript": "2.4.1",
@@ -30,7 +32,7 @@
     "build": "export NODE_ENV=production && tsc",
     "start-tsc": "tsc -w & export NODE_PATH=./ && nodemon dist/ts-backend/src/index.js",
     "start-prod": "export NODE_PATH=./ && node dist/ts-backend/src/index.js",
-    "start-tsc": "tsc -w & export NODE_PATH=./ && nodemon dist/ts-backend/src/index.js",
+    "start": "tsc -w & export NODE_PATH=./ && nodemon dist/ts-backend/src/index.js",
     "test": "export APP_ENV=testing NODE_PATH=./src && jest --config .jestrc.json",
     "test:watch": "export APP_ENV=testing NODE_PATH=./src && jest --config .jestrc.json --watchAll"
   },
