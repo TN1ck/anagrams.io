@@ -1,20 +1,16 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import * as keymaster from 'keymaster';
-import styled from 'styled-components';
-import {random, range, sample, throttle, groupBy, last} from 'lodash';
-import axios, {AxiosPromise} from 'axios';
-import { ThemedStyledFunction, css } from 'styled-components';
+import styled, {css} from 'styled-components';
+import {AxiosPromise} from 'axios';
 
-import {triangularPyramidal} from './math';
-import {LIGHT_COLOR, LIGHTER_COLOR, DARK_COLOR} from './constants';
+// import {triangularPyramidal} from './math';
 
 import Footer from './components/Footer';
 import Form from './components/Form';
 import Header from './components/Header';
 import InnerContainer from './components/InnerContainer';
 import Input from './components/Input';
-import InputGroup from './components/InputGroup';
+// import InputGroup from './components/InputGroup';
 import SearchButton from './components/SearchButton';
 import SubTitle from './components/SubTitle';
 import Title from './components/Title';
@@ -26,8 +22,8 @@ import {RequestStatus} from 'src/api';
 // TODO: remove later
 //
 
-import * as dictionaryEngUs1 from 'dictionaries/eng-us-1.csv';
-import * as dictionaryEngUs2 from 'dictionaries/eng-us-2.csv';
+import * as dictionaryEngUs1 from 'src/../../dictionaries/eng-us-1.csv';
+import * as dictionaryEngUs2 from 'src/../../dictionaries/eng-us-2.csv';
 
 import * as anagram from 'src/anagram';
 import {parseDictionary} from 'src/dictionaries';
@@ -237,7 +233,7 @@ class Anagramania extends React.Component<{}, {
   render() {
     const isLoading = this.state.queryStatus === RequestStatus.loading;
     const isDone = this.state.queryStatus === RequestStatus.success;
-    const possibilities = triangularPyramidal(this.state.subanagrams.length);
+    // const possibilities = triangularPyramidal(this.state.subanagrams.length);
 
     return (
       <div>

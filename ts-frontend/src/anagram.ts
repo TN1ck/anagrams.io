@@ -118,7 +118,6 @@ export interface AnagramSolution {
 }
 
 export function findSortedSubAnagrmns(query: string, dictionary: Word[]): IndexedWord[] {
-  const nQuery = stringToWord(query);
   const _subanagrams = findSubAnagrams(query, dictionary);
   // we like long words more
   const sorted = sortWordList(_subanagrams);
@@ -235,7 +234,7 @@ Array<{list: AnagramSolution[], word: string, checked: boolean, counter: number}
     };
   });
 
-  let current = null;
+  // let current = null;
   let currentWord = '';
   let currentWordIndex = 0;
 

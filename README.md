@@ -1,5 +1,16 @@
 # anagramania
 
+## Build
+```
+# backend
+cd ts-backend
+npm install
+
+# frontend
+cd ts-frontend
+npm install
+```
+
 ## Deployment
 
 We use a max of gitlab + digital ocean for deployment.
@@ -65,7 +76,7 @@ server_name anagramania.io api.anagramania.io www.anagramania.io
 sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx -d anagramania.io -d www.anagramania.io -d api.anagramania.io
 ```
-1. Install Node etc according to:
+5. Install Node etc according to:
 https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-16-04
 
 ```
@@ -77,4 +88,11 @@ sudo apt-get install -y build-essential
 sudo npm install -g pm2
 # setup nginx as a reverse proxy server
 # ...
+```
+6. Setup the application
+```
+sudo mkdir /opt/apps
+sudo chown -R tom:tom /opt/apps
+cd /opt/apps
+git clone git@gitlab.com:TN1ck/anagramania.git
 ```

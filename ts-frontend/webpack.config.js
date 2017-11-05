@@ -78,7 +78,7 @@ module.exports = {
       {
         test: /\.csv$/,
         use: ['raw-loader'],
-        include: path.join(__dirname, 'dictionaries')
+        include: path.join(__dirname, '../dictionaries')
       }
     ]
   }
