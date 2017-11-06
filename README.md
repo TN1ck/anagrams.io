@@ -1,5 +1,17 @@
 # anagramania
 
+## Data Sources
+
+### Words
+* https://github.com/hermitdave/FrequencyWords
+
+### Countries
+* https://github.com/umpirsky/country-list
+* http://brilliantmaps.com/top-100-tourist-destinations/
+
+### People
+* https://www.biographyonline.net/people/famous-100.html
+
 ## Build
 ```
 # backend

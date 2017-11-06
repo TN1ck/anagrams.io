@@ -8,7 +8,8 @@ function readFile(path: string) {
 
 const dictionaries = {
   // TOOD: fix this
-  engUS1: parseDictionary(readFile(path.join(__dirname, '../../../../dictionaries/eng-us-1.csv'))),
-  engUS2: parseDictionary(readFile(path.join(__dirname, '../../../../dictionaries/eng-us-2.csv'))),
+  engUS1: parseDictionary(readFile(path.join(__dirname, '../../../../dictionaries/eng-us-3k.csv'))),
+  engUS2: parseDictionary(readFile(path.join(__dirname, '../../../../dictionaries/eng-us-10k.csv'))),
+  engUS3: parseDictionary(readFile(path.join(__dirname, '../../../../dictionaries/eng-us-50k.csv'))),
 }
 export default dictionaries;
