@@ -16,3 +16,15 @@ export function getSubAnagrams(query: string)  {
     anagrams: IndexedWord[];
   }>(BACKEND_URL + '/anagram/' + query);
 }
+
+interface Dictionary {
+  id: string;
+  name: string;
+}
+
+export function getDictionaries() {
+  return axios.get<{
+    success: boolean;
+    dictionaries: Dictionary[];
+  }>(BACKEND_URL + '/anagram-dictionaries');
+}
