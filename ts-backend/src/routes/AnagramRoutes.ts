@@ -9,11 +9,27 @@ router.get(
   '/anagram/:query',
   cors(),
   (request, response): void => {
-    const query = request.param('query');
+    const query = request.params.query;
+    const dictionaryKey = request.query.dictionary;
     const sanitizedQuery = anagram.sanitizeQuery(query);
-    const sortedSubAnagrams = anagram.findSortedSubAnagrmns(sanitizedQuery, dictionaries.engUS1)
+    const dictionary = dictionaries.find(d => d.id === dictionaryKey) || dictionaries[0];
+    const sortedSubAnagrams = anagram.findSortedSubAnagrmns(sanitizedQuery, dictionary.dict)
     response.json({anagrams: sortedSubAnagrams, success: true});
-  },
+  }
 );
+
+router.get(
+  '/anagram-dictionaries',
+  cors(),
+  (request, response): void => {
+    const dictionarieList = dictionaries.map(d => {
+      return {
+        id: d.id,
+        name: d.name,
+      };
+    });
+    response.json(dictionarieList);
+  }
+)
 
 export default router;

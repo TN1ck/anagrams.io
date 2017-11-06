@@ -44,7 +44,7 @@ const prodPlugins = [
 ];
 
 const plugins = basePlugins.concat(
-  IS_PRODUCTION ? prodPlugins : [],
+  IS_PRODUCTION ? prodPlugins : []
 );
 
 console.log('IS PRODUCTION', IS_PRODUCTION);
