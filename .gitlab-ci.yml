@@ -23,8 +23,7 @@ pages:
   - cd ts-frontend
   - npm install
   - npm run build
-  - mkdir public
-  - mv dist/* public/
+  - mv dist public
   artifacts:
     paths:
     - public
