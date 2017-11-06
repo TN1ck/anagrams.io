@@ -1,4 +1,4 @@
-import {Word, stringToWord} from './anagram';
+import {Word, stringToWord, sanitizeQuery} from './anagram';
 
 // 1 and 2 letter words are the most 'problematic', as they match easily
 // but do not look good. So we allow only specific words there
@@ -44,8 +44,8 @@ const ALLOWED_WORDS_SMALLER_THAN_TWO = [
 export function parseDictionary(rawDictionary: string): Word[] {
   const rows = rawDictionary.split('\n');
   return rows.map(str => {
-    const lowercaseStr = str.toLowerCase();
-    const nStr = stringToWord(lowercaseStr);
+    const sanitized = sanitizeQuery(str);
+    const nStr = stringToWord(sanitized);
     return nStr;
   }).filter(str => {
     return str.word.length > 2 || ALLOWED_WORDS_SMALLER_THAN_TWO.includes(str.word);
