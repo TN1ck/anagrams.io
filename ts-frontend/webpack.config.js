@@ -85,6 +85,7 @@ module.exports = {
           use: 'css-loader',
           fallback: 'style-loader',
         }),
+        include: [path.join(__diranem, 'src'), path.join(__dirname, '../node_modules/react-select/dist/react-select.css')]
       },
       {
         test: /\.csv$/,

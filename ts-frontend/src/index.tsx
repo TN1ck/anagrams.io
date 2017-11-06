@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import styled, {css} from 'styled-components';
 import {AxiosPromise} from 'axios';
+import Select from 'react-select';
 
 // import {triangularPyramidal} from './math';
 
@@ -16,16 +17,22 @@ import SubTitle from './components/SubTitle';
 import Title from './components/Title';
 
 import {withProps} from 'src/utility';
-import {RequestStatus, getSubAnagrams} from 'src/api';
+import {RequestStatus, getSubAnagrams, getDictionaries, Dictionary} from 'src/api';
 
 import * as anagram from 'src/anagram';
 
 import './styles.css';
+import '../node_modules/react-select/dist/react-select.css';
 
 const ResultContainer = styled.div`
   color: black;
   white-space: nowrap;
   margin-top: 5px;
+`;
+
+const SelectContainer = styled.div`
+  max-width: 500px;
+  margin: 0 auto;
 `;
 
 const Result: React.StatelessComponent<{
@@ -115,6 +122,8 @@ class Anagramania extends React.Component<{}, {
   solutions: anagram.AnagramSolution[];
   possibilitiesChecked: number;
   iterations: number;
+  dictionaries: Dictionary[];
+  selectedDictionaries: string;
 }> {
   request: AxiosPromise;
   constructor(props: any) {
@@ -127,7 +136,15 @@ class Anagramania extends React.Component<{}, {
       solutions: [],
       possibilitiesChecked: 0,
       iterations: 0,
+      dictionaries: [],
+      selectedDictionaries: 'eng-us-3k',
     };
+  }
+  async componentWillMount() {
+    const result = await getDictionaries();
+    this.setState({
+      dictionaries: result.data.dictionaries,
+    });
   }
   onQueryChange(query: string) {
     this.setState({
@@ -135,11 +152,11 @@ class Anagramania extends React.Component<{}, {
     });
   }
   async requestAnagram() {
-    console.log('request anagram', this.state.cleanedQuery);
 
     const cleanedQuery = anagram.sanitizeQuery(this.state.query);
 
-    const result = await getSubAnagrams(cleanedQuery);
+    console.log(this.state.selectedDictionaries);
+    const result = await getSubAnagrams(cleanedQuery, this.state.selectedDictionaries);
     const {anagrams: subanagrams} = result.data;
 
     const {
@@ -225,7 +242,6 @@ class Anagramania extends React.Component<{}, {
     const isLoading = this.state.queryStatus === RequestStatus.loading;
     const isDone = this.state.queryStatus === RequestStatus.success;
     // const possibilities = triangularPyramidal(this.state.subanagrams.length);
-
     return (
       <div>
         <Header>
@@ -245,6 +261,15 @@ class Anagramania extends React.Component<{}, {
                 {'Go!'}
               </SearchButton>
             </Form>
+            <SelectContainer>
+              <Select
+                options={this.state.dictionaries.map(d => {
+                  return {value: d.id, label: d.name};
+                })}
+                value={this.state.selectedDictionaries}
+                onChange={(value) => this.setState({selectedDictionaries: value.value})}
+              />
+            </SelectContainer>
           </InnerContainer>
         </Header>
         <InnerContainer>

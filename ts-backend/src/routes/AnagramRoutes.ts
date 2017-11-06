@@ -28,7 +28,7 @@ router.get(
         name: d.name,
       };
     });
-    response.json(dictionarieList);
+    response.json({success: true, dictionaries: dictionarieList});
   }
 )
 

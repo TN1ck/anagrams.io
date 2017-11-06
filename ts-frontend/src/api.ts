@@ -10,14 +10,14 @@ export enum RequestStatus {
   error = 'error',
 };
 
-export function getSubAnagrams(query: string)  {
+export function getSubAnagrams(query: string, dictionaries: string)  {
   return axios.get<{
     success: boolean;
     anagrams: IndexedWord[];
-  }>(BACKEND_URL + '/anagram/' + query);
+  }>(BACKEND_URL + '/anagram/' + query + '?dictionary=' + dictionaries);
 }
 
-interface Dictionary {
+export interface Dictionary {
   id: string;
   name: string;
 }
