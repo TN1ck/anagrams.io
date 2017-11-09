@@ -12,6 +12,6 @@ export function parseDictionary(rawDictionary: string): Word[] {
 export function filterDictionaryFromDictionary(dict1: Word[], dict2: Word[]) {
   const wordStrings = dict2.map(d => d.word);
   return dict1.filter(w => {
-    return w.word.length > 2 || wordStrings.includes(w.word);
+    return w.word.length > 3 || wordStrings.includes(w.word);
   });
 }

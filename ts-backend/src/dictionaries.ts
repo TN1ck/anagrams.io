@@ -10,14 +10,19 @@ function readFile(path: string) {
 const NODE_PATH = process.env.NODE_PATH || '/opt/apps/anagramania/ts-backend';
 
 const deTwo = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/de-allowed-1-2.csv')));
+const deThree = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/de-allowed-3.csv')));
 const enTwo = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/en-allowed-1-2.csv')));
+const enThree = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/en-allowed-3.csv')));
+
+const deTest = deTwo.concat(deThree);
+const enTest = enTwo.concat(enThree);
 
 const dictionaries = [
   // TOOD: fix this
   {
     dict: filterDictionaryFromDictionary(
       parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/eng-us-3k.csv'))),
-      enTwo
+      enTest
     ),
     id: 'eng-us-3k',
     name: 'English 3k'
@@ -25,7 +30,7 @@ const dictionaries = [
   {
     dict: filterDictionaryFromDictionary(
       parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/eng-us-10k.csv'))),
-      enTwo
+      enTest
     ),
     id: 'eng-us-10k',
     name: 'English 10k'
@@ -33,7 +38,7 @@ const dictionaries = [
   {
     dict: filterDictionaryFromDictionary(
       parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/eng-us-50k.csv'))),
-      enTwo
+      enTest
     ),
     id: 'eng-us-50k',
     name: 'English 50k'
@@ -46,7 +51,7 @@ const dictionaries = [
   {
     dict: filterDictionaryFromDictionary(
       parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/de-3k.csv'))),
-      deTwo
+      deTest
     ),
     id: 'de-3k',
     name: 'German 3k'
@@ -54,7 +59,7 @@ const dictionaries = [
   {
     dict: filterDictionaryFromDictionary(
       parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/de-10k.csv'))),
-      deTwo
+      deTest
     ),
     id: 'de-10k',
     name: 'German 10k'
@@ -62,7 +67,7 @@ const dictionaries = [
   {
     dict: filterDictionaryFromDictionary(
       parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/de-50k.csv'))),
-      deTwo
+      deTest
     ),
     id: 'de-50k',
     name: 'German 50k'
