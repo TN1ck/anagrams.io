@@ -6,7 +6,8 @@ function readFile(path: string) {
   return fs.readFileSync(path).toString();
 }
 
-const NODE_PATH = process.env.NODE_PATH;
+// QUICK FIX: Too stupid to set env variables with pm2 :D
+const NODE_PATH = process.env.NODE_PATH || '/opt/apps/anagramania/ts-backend';
 
 const deTwo = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/de-allowed-1-2.csv')));
 const enTwo = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/en-allowed-1-2.csv')));
