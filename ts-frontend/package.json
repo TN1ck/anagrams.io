@@ -22,6 +22,7 @@
     "@types/react": "16.0.5",
     "@types/react-dom": "15.5.4",
     "@types/webpack-env": "^1.13.2",
+    "assemblyscript": "^0.3.0",
     "awesome-typescript-loader": "3.2.3",
     "css-loader": "^0.28.7",
     "style-loader": "0.18.2",

@@ -1,4 +1,5 @@
 {
+  "extends": "./node_modules/assemblyscript/tsconfig.assembly.json",
   "buildOnSave": false,
   "compileOnSave": false,
   "compilerOptions": {
