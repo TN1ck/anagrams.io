@@ -277,11 +277,17 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
   return subanagramsGenerators;
 }
 
+export interface GroupedAnagramSolutions {
+  list: AnagramSolution[],
+  word: string,
+  checked: boolean,
+  counter: number,
+};
+
 export function groupAnagramsByStartWord(
   subanagrams: IndexedWord[],
   anagrams: AnagramSolution[]
-):
-Array<{list: AnagramSolution[], word: string, checked: boolean, counter: number}> {
+): GroupedAnagramSolutions[] {
   const groups = subanagrams.map(a => {
     return {
       list: [] as AnagramSolution[],

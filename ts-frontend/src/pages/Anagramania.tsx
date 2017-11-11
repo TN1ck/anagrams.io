@@ -25,6 +25,9 @@ const AnagramWorker = require('../anagram.worker');
 import 'src/assets/styles.css';
 import 'src/../node_modules/react-select/dist/react-select.css';
 
+const TESTING = true;
+import mockState from 'src/assets/anagramPageMock';
+
 const ResultContainer = styled.div`
   color: black;
   white-space: nowrap;
@@ -50,9 +53,6 @@ const Result: React.StatelessComponent<{
 }
 
 const AnagramResultsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: start;
   margin-left: -10px;
   margin-right: -10px;
 `;
@@ -61,7 +61,8 @@ const AnagramResultGroup = withProps<{
   loading: boolean,
   hasNoSolution: boolean;
 }>()(styled.div)`
-  flex-grow: 0;
+  float: left;
+  width: 300px;
   background: white;
   margin: 10px;
   padding: 10px;
@@ -75,46 +76,180 @@ const AnagramResultGroup = withProps<{
   `}
 `;
 
-const AnagramResults: React.StatelessComponent<{
+const ShowAllButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: bold;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  outline: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+class AnagramResult extends React.Component<
+{
+  loading: boolean;
+  hasNoSolution: boolean;
+  word: string;
+  list: anagram.AnagramSolution[];
+  counter: number;
+  columnWidth: number;
+},
+{
+  showAll: boolean;
+}
+> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showAll: false,
+    };
+    this.toggleShowAll = this.toggleShowAll.bind(this);
+  }
+  toggleShowAll() {
+    this.setState({
+      showAll: !this.state.showAll,
+    });
+  }
+  render() {
+    const {
+      loading,
+      hasNoSolution,
+      word,
+      list,
+      counter,
+      columnWidth,
+    } = this.props;
+    return (
+      <AnagramResultGroup
+        loading={loading}
+        hasNoSolution={hasNoSolution}
+        style={{
+          width: columnWidth - 20,
+        }}
+      >
+        <div style={{position: 'relative'}}>
+          <strong>
+            {word}
+          </strong>
+          <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div>
+          {take(list, !this.state.showAll ? 10 : list.length).map((a, i) => {
+            return <Result key={i} result={a} index={i} />
+          })}
+          {
+            list.length > 10
+              ? 
+                <ShowAllButton onClick={this.toggleShowAll}>
+                  {this.state.showAll
+                    ? `... hide ${list.length - 10} items`
+                    : `... show ${list.length - 10} more`
+                  }
+                </ShowAllButton>
+              : null
+          }
+        </div>
+      </AnagramResultGroup>
+    );
+  }
+}
+
+const AnagramResultRow = styled.div`
+  float: left;
+`;
+
+class AnagramResults extends React.Component<
+{
   anagrams: anagram.AnagramSolution[];
   subanagrams: anagram.IndexedWord[];
   cleanedQuery: string;
   isDone: boolean;
-}> = ({anagrams, subanagrams, cleanedQuery, isDone}) => {
+},
+{
+  columnWidth: number;
+  numberOfColumns: number;
+}
+> {
+  dom: HTMLElement;
+  constructor(props) {
+    super(props);
+    this.state = {
+      columnWidth: 250,
+      numberOfColumns: 1,
+    };
+    this.setRef = this.setRef.bind(this);
+  }
+  componentDidMount() {
+    window.addEventListener('resize', () => {
+      this.setColumnWidth();
+    });
+    this.setColumnWidth();
+  }
+  // we use javascript for this, becaus flexbox might be to slow
+  calculateColumnWidth() {
+    const width = this.dom.clientWidth;
+    const MIN_COLUMN_WIDTH = 250;
 
-  const groupedAnagrams = anagram.groupAnagramsByStartWord(subanagrams, anagrams);
-  return (
-    <AnagramResultsContainer>
-      {groupedAnagrams.map((d,) => {
-        const {word, list, checked, counter} = d;
-        return (
-          <AnagramResultGroup
-            key={word}
-            loading={list.length === 0 && !checked && !isDone}
-            hasNoSolution={(checked || isDone) && counter === 0}
-          >
-            <span style={{whiteSpace: 'nowrap', opacity: 0, height: 0}}>
-              {cleanedQuery.split('').map(() => 'a').join(' ')}
-            </span>
-            <div style={{position: 'relative', top: -15, marginBottom: -15}}>
-              <strong>
-                {word}
-              </strong>
-              <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div>
-              {take(list, 10).map((a, i) => {
-                return <Result key={i} result={a} index={i} />
+    
+    const numberOfColumns = Math.floor(width / MIN_COLUMN_WIDTH);
+    const columnWidth = width / numberOfColumns;
+    return {
+      columnWidth,
+      numberOfColumns,
+    };
+  }
+  setColumnWidth() {
+    this.setState(this.calculateColumnWidth());
+  }
+  setRef(dom) {
+    this.dom = dom;
+  }
+  render() {
+    const {anagrams, subanagrams, isDone} = this.props;
+    const groupedAnagrams = anagram.groupAnagramsByStartWord(subanagrams, anagrams);
+    const groupedAngramsContainer = [];
+    let currentGroup: anagram.GroupedAnagramSolutions[] = [];
+    for (let ga of groupedAnagrams) {
+      currentGroup.push(ga);
+      if (currentGroup.length === this.state.numberOfColumns) {
+        groupedAngramsContainer.push(currentGroup);
+        currentGroup = [];
+      }
+    }
+    if (currentGroup.length !== 0) {
+      groupedAngramsContainer.push(currentGroup);
+    }
+
+    return (
+      <AnagramResultsContainer innerRef={this.setRef}>
+        {groupedAngramsContainer.map((group, i) => {
+          return (
+            <AnagramResultRow key={i}>
+              {group.map((d) => {
+                const {word, list, checked, counter} = d;
+                const loading = list.length === 0 && !checked && !isDone;
+                const hasNoSolution = (checked || isDone) && counter === 0;
+                return (
+                  <AnagramResult
+                    key={word}
+                    columnWidth={this.state.columnWidth}
+                    loading={loading}
+                    hasNoSolution={hasNoSolution}
+                    word={word}
+                    list={list}
+                    counter={counter}
+                  />
+                );
               })}
-              {
-                list.length > 10
-                  ? `... show ${list.length - 10} more`
-                  : null
-              }
-            </div>
-          </AnagramResultGroup>
-        )
-      })}
-    </AnagramResultsContainer>
-  );
+            </AnagramResultRow>
+          );
+        })}
+      </AnagramResultsContainer>
+    );
+  }
 };
 
 // const MAX_ITERATIONS = 100000;
@@ -131,7 +266,7 @@ class Anagramania extends React.Component<{}, {
 }> {
   constructor(props: any) {
     super(props);
-    this.state = {
+    const defaultState = {
       queryStatus: RequestStatus.none,
       query: '',
       cleanedQuery: '',
@@ -140,6 +275,11 @@ class Anagramania extends React.Component<{}, {
       subanagrams: [],
       anagramIteratorState: null,
     };
+
+    this.state = defaultState;
+    if (TESTING) {
+      this.state = mockState;
+    }
   }
   async componentWillMount() {
     const result = await getDictionaries();
