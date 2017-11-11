@@ -141,6 +141,49 @@ export interface SubanagramSolver {
   generator: AnagramGenerator;
 }
 
+export interface AnagramIteratorState {
+  breakLoop: boolean;
+  counter: number;
+  numberOfPossibilitiesChecked: number;
+  unsolvedGenerators: SubanagramSolver[];
+  solvedGenerators: SubanagramSolver[];
+  currentGenerators: SubanagramSolver[];
+  solutions: AnagramSolution[];
+}
+
+export function angagramIteratorStateFactory(unsolvedGenerators = []) {
+  const state: AnagramIteratorState = {
+    breakLoop: false,
+    counter: 0,
+    numberOfPossibilitiesChecked: 0,
+    unsolvedGenerators,
+    solvedGenerators: [],
+    currentGenerators: [],
+    solutions: [],
+  };
+  return state;
+}
+
+export interface SerializedAnagramIteratorState {
+  counter: number;
+  numberOfPossibilitiesChecked: number;
+  unsolvedSubanagrams: IndexedWord[];
+  solvedSubanagrams: IndexedWord[];
+  currentSubanagrams: IndexedWord[];
+  solutions: AnagramSolution[];
+}
+
+export function serializeAnagramIteratorStateFactor(state: AnagramIteratorState): SerializedAnagramIteratorState {
+  return {
+    counter: state.counter,
+    numberOfPossibilitiesChecked: state.numberOfPossibilitiesChecked,
+    unsolvedSubanagrams: state.unsolvedGenerators.map(d => d.subanagram),
+    solvedSubanagrams: state.solvedGenerators.map(d => d.subanagram),
+    currentSubanagrams: state.currentGenerators.map(d => d.subanagram),
+    solutions: state.solutions,
+  }
+}
+
 export function findAnagramSentences(query: string, subanagrams: IndexedWord[]): SubanagramSolver[] {
 
   const nQuery = stringToWord(query);

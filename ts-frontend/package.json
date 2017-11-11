@@ -47,6 +47,7 @@
     "react-select": "^1.0.0-rc.10",
     "recharts": "^1.0.0-beta.1",
     "styled-components": "2.2.1",
-    "ts-jest": "^21.1.4"
+    "ts-jest": "^21.1.4",
+    "worker-loader": "^1.1.0"
   }
 }
