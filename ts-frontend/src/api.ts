@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {IndexedWord} from './anagram';
+import {Performance} from './performance/performance';
 
 import {BACKEND_URL} from './constants';
 
@@ -27,4 +28,8 @@ export function getDictionaries() {
     success: boolean;
     dictionaries: Dictionary[];
   }>(BACKEND_URL + '/anagram-dictionaries');
+}
+
+export function postPerformance(performance: Performance) {
+  return axios.post<{success: boolean}>(BACKEND_URL + '/performance', performance);
 }

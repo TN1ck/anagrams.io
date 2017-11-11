@@ -4,6 +4,7 @@ import * as express from 'express';
 
 import TestRoutes from './routes/TestRoutes';
 import AnagramRoutes from './routes/AnagramRoutes';
+import PerformanceRoutes from './routes/PerformanceRoutes';
 
 const PORT: number = parseInt(process.env.PORT, 10) || 3000;
 
@@ -23,6 +24,7 @@ class Server {
   public routes(): void {
     this.app.use(TestRoutes);
     this.app.use(AnagramRoutes);
+    this.app.use(PerformanceRoutes);
   }
 }
 

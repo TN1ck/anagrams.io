@@ -212,8 +212,6 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
     }
   }
 
-
-
   return {
     generator,
     subanagrams,

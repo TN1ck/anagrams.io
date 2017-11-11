@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
-import Anagramania from './pages/Main';
+import Root from './pages/Root';
 
 function renderApp(Component) {
   ReactDom.render(
@@ -10,12 +10,12 @@ function renderApp(Component) {
   );
 }
 
-renderApp(Anagramania);
+renderApp(Root);
 
 if (module.hot) {
   module.hot.accept();
-  module.hot.accept(['./pages/Main.tsx'], () => {
+  module.hot.accept(['./pages/Root.tsx'], () => {
     console.log('hey');
-    renderApp(require('./pages/Main.tsx').default);
+    renderApp(require('./pages/Root.tsx').default);
   });
 }

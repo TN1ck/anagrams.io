@@ -1,13 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import {parseDictionary, filterDictionaryFromDictionary} from '../../ts-frontend/src/dictionaries';
+import {NODE_PATH} from './constants';
 
 function readFile(path: string) {
   return fs.readFileSync(path).toString();
 }
-
-// QUICK FIX: Too stupid to set env variables with pm2 :D
-const NODE_PATH = process.env.NODE_PATH || '/opt/apps/anagramania/ts-backend';
 
 const deTwo = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/de-allowed-1-2.csv')));
 const deThree = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/de-allowed-3.csv')));
