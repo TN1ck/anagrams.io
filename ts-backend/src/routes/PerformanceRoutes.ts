@@ -27,7 +27,7 @@ function readPerformanceFile(callback: (performances: Performance[]) => any) {
     const performances: Performance[] = lines.filter(l => l !== '').map(l => {
       const [executed, start, end, timeNeeded] = l.split(',');
       return {
-        executed: new Date(executed),
+        executed: executed,
         start: Number(start),
         end: Number(end),
         timeNeeded: Number(timeNeeded),

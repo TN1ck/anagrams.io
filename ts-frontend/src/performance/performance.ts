@@ -1,6 +1,6 @@
 import {flatten} from 'lodash';
 import mockData from './mock';
-import * as anagram from 'src/anagram';
+import * as anagram from '../anagram';
 
 export interface Performance {
   executed: string;
