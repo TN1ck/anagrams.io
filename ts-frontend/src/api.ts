@@ -31,5 +31,9 @@ export function getDictionaries() {
 }
 
 export function postPerformance(performance: Performance) {
-  return axios.post<{success: boolean}>(BACKEND_URL + '/performance', performance);
+  return axios.post<{success: boolean, performances: Performance[]}>(BACKEND_URL + '/performance', performance);
+}
+
+export function getPerformances() {
+  return axios.get<{success: boolean, performances: Performance[]}>(BACKEND_URL + '/performances');
 }

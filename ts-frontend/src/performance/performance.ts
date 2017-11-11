@@ -2,7 +2,7 @@ import mockData from './mock';
 import * as anagram from 'src/anagram';
 
 export interface Performance {
-  executed: Date;
+  executed: string;
   start: number;
   end: number;
   timeNeeded: number;
@@ -22,7 +22,7 @@ export function testPerformanceOne(): PerformanceWithSolutions {
   const end = performance.now();
   const timeNeeded = end - start;
   return {
-    executed,
+    executed: executed.toISOString(),
     start,
     end,
     timeNeeded,

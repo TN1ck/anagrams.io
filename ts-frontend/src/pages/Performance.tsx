@@ -1,12 +1,55 @@
 import * as React from 'react';
 import styled from 'styled-components';
+
 import Header from 'src/components/Header';
 import Title from 'src/components/Title';
 import InnerContainer from 'src/components/InnerContainer';
 import * as performanceTest from 'src/performance/performance';
-import {postPerformance} from 'src/api';
+import {postPerformance, getPerformances} from 'src/api';
+import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts';
 
-const ResultContainer = styled.div`
+
+// const data = [
+//   {name: 'Page A', uv: 4000, pv: 2400, amt: 2400},
+//   {name: 'Page B', uv: 3000, pv: 1398, amt: 2210},
+//   {name: 'Page C', uv: 2000, pv: 9800, amt: 2290},
+//   {name: 'Page D', uv: 2780, pv: 3908, amt: 2000},
+//   {name: 'Page E', uv: 1890, pv: 4800, amt: 2181},
+//   {name: 'Page F', uv: 2390, pv: 3800, amt: 2500},
+//   {name: 'Page G', uv: 3490, pv: 4300, amt: 2100},
+// ];
+
+const SimpleBarChart: React.StatelessComponent<{performances: performanceTest.Performance[]}> = ({performances}) => {
+
+  const data = performances.map((p) => {
+    return {
+      name: p.executed,
+      timeNeeded: p.timeNeeded,
+      max: p.timeNeeded,
+    };
+  });
+
+  return (
+    <Card>
+      <div style={{height: 300}}>
+        <ResponsiveContainer>
+          <BarChart height={300} data={data}
+                margin={{top: 5, right: 0, left: 0, bottom: 5}}>
+            <XAxis dataKey="name"/>
+            <YAxis unit={'ms'} />
+            <CartesianGrid strokeDasharray="3 3"/>
+            <Tooltip/>
+            <Legend />
+            <Bar dataKey="timeNeeded" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+};
+
+
+const Card = styled.div`
   background: white;
   padding: 20px;
   border-radius: 4px;
@@ -16,15 +59,15 @@ const ResultContainer = styled.div`
 
 const PerformanceResult: React.StatelessComponent<{result: performanceTest.Performance}> = ({result}) => {
   return (
-    <ResultContainer>
-      executed: {result.executed.toISOString()}
+    <Card>
+      executed: {result.executed}
       <br/>
       start: {result.start}ms
       <br/>
       end: {result.end}ms
       <br/>
       time: {result.timeNeeded}ms
-    </ResultContainer>
+    </Card>
   );
 }
 
@@ -54,12 +97,25 @@ class PerformancePage extends React.Component<{}, {
       performances: [],
     };
   }
+  componentDidMount() {
+    getPerformances().then(result => {
+      const data = result.data;
+      if (data && data.success) {
+        this.setState({
+          performances: data.performances,
+        });
+      }
+    })
+  }
   testPerformance() {
     const test = performanceTest.testPerformanceOne();
-    postPerformance(test);
-    const performances = this.state.performances;
-    this.setState({
-      performances: [test, ...performances],
+    postPerformance(test).then(result => {
+      const data = result.data;
+      if (data && data.success) {
+        this.setState({
+          performances: data.performances,
+        });
+      }
     });
   }
   render() {
@@ -78,6 +134,9 @@ class PerformancePage extends React.Component<{}, {
               {'Start Performance Test'}
             </StartButton>
           </StartButtonContainer>
+          <SimpleBarChart
+            performances={this.state.performances}
+          />
           {this.state.performances.map((p, i) => {
             return (
               <PerformanceResult result={p} key={i}/>
