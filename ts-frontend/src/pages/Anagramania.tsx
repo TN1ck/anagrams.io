@@ -25,7 +25,7 @@ const AnagramWorker = require('../anagram.worker');
 import 'src/assets/styles.css';
 import 'src/../node_modules/react-select/dist/react-select.css';
 
-const TESTING = true;
+const TESTING = false;
 import mockState from 'src/assets/anagramPageMock';
 
 const ResultContainer = styled.div`
