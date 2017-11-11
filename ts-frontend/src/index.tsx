@@ -3,7 +3,19 @@ import * as ReactDom from 'react-dom';
 
 import Anagramania from './pages/Main';
 
-ReactDom.render(
-  <Anagramania />,
-  document.getElementById('root'),
-);
+function renderApp(Component) {
+  ReactDom.render(
+    <Component />,
+    document.getElementById('root'),
+  );
+}
+
+renderApp(Anagramania);
+
+if (module.hot) {
+  module.hot.accept();
+  module.hot.accept(['./pages/Main.tsx'], () => {
+    console.log('hey');
+    renderApp(require('./pages/Main.tsx').default);
+  });
+}

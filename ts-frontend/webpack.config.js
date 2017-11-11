@@ -43,8 +43,12 @@ const prodPlugins = [
   })
 ];
 
+const devPlugins = [
+  new webpack.HotModuleReplacementPlugin()
+];
+
 const plugins = basePlugins.concat(
-  IS_PRODUCTION ? prodPlugins : []
+  IS_PRODUCTION ? prodPlugins : devPlugins
 );
 
 console.log('IS PRODUCTION', IS_PRODUCTION);
@@ -53,6 +57,7 @@ module.exports = {
   devtool: 'eval',
   entry: IS_PRODUCTION ? ['./src/index'] : [
     'webpack-dev-server/client?http://localhost:3001',
+    'webpack/hot/dev-server',
     './src/index'
   ],
   output: {
@@ -81,7 +86,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: extractCss.extract({
+        use: IS_PRODUCTION ? ['style-loader', 'css-loader'] : extractCss.extract({
           use: 'css-loader',
           fallback: 'style-loader',
         }),
