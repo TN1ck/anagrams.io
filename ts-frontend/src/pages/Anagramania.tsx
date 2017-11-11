@@ -178,13 +178,13 @@ class Anagramania extends React.Component<{}, {
     const {anagrams: subanagrams} = result.data;
 
     const generators = anagram.findAnagramSentences(cleanedQuery, subanagrams);
-    const state = angagramIteratorStateFactory(generators);
+    const initialState = angagramIteratorStateFactory(generators);
 
     this.setState({
       subanagrams,
       queryStatus: RequestStatus.loading,
       cleanedQuery,
-      anagramIteratorState: state,
+      anagramIteratorState: initialState,
     });
 
     
@@ -210,7 +210,6 @@ class Anagramania extends React.Component<{}, {
             return false;
           }
           if (value.value.solution) {
-            console.log('solution', value.value.solution);
             state.solutions.push(value.value.current);
             state.numberOfPossibilitiesChecked = value.value.numberOfPossibilitiesChecked;
           }
@@ -225,15 +224,22 @@ class Anagramania extends React.Component<{}, {
       }
     };
 
-    const mainGenerator = getSolutions(this.state.anagramIteratorState);
+    const mainGenerator = getSolutions({...initialState});
     this.mainGenerator = mainGenerator;
     
     const start = () => {
-      let current = mainGenerator.next();
-      let state = current.value;
-      while (!current.done && current.value) {
-        state = current.value;
-        current = mainGenerator.next();
+      let state: AnagramIteratorState = null;
+      for (state of mainGenerator) {
+        if (mainGenerator !== this.mainGenerator) {
+          break;
+        }
+        const updateCounter = (this.state.anagramIteratorState.counter + 250) < state.counter;
+        const updateSolutions = this.state.anagramIteratorState.solutions.length !== state.solutions.length;
+        if (updateCounter || updateSolutions) {
+          this.setState({
+            anagramIteratorState: {...state},
+          });
+        }
       }
       this.setState({
         anagramIteratorState: state,
@@ -286,6 +292,8 @@ class Anagramania extends React.Component<{}, {
                 <SubTitle>
                   {`I found ${this.state.subanagrams.length} subanagrams.`}
                 </SubTitle>
+                <strong style={{color: 'white'}}>{`Currently checking the subanagrams: ${state.currentGenerators.map(c => c.subanagram.word.word).join(', ')}.`}</strong>
+                <br/>
                 <strong style={{color: 'white'}}>{`Checked ${state.numberOfPossibilitiesChecked} possibilities.`}</strong>
                 <strong style={{color: 'white'}}>{` ${state.counter} iterations.`}</strong>
                 <br/>
