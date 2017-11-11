@@ -110,6 +110,19 @@ const AnagramResults: React.StatelessComponent<{
   );
 };
 
+function angagramIteratorStateFactory(unsolvedGenerators =[]) {
+  const state: AnagramIteratorState = {
+    breakLoop: false,
+    counter: 0,
+    numberOfPossibilitiesChecked: 0,
+    unsolvedGenerators,
+    solvedGenerators: [],
+    currentGenerators: [],
+    solutions: [],
+  };
+  return state;
+}
+
 // const MAX_ITERATIONS = 100000;
 
 interface AnagramIteratorState {
@@ -128,9 +141,7 @@ class Anagramania extends React.Component<{}, {
   cleanedQuery: string;
   // anagrams: AnagramResult[];
   subanagrams: anagram.IndexedWord[];
-  solutions: anagram.AnagramSolution[];
-  possibilitiesChecked: number;
-  iterations: number;
+  anagramIteratorState: AnagramIteratorState;
   dictionaries: Dictionary[];
   selectedDictionaries: string;
 }> {
@@ -142,12 +153,10 @@ class Anagramania extends React.Component<{}, {
       queryStatus: RequestStatus.none,
       query: '',
       cleanedQuery: '',
-      subanagrams: [],
-      solutions: [],
-      possibilitiesChecked: 0,
-      iterations: 0,
       dictionaries: [],
       selectedDictionaries: 'eng-us-3k',
+      subanagrams: [],
+      anagramIteratorState: null,
     };
   }
   async componentWillMount() {
@@ -169,27 +178,17 @@ class Anagramania extends React.Component<{}, {
     const {anagrams: subanagrams} = result.data;
 
     const generators = anagram.findAnagramSentences(cleanedQuery, subanagrams);
+    const state = angagramIteratorStateFactory(generators);
 
     this.setState({
       subanagrams,
-      solutions: [],
       queryStatus: RequestStatus.loading,
-      possibilitiesChecked: 0,
-      iterations: 0,
       cleanedQuery,
+      anagramIteratorState: state,
     });
 
-    function* getSolutions () {
     
-      const state: AnagramIteratorState = {
-        breakLoop: false,
-        counter: 0,
-        numberOfPossibilitiesChecked: 0,
-        unsolvedGenerators: generators,
-        solvedGenerators: [],
-        currentGenerators: [],
-        solutions: [],
-      };
+    function* getSolutions (state: AnagramIteratorState) {
 
       while (!state.breakLoop && state.unsolvedGenerators.length !== 0) {
 
@@ -226,7 +225,7 @@ class Anagramania extends React.Component<{}, {
       }
     };
 
-    const mainGenerator = getSolutions();
+    const mainGenerator = getSolutions(this.state.anagramIteratorState);
     this.mainGenerator = mainGenerator;
     
     const start = () => {
@@ -237,8 +236,7 @@ class Anagramania extends React.Component<{}, {
         current = mainGenerator.next();
       }
       this.setState({
-        solutions: state.solutions,
-        iterations: state.counter,
+        anagramIteratorState: state,
       });
     };
 
@@ -249,6 +247,8 @@ class Anagramania extends React.Component<{}, {
     const isLoading = this.state.queryStatus === RequestStatus.loading;
     const isDone = this.state.queryStatus === RequestStatus.success;
     // const possibilities = triangularPyramidal(this.state.subanagrams.length);
+
+    const state = this.state.anagramIteratorState;
     return (
       <div>
         <Header>
@@ -286,19 +286,19 @@ class Anagramania extends React.Component<{}, {
                 <SubTitle>
                   {`I found ${this.state.subanagrams.length} subanagrams.`}
                 </SubTitle>
-                <strong style={{color: 'white'}}>{`Checked ${this.state.possibilitiesChecked} possibilities.`}</strong>
-                <strong style={{color: 'white'}}>{` ${this.state.iterations} iterations.`}</strong>
+                <strong style={{color: 'white'}}>{`Checked ${state.numberOfPossibilitiesChecked} possibilities.`}</strong>
+                <strong style={{color: 'white'}}>{` ${state.counter} iterations.`}</strong>
                 <br/>
                 {
                   isDone ? (
                     <strong style={{color: 'white'}}>
-                      {`Finished: found ${this.state.solutions.length} solutions.`}
+                      {`Finished: found ${state.solutions.length} solutions.`}
                     </strong>
                   ) : null
                 }
                 <AnagramResults
                   subanagrams={this.state.subanagrams}
-                  anagrams={this.state.solutions}
+                  anagrams={state.solutions}
                   cleanedQuery={this.state.cleanedQuery}
                   isDone={isDone}
                 />
