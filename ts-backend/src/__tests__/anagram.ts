@@ -1,3 +1,5 @@
+import {flatten} from 'lodash';
+
 import * as anagram from 'src/../../ts-frontend/src/anagram';
 import dictionaries from 'src/dictionaries';
 
@@ -22,9 +24,13 @@ describe('Anagram / findanagrams', () => {
     const dictionary = dictionaries.find(d => d.id === 'eng-us-3k');
     const subanagrams = anagram.findSortedSubAnagrmns(TEST_WORD, dictionary.dict);
     expect(subanagrams.length).toBe(NUMBER_OF_SUBANAGRAMS);
-    const {generator} = anagram.findAnagramSentences(TEST_WORD, subanagrams);
-    const gen = generator();
-    const values = [...gen].filter(v => v.solution);
+    const generators = anagram.findAnagramSentences(TEST_WORD, subanagrams);
+    const subanagramSolutions = generators.map(({generator}) => {
+      const gen = generator;
+      const values = [...gen].filter(v => v.solution);
+      return values;
+    });
+    const values = flatten(subanagramSolutions);
     expect(values.length).toBe(TEST_WORD_SOLUTIONS.length);
   });
 });

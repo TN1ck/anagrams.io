@@ -1,3 +1,4 @@
+import {flatten} from 'lodash';
 import mockData from './mock';
 import * as anagram from 'src/anagram';
 
@@ -16,9 +17,13 @@ export function testPerformanceOne(): PerformanceWithSolutions {
   const executed = new Date();
   const start = performance.now();
   const test = mockData.testOne;
-  const {generator} = anagram.findAnagramSentences(test.string, test.subanagrams);
-  const gen = generator();
-  const solutions = [...gen].filter(v => v.solution).map(v => v.current);
+  const generators = anagram.findAnagramSentences(test.string, test.subanagrams);
+  const subanagramSolutions = generators.map(({generator}) => {
+    const gen = generator;
+    const values = [...gen].filter(v => v.solution).map(v => v.current);
+    return values;
+  });
+  const solutions = flatten(subanagramSolutions);
   const end = performance.now();
   const timeNeeded = end - start;
   return {

@@ -130,92 +130,108 @@ export function findSortedSubAnagrmns(query: string, dictionary: Word[]): Indexe
   return subanagrams;
 }
 
-export function findAnagramSentences(query: string, subanagrams: IndexedWord[]): {
-  subanagrams: IndexedWord[],
-  generator: () => IterableIterator<{
-    current: AnagramSolution,
-    solution: boolean,
-    numberOfPossibilitiesChecked: number,
-  }>
-} {
+export type AnagramGenerator = IterableIterator<{
+  current: AnagramSolution,
+  solution: boolean,
+  numberOfPossibilitiesChecked: number,
+}>;
+
+export interface SubanagramSolver {
+  subanagram: IndexedWord;
+  generator: AnagramGenerator;
+}
+
+export function findAnagramSentences(query: string, subanagrams: IndexedWord[]): SubanagramSolver[] {
 
   const nQuery = stringToWord(query);
 
-  const initialStack = subanagrams.map((w) => {
-    return {
-      list: [w],
-      set: w.word.set,
-      goodness: 0,
-    }
-  });
-  
+  interface StackItem {
+    list: IndexedWord[];
+    set: string[];
+    goodness: number;
+  }
   
   const queryLength = query.length;
   
-  const generator = function* () {
-
-    let stack: AnagramSolution[] = initialStack;
-    const solutions: AnagramSolution[] = [];
-
-    let numberOfPossibilitiesChecked = initialStack.length;
-    while(stack.length !== 0) {
-      const current = stack.shift() as AnagramSolution;
-      let solution = false;
-
-      if (isSame(nQuery.set, current.set)) {
-        solutions.push(current);
-        solution = true;
-      } else {
-
-        const charsMissing = queryLength - current.set.length;
-
-        // drop all subanagrams that were before index
-        const droppedSubanagrams = drop(subanagrams, current.list[0].index); 
-
-        numberOfPossibilitiesChecked += droppedSubanagrams.length;
-
-        // first filter those out, that are two big
-        const possibleSubanagrams = droppedSubanagrams.filter(s => {
-          return s.word.word.length <= charsMissing;
-        });
-
-        const combinedWords = possibleSubanagrams.map(w => {
-          return {
-            word: w,
-            combined: joinTwoNStrings(w.word.set, current.set)
+  const createGenerator = (initialStack: StackItem[]) => {
+    const generator = function* () {
+        let stack: AnagramSolution[] = initialStack;
+        const solutions: AnagramSolution[] = [];
+    
+        let numberOfPossibilitiesChecked = initialStack.length;
+        while(stack.length !== 0) {
+          const current = stack.shift() as AnagramSolution;
+          let solution = false;
+    
+          if (isSame(nQuery.set, current.set)) {
+            solutions.push(current);
+            solution = true;
+          } else {
+    
+            const charsMissing = queryLength - current.set.length;
+    
+            // drop all subanagrams that were before index
+            const droppedSubanagrams = drop(subanagrams, current.list[0].index); 
+    
+            numberOfPossibilitiesChecked += droppedSubanagrams.length;
+    
+            // first filter those out, that are two big
+            const possibleSubanagrams = droppedSubanagrams.filter(s => {
+              return s.word.word.length <= charsMissing;
+            });
+    
+            const combinedWords = possibleSubanagrams.map(w => {
+              return {
+                word: w,
+                combined: joinTwoNStrings(w.word.set, current.set)
+              };
+            });
+    
+            // check if the result is still a subset
+            const filterCombined = combinedWords.filter(cw => {
+              return isSubset(cw.combined, nQuery.set);
+            });
+    
+            const newStackItems: AnagramSolution[] = filterCombined.map(cw => {
+              return {
+                list: [cw.word].concat(current.list),
+                goodness: current.goodness,
+                set: cw.combined,
+              };
+            });
+    
+            for (let item of newStackItems) {
+              stack.unshift(item);
+            }
+          }
+    
+          yield {
+            current,
+            solution,
+            numberOfPossibilitiesChecked,
           };
-        });
-
-        // check if the result is still a subset
-        const filterCombined = combinedWords.filter(cw => {
-          return isSubset(cw.combined, nQuery.set);
-        });
-
-        const newStackItems: AnagramSolution[] = filterCombined.map(cw => {
-          return {
-            list: [cw.word].concat(current.list),
-            goodness: current.goodness,
-            set: cw.combined,
-          };
-        });
-
-        for (let item of newStackItems) {
-          stack.unshift(item);
         }
       }
-
-      yield {
-        current,
-        solution,
-        numberOfPossibilitiesChecked,
-      };
-    }
+      return generator();
   }
 
-  return {
-    generator,
-    subanagrams,
-  };
+  const subanagramsGenerators = subanagrams.map((w) => {
+
+    const initialStack = [{
+      list: [w],
+      set: w.word.set,
+      goodness: 0,
+    }];
+
+    const generator = createGenerator(initialStack);
+
+    return {
+      subanagram: w,
+      generator,
+    };
+  });
+
+  return subanagramsGenerators;
 }
 
 export function groupAnagramsByStartWord(

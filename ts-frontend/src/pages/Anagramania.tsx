@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled, {css} from 'styled-components';
-import {AxiosPromise} from 'axios';
 import Select from 'react-select';
+import {drop} from 'lodash';
 
 // import {triangularPyramidal} from './math';
 
@@ -110,7 +110,17 @@ const AnagramResults: React.StatelessComponent<{
   );
 };
 
-const MAX_ITERATIONS = 100000;
+// const MAX_ITERATIONS = 100000;
+
+interface AnagramIteratorState {
+  breakLoop: boolean;
+  counter: number;
+  numberOfPossibilitiesChecked: number;
+  unsolvedGenerators: anagram.SubanagramSolver[];
+  solvedGenerators: anagram.SubanagramSolver[];
+  currentGenerators: anagram.SubanagramSolver[];
+  solutions: anagram.AnagramSolution[];
+}
 
 class Anagramania extends React.Component<{}, {
   queryStatus: RequestStatus;
@@ -124,7 +134,8 @@ class Anagramania extends React.Component<{}, {
   dictionaries: Dictionary[];
   selectedDictionaries: string;
 }> {
-  request: AxiosPromise;
+  mainGenerator: IterableIterator<AnagramIteratorState>
+
   constructor(props: any) {
     super(props);
     this.state = {
@@ -154,13 +165,10 @@ class Anagramania extends React.Component<{}, {
 
     const cleanedQuery = anagram.sanitizeQuery(this.state.query);
 
-    console.log(this.state.selectedDictionaries);
     const result = await getSubAnagrams(cleanedQuery, this.state.selectedDictionaries);
     const {anagrams: subanagrams} = result.data;
 
-    const {
-      generator,
-    } = anagram.findAnagramSentences(cleanedQuery, subanagrams);
+    const generators = anagram.findAnagramSentences(cleanedQuery, subanagrams);
 
     this.setState({
       subanagrams,
@@ -171,70 +179,70 @@ class Anagramania extends React.Component<{}, {
       cleanedQuery,
     });
 
-    const solutions: anagram.AnagramSolution[] = [];
+    function* getSolutions () {
+    
+      const state: AnagramIteratorState = {
+        breakLoop: false,
+        counter: 0,
+        numberOfPossibilitiesChecked: 0,
+        unsolvedGenerators: generators,
+        solvedGenerators: [],
+        currentGenerators: [],
+        solutions: [],
+      };
 
-    const state = {
-      breakLoop: false,
-      counter: 0,
-      numberOfPossibilitiesChecked: 0,
+      while (!state.breakLoop && state.unsolvedGenerators.length !== 0) {
+
+        // console.log(state.counter, state);
+
+        let currentGenerators = state.currentGenerators;
+        let unsolvedGenerators = state.unsolvedGenerators;
+        let solvedGenerators = state.solvedGenerators;
+        if (currentGenerators.length === 0) {
+          currentGenerators = [state.unsolvedGenerators[0]];
+          unsolvedGenerators = drop(unsolvedGenerators, 1);
+        }
+
+        unsolvedGenerators = unsolvedGenerators.filter((g) => {
+          const value = g.generator.next();
+          state.counter++;
+          if (!value || value.done) {
+            solvedGenerators.push(g);
+            return false;
+          }
+          if (value.value.solution) {
+            console.log('solution', value.value.solution);
+            state.solutions.push(value.value.current);
+            state.numberOfPossibilitiesChecked = value.value.numberOfPossibilitiesChecked;
+          }
+          return true;
+        });
+
+        state.unsolvedGenerators = unsolvedGenerators;
+        state.solvedGenerators = solvedGenerators;
+        state.currentGenerators = currentGenerators;
+        yield state;
+
+      }
     };
 
-    const gen = generator();
-
-    const CONCURRENT_GET_NEXT = 100;
-
-    const getNext = (startAgain: boolean) => {
-      state.counter++;
-
-      if (state.breakLoop) {
-        return;
+    const mainGenerator = getSolutions();
+    this.mainGenerator = mainGenerator;
+    
+    const start = () => {
+      let current = mainGenerator.next();
+      let state = current.value;
+      while (!current.done && current.value) {
+        state = current.value;
+        current = mainGenerator.next();
       }
+      this.setState({
+        solutions: state.solutions,
+        iterations: state.counter,
+      });
+    };
 
-      const value = gen.next();
-      if (!value || value.done || MAX_ITERATIONS <= state.counter) {
-        state.breakLoop = true;
-        // so we update the state after the others are finished
-        setTimeout(() => {
-          this.setState({
-            solutions,
-            iterations: state.counter,
-            queryStatus: RequestStatus.success,
-            possibilitiesChecked: state.numberOfPossibilitiesChecked,
-          });
-        });
-        return;
-      }
-
-      if (value.value) {        
-        if (value.value.solution) {
-          solutions.push(value.value.current);
-          state.numberOfPossibilitiesChecked = value.value.numberOfPossibilitiesChecked;
-          this.setState({
-            solutions,
-            possibilitiesChecked: state.numberOfPossibilitiesChecked,
-            iterations: state.counter,
-          });
-        } else if (state.counter % 250 === 0 && value.value) {
-          state.numberOfPossibilitiesChecked = value.value.numberOfPossibilitiesChecked;
-          this.setState({
-            possibilitiesChecked: state.numberOfPossibilitiesChecked,
-            iterations: state.counter,
-          });
-        }
-      }
-
-      if (startAgain) {
-        setTimeout(() => {
-          for (let i = 0; i <= CONCURRENT_GET_NEXT; i++) {
-            getNext(false);
-          }
-        });
-        setTimeout(() => (getNext(true)));
-      }
-    }
-
-    getNext(true);
-
+    setTimeout(() => start());
 
   }
   render() {
