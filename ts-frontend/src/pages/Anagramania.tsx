@@ -379,7 +379,7 @@ class Anagramania extends React.Component<{}, {
                 <SubTitle>
                   {`
                     I found ${this.state.subanagrams.length} subanagrams. 
-                    Checked ${Math.round((state.solvedSubanagrams.length / this.state.subanagrams.length) * 100)} %.`}
+                    Checked ${Math.ceil((state.solvedSubanagrams.length / this.state.subanagrams.length) * 100)} %.`}
                 </SubTitle>
                 <strong style={{color: 'white'}}>{`Currently checking the subanagrams: ${state.currentSubanagrams.map(i => this.state.subanagrams[i].word.word).join(', ')}.`}</strong>
                 <br/>
