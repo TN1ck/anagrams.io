@@ -33,7 +33,7 @@ ctx.addEventListener('message', (message) => {
         }
         if (value.value.solution) {
           state.solutions.push(value.value.current);
-          state.numberOfPossibilitiesChecked = value.value.numberOfPossibilitiesChecked;
+          state.numberOfPossibilitiesChecked += value.value.numberOfPossibilitiesChecked;
         }
         return true;
       });

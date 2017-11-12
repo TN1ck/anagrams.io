@@ -1,4 +1,4 @@
-import {sortBy, drop, last} from 'lodash';
+import {sortBy, drop} from 'lodash';
 
 type NString = string[];
 
@@ -117,6 +117,8 @@ export interface AnagramSolution {
   goodness: number;
 }
 
+type OptimizedAnagramSolution = number[];
+
 export function findSortedSubAnagrmns(query: string, dictionary: Word[]): IndexedWord[] {
   const _subanagrams = findSubAnagrams(query, dictionary);
   // we like long words more
@@ -170,17 +172,19 @@ export interface SerializedAnagramIteratorState {
   unsolvedSubanagrams: IndexedWord[];
   solvedSubanagrams: IndexedWord[];
   currentSubanagrams: IndexedWord[];
-  solutions: AnagramSolution[];
+  solutions: OptimizedAnagramSolution[];
 }
 
 export function serializeAnagramIteratorStateFactor(state: AnagramIteratorState): SerializedAnagramIteratorState {
+  const solutions = state.solutions.map(s => s.list.map(w => w.index).reverse());
   return {
     counter: state.counter,
     numberOfPossibilitiesChecked: state.numberOfPossibilitiesChecked,
     unsolvedSubanagrams: state.unsolvedGenerators.map(d => d.subanagram),
     solvedSubanagrams: state.solvedGenerators.map(d => d.subanagram),
     currentSubanagrams: state.currentGenerators.map(d => d.subanagram),
-    solutions: state.solutions,
+    // use numbers to reduce memory footprint
+    solutions,
   }
 }
 
@@ -278,48 +282,37 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
 }
 
 export interface GroupedAnagramSolutions {
-  list: AnagramSolution[],
+  list: IndexedWord[][],
   word: string,
-  checked: boolean,
   counter: number,
 };
 
 export function groupAnagramsByStartWord(
   subanagrams: IndexedWord[],
-  anagrams: AnagramSolution[]
+  anagrams: OptimizedAnagramSolution[]
 ): GroupedAnagramSolutions[] {
   const groups = subanagrams.map(a => {
     return {
-      list: [] as AnagramSolution[],
+      list: [] as IndexedWord[][],
       word: a.word.word,
       counter: 0,
-      checked: false,
     };
   });
 
   // let current = null;
-  let currentWord = '';
   let currentWordIndex = 0;
 
   for (let i = 0; i < anagrams.length; i++) {
     const a = anagrams[i];
-    const newIndexdWord = last(a.list) as IndexedWord;
-    const newWord = newIndexdWord.word.word;
-    if (currentWord !== newWord) {
-      currentWordIndex = subanagrams.findIndex(a => a.word.word === newWord);
-      currentWord = newWord;
+    const aList = a.map(j => subanagrams[j]);
+    const newIndexdWordIndex = a[0];
+    if (currentWordIndex !== newIndexdWordIndex) {
+      currentWordIndex = newIndexdWordIndex;
     }
-    groups[currentWordIndex].list.push(a);
-    for (let subangram of a.list) {
-      const currentWordIndex = subanagrams.findIndex(a => a.word.word === subangram.word.word);
-      groups[currentWordIndex].counter += 1;
+    groups[currentWordIndex].list.push(aList);
+    for (let subangramIndex of a) {
+      groups[subangramIndex].counter += 1;
     }
-  }
-  
-  // all anagrams that are less than the currentWordIndex and have an empty list have no solutino
-  for(let i = 0; i < groups.length; i++) {
-    const group = groups[i];
-    group.checked = i < currentWordIndex;
   }
 
   return groups;

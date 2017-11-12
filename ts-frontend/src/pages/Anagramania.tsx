@@ -26,7 +26,7 @@ import 'src/assets/styles.css';
 import 'src/../node_modules/react-select/dist/react-select.css';
 
 const TESTING = false;
-import mockState from 'src/assets/anagramPageMock';
+// import mockState from 'src/assets/anagramPageMock';
 
 const ResultContainer = styled.div`
   color: black;
@@ -40,12 +40,12 @@ const SelectContainer = styled.div`
 `;
 
 const Result: React.StatelessComponent<{
-  result: anagram.AnagramSolution;
+  result: anagram.IndexedWord[];
   index: number;
 }> = ({result, index}) => {
   return (
     <ResultContainer>
-      {(index + 1) + '. ' + [...result.list].reverse().map(w => {
+      {(index + 1) + '. ' + result.map(w => {
         return w.word.word;
       }).join(' ')}
     </ResultContainer>
@@ -99,7 +99,7 @@ class AnagramResult extends React.Component<
 {
   result: AnagramResultState;
   word: string;
-  list: anagram.AnagramSolution[];
+  list: anagram.IndexedWord[][];
   counter: number;
   columnWidth: number;
 },
@@ -290,7 +290,7 @@ class Anagramania extends React.Component<{}, {
 
     this.state = defaultState;
     if (TESTING) {
-      this.state = mockState;
+      // this.state = mockState;
     }
   }
   async componentWillMount() {
