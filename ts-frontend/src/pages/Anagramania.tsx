@@ -238,11 +238,11 @@ class AnagramResults extends React.Component<
           return (
             <AnagramResultRow key={i}>
               {group.map((d) => {
-                const {word, list, counter} = d;
+                const {word, list, counter, wordIndex} = d;
                 let resultState = AnagramResultState.unsolved;
-                if (currentSubanagrams.find(d => d.word.word === word)) {
+                if (currentSubanagrams.find(index => wordIndex === index)) {
                   resultState = AnagramResultState.active;
-                } else if (solvedSubanagrams.find(d => d.word.word === word)) {
+                } else if (solvedSubanagrams.find(index => index === wordIndex)) {
                   resultState = AnagramResultState.solved;
                 }
                 return (
@@ -377,9 +377,11 @@ class Anagramania extends React.Component<{}, {
             (isLoading || isDone) ? (
               <div>
                 <SubTitle>
-                  {`I found ${this.state.subanagrams.length} subanagrams.`}
+                  {`
+                    I found ${this.state.subanagrams.length} subanagrams. 
+                    Checked ${Math.round((state.solvedSubanagrams.length / this.state.subanagrams.length) * 100)} %.`}
                 </SubTitle>
-                <strong style={{color: 'white'}}>{`Currently checking the subanagrams: ${state.currentSubanagrams.map(c => c.word.word).join(', ')}.`}</strong>
+                <strong style={{color: 'white'}}>{`Currently checking the subanagrams: ${state.currentSubanagrams.map(i => this.state.subanagrams[i].word.word).join(', ')}.`}</strong>
                 <br/>
                 <strong style={{color: 'white'}}>{`Checked ${state.numberOfPossibilitiesChecked} possibilities.`}</strong>
                 <strong style={{color: 'white'}}>{` ${state.counter} iterations.`}</strong>

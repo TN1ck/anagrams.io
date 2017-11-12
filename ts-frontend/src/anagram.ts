@@ -169,9 +169,9 @@ export function angagramIteratorStateFactory(unsolvedGenerators = []) {
 export interface SerializedAnagramIteratorState {
   counter: number;
   numberOfPossibilitiesChecked: number;
-  unsolvedSubanagrams: IndexedWord[];
-  solvedSubanagrams: IndexedWord[];
-  currentSubanagrams: IndexedWord[];
+  unsolvedSubanagrams: number[];
+  solvedSubanagrams: number[];
+  currentSubanagrams: number[];
   solutions: OptimizedAnagramSolution[];
 }
 
@@ -180,9 +180,9 @@ export function serializeAnagramIteratorStateFactor(state: AnagramIteratorState)
   return {
     counter: state.counter,
     numberOfPossibilitiesChecked: state.numberOfPossibilitiesChecked,
-    unsolvedSubanagrams: state.unsolvedGenerators.map(d => d.subanagram),
-    solvedSubanagrams: state.solvedGenerators.map(d => d.subanagram),
-    currentSubanagrams: state.currentGenerators.map(d => d.subanagram),
+    unsolvedSubanagrams: state.unsolvedGenerators.map(d => d.subanagram.index),
+    solvedSubanagrams: state.solvedGenerators.map(d => d.subanagram.index),
+    currentSubanagrams: state.currentGenerators.map(d => d.subanagram.index),
     // use numbers to reduce memory footprint
     solutions,
   }
@@ -285,6 +285,7 @@ export interface GroupedAnagramSolutions {
   list: IndexedWord[][],
   word: string,
   counter: number,
+  wordIndex: number;
 };
 
 export function groupAnagramsByStartWord(
@@ -296,6 +297,7 @@ export function groupAnagramsByStartWord(
       list: [] as IndexedWord[][],
       word: a.word.word,
       counter: 0,
+      wordIndex: a.index,
     };
   });
 

@@ -66,7 +66,7 @@ ctx.addEventListener('message', (message) => {
         diff > MINIMUM_TIME &&
         ((lastTimeSend.counter + 2500) < state.counter ||
         lastTimeSend.solutions.length !== state.solutions.length ||
-        lastTimeSend.currentSubanagrams.map(c => c.index).join(',') !== state.currentGenerators.map(c => c.subanagram.index).join(','))
+        lastTimeSend.currentSubanagrams.join(',') !== state.currentGenerators.map(c => c.subanagram.index).join(','))
       ) {
         lastTimeSend = anagram.serializeAnagramIteratorStateFactor(state);
         lastTimeSendDate = +(new Date());
