@@ -1,5 +1,4 @@
 import * as anagram from './anagram';
-import {drop} from 'lodash';
 
 const ctx: Worker = self as any;
 
@@ -20,11 +19,11 @@ ctx.addEventListener('message', (message) => {
       let currentGenerators = state.currentGenerators;
       let unsolvedGenerators = state.unsolvedGenerators;
       let solvedGenerators = state.solvedGenerators;
+
       if (currentGenerators.length === 0) {
-        currentGenerators = [state.unsolvedGenerators[0]];
-        unsolvedGenerators = drop(unsolvedGenerators, 1);
+        currentGenerators = [state.unsolvedGenerators.shift()];
       }
-      
+
       currentGenerators = currentGenerators.filter((g) => {
         const value = g.generator.next();
         state.counter++;
@@ -38,6 +37,10 @@ ctx.addEventListener('message', (message) => {
         }
         return true;
       });
+
+      if (currentGenerators.length === 0) {
+        currentGenerators = [state.unsolvedGenerators.shift()];
+      }
       
       state.unsolvedGenerators = unsolvedGenerators;
       state.solvedGenerators = solvedGenerators;

@@ -1,4 +1,4 @@
-import {sortBy, identity, drop, last} from 'lodash';
+import {sortBy, drop, last} from 'lodash';
 
 type NString = string[];
 
@@ -16,7 +16,7 @@ export function sanitizeQuery(str: string): string {
 }
 
 export function stringToWord (str: string): Word {
-  const sorted = sortBy([...str], identity);
+  const sorted = sortBy([...str], d => d);
   let i = 0;
   let j = 0;
   let newString = [];

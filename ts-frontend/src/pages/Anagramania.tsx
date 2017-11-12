@@ -58,8 +58,8 @@ const AnagramResultsContainer = styled.div`
 `;
 
 const AnagramResultGroup = withProps<{
-  loading: boolean,
-  hasNoSolution: boolean;
+  state: AnagramResultState;
+  noResults: boolean;
 }>()(styled.div)`
   float: left;
   width: 300px;
@@ -68,11 +68,16 @@ const AnagramResultGroup = withProps<{
   padding: 10px;
   box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.3);
   border-radius: 2px;
-  ${(props: any) => props.hasNoSolution && css`
+  opacity: 0.3;
+  ${(props: any) => AnagramResultState.solved === props.state && css`
+    opacity: 1.0;
+  `}
+  ${(props: any) => props.noResults && css`
     opacity: 0.3;
   `}
-  ${(props: any) => props.loading && css`
-    opacity: 0.7;
+  ${(props: any) => AnagramResultState.active === props.state && css`
+    opacity: 1.0;
+    background: #2ecc71;
   `}
 `;
 
@@ -92,8 +97,7 @@ const ShowAllButton = styled.button`
 
 class AnagramResult extends React.Component<
 {
-  loading: boolean;
-  hasNoSolution: boolean;
+  result: AnagramResultState;
   word: string;
   list: anagram.AnagramSolution[];
   counter: number;
@@ -117,17 +121,16 @@ class AnagramResult extends React.Component<
   }
   render() {
     const {
-      loading,
-      hasNoSolution,
       word,
       list,
       counter,
       columnWidth,
+      result,
     } = this.props;
     return (
       <AnagramResultGroup
-        loading={loading}
-        hasNoSolution={hasNoSolution}
+        state={result}
+        noResults={counter === 0}
         style={{
           width: columnWidth - 20,
         }}
@@ -157,16 +160,21 @@ class AnagramResult extends React.Component<
   }
 }
 
+export enum AnagramResultState {
+  active = "active",
+  unsolved = "unsolved",
+  solved = "solved",
+}
+
 const AnagramResultRow = styled.div`
   float: left;
 `;
 
 class AnagramResults extends React.Component<
 {
-  anagrams: anagram.AnagramSolution[];
-  subanagrams: anagram.IndexedWord[];
-  cleanedQuery: string;
+  anagramIteratorState: anagram.SerializedAnagramIteratorState;
   isDone: boolean;
+  subanagrams: anagram.IndexedWord[];
 },
 {
   columnWidth: number;
@@ -208,9 +216,10 @@ class AnagramResults extends React.Component<
     this.dom = dom;
   }
   render() {
-    const {anagrams, subanagrams, isDone} = this.props;
-    const groupedAnagrams = anagram.groupAnagramsByStartWord(subanagrams, anagrams);
-    const groupedAngramsContainer = [];
+    const {anagramIteratorState, subanagrams} = this.props;
+    const {solutions, currentSubanagrams, solvedSubanagrams} = anagramIteratorState;
+    const groupedAnagrams = anagram.groupAnagramsByStartWord(subanagrams, solutions);
+    const groupedAngramsContainer: anagram.GroupedAnagramSolutions[][] = [];
     let currentGroup: anagram.GroupedAnagramSolutions[] = [];
     for (let ga of groupedAnagrams) {
       currentGroup.push(ga);
@@ -229,15 +238,18 @@ class AnagramResults extends React.Component<
           return (
             <AnagramResultRow key={i}>
               {group.map((d) => {
-                const {word, list, checked, counter} = d;
-                const loading = list.length === 0 && !checked && !isDone;
-                const hasNoSolution = (checked || isDone) && counter === 0;
+                const {word, list, counter} = d;
+                let resultState = AnagramResultState.unsolved;
+                if (currentSubanagrams.find(d => d.word.word === word)) {
+                  resultState = AnagramResultState.active;
+                } else if (solvedSubanagrams.find(d => d.word.word === word)) {
+                  resultState = AnagramResultState.solved;
+                }
                 return (
                   <AnagramResult
                     key={word}
                     columnWidth={this.state.columnWidth}
-                    loading={loading}
-                    hasNoSolution={hasNoSolution}
+                    result={resultState}
                     word={word}
                     list={list}
                     counter={counter}
@@ -383,8 +395,7 @@ class Anagramania extends React.Component<{}, {
                 }
                 <AnagramResults
                   subanagrams={this.state.subanagrams}
-                  anagrams={state.solutions}
-                  cleanedQuery={this.state.cleanedQuery}
+                  anagramIteratorState={this.state.anagramIteratorState}
                   isDone={isDone}
                 />
               </div>
