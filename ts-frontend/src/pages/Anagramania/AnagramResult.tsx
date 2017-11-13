@@ -94,10 +94,10 @@ class AnagramResult extends React.Component<AnagramResultProps,
       showAll: !this.state.showAll,
     });
   }
-  shouldComponentUpdate(newProps: AnagramResultProps) {
+  shouldComponentUpdate(newProps: AnagramResultProps, newState) {
     if (this.props.counter !== newProps.counter ||
         this.props.columnWidth !== newProps.columnWidth ||
-        this.state !== this.state ||
+        this.state !== newState ||
         this.props.result !== newProps.result
     ) {
         return true;
