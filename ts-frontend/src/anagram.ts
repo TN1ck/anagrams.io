@@ -319,3 +319,9 @@ export function groupAnagramsByStartWord(
 
   return groups;
 }
+
+export enum AnagramResultState {
+  active = "active",
+  unsolved = "unsolved",
+  solved = "solved",
+}

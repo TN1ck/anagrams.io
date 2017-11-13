@@ -75,5 +75,6 @@ ctx.addEventListener('message', (message) => {
   }
 
   ctx.postMessage(anagram.serializeAnagramIteratorStateFactor(state));
+  ctx.postMessage('finish');
   
 });

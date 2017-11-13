@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Anagramania from './Anagramania';
+import Anagramania from './Anagramania/Anagramania';
 import Performance from './Performance';
 
 const Root: React.StatelessComponent<{}> = () => {
