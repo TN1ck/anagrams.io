@@ -92,7 +92,7 @@ class AnagramResults extends React.Component<
     const someAreHidden = subanagrams.length > MAX_NUMBER_FOR_BROWSER && !this.state.showAll && !isDone;
     const groupedAnagrams = anagram.groupAnagramsByStartWord(subanagrams, solutions);
 
-    let reducedgroupedAnagrams = this.state.showAll ? groupedAnagrams : take(groupedAnagrams, MAX_NUMBER_FOR_BROWSER);
+    let reducedgroupedAnagrams = (this.state.showAll || isDone) ? groupedAnagrams : take(groupedAnagrams, MAX_NUMBER_FOR_BROWSER);
     let groupedAnagramsWithoutSolutions;
     let groupedAnagramsThatAppearAbove;
 
