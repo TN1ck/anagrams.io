@@ -2,11 +2,30 @@ import * as React from 'react';
 import {take} from 'lodash';
 import styled from 'styled-components';
 
+import SubTitle from 'src/components/SubTitle';
+
 import * as anagram from 'src/anagram';
 
 import AnagramResult from './AnagramResult';
+import { AnagramResultState } from 'src/anagram';
 
 // import mockState from 'src/assets/anagramPageMock';
+
+function partitionArray<T>(array: T[], columns: number): T[][] {
+  const partitionedArray: T[][] = [];
+  let currentGroup: T[] = [];
+  for (let ga of array) {
+    currentGroup.push(ga);
+    if (currentGroup.length === columns) {
+      partitionedArray.push(currentGroup);
+      currentGroup = [];
+    }
+  }
+  if (currentGroup.length !== 0) {
+    partitionedArray.push(currentGroup);
+  }
+  return partitionedArray;
+}
 
 const AnagramResultsContainer = styled.div`
   margin-left: -10px;
@@ -66,25 +85,27 @@ class AnagramResults extends React.Component<
   }
   render() {
     const {anagramIteratorState, subanagrams} = this.props;
-    const {solutions, currentSubanagrams, solvedSubanagrams} = anagramIteratorState;
+    const {solutions, currentSubanagrams, solvedSubanagrams, unsolvedSubanagrams} = anagramIteratorState;
+    const isDone = unsolvedSubanagrams.length === 0;
     // only show 500 subanagrams, browser would die else
     const MAX_NUMBER_FOR_BROWSER = 500;
-    const someAreHidden = subanagrams.length > MAX_NUMBER_FOR_BROWSER && !this.state.showAll;
+    const someAreHidden = subanagrams.length > MAX_NUMBER_FOR_BROWSER && !this.state.showAll && !isDone;
     const groupedAnagrams = anagram.groupAnagramsByStartWord(subanagrams, solutions);
-    const reducedgroupedAnagrams = this.state.showAll ? groupedAnagrams : take(groupedAnagrams, MAX_NUMBER_FOR_BROWSER);
 
-    const groupedAngramsContainer: anagram.GroupedAnagramSolutions[][] = [];
-    let currentGroup: anagram.GroupedAnagramSolutions[] = [];
-    for (let ga of reducedgroupedAnagrams) {
-      currentGroup.push(ga);
-      if (currentGroup.length === this.state.numberOfColumns) {
-        groupedAngramsContainer.push(currentGroup);
-        currentGroup = [];
-      }
+    let reducedgroupedAnagrams = this.state.showAll ? groupedAnagrams : take(groupedAnagrams, MAX_NUMBER_FOR_BROWSER);
+    let groupedAnagramsWithoutSolutions;
+
+    if (isDone) {
+      const anagramsWithoutSolutions = reducedgroupedAnagrams.filter(a => {
+        return a.counter === 0;
+      });
+      groupedAnagramsWithoutSolutions = partitionArray(anagramsWithoutSolutions, this.state.numberOfColumns);
+      reducedgroupedAnagrams = reducedgroupedAnagrams.filter(a => {
+        return a.counter > 0;
+      });
     }
-    if (currentGroup.length !== 0) {
-      groupedAngramsContainer.push(currentGroup);
-    }
+
+    const groupedAngramsContainer = partitionArray(reducedgroupedAnagrams, this.state.numberOfColumns);
 
     return (
       <AnagramResultsContainer innerRef={this.setRef}>
@@ -113,6 +134,34 @@ class AnagramResults extends React.Component<
             </AnagramResultRow>
           );
         })}
+        {
+          isDone ? (
+            <div>
+              <div style={{float: 'left', width: '100%', marginLeft: '10px'}}>
+                <SubTitle>{'Subanagrams that had no solution:'}</SubTitle>
+              </div>
+              {groupedAnagramsWithoutSolutions.map((group, i) => {
+                return (
+                  <AnagramResultRow key={i}>
+                    {group.map((d) => {
+                      const {word, list, counter} = d;
+                      return (
+                        <AnagramResult
+                          key={word}
+                          columnWidth={this.state.columnWidth}
+                          result={AnagramResultState.unsolved}
+                          word={word}
+                          list={list}
+                          counter={counter}
+                        />
+                      );
+                    })}
+                  </AnagramResultRow>
+                );
+              })}
+            </div>
+          ) : null
+        }
         {
           someAreHidden
             ? (
