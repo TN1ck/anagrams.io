@@ -116,9 +116,9 @@ class AnagramInfoArea extends React.Component<{
         <br/>
         {
           isDone ? (
-            <Strong>
+            <SubTitle>
               {`Finished: found ${solutions.length} solutions.`}
-            </Strong>
+            </SubTitle>
           ) : null
         }
         <AnagramResults

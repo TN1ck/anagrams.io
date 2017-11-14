@@ -75,6 +75,7 @@ interface AnagramResultProps {
     list: anagram.IndexedWord[][];
     counter: number;
     columnWidth: number;
+    maxLengthInGroup: number;
 };
 
 class AnagramResult extends React.Component<AnagramResultProps,
@@ -98,7 +99,8 @@ class AnagramResult extends React.Component<AnagramResultProps,
     if (this.props.counter !== newProps.counter ||
         this.props.columnWidth !== newProps.columnWidth ||
         this.state !== newState ||
-        this.props.result !== newProps.result
+        this.props.result !== newProps.result ||
+        this.props.maxLengthInGroup !== newProps.maxLengthInGroup
     ) {
         return true;
     }
@@ -111,13 +113,23 @@ class AnagramResult extends React.Component<AnagramResultProps,
       counter,
       columnWidth,
       result,
+      maxLengthInGroup,
     } = this.props;
+
+    const minHeight = 17;
+    const rowHeight = 21;
+    const maxHeight = 262;
+
+    let height: any = (maxLengthInGroup > 10 ? maxHeight : minHeight + (rowHeight * maxLengthInGroup)) + 20;
+    height = this.state.showAll ? 'auto' : height;
+
     return (
       <AnagramResultGroup
         state={result}
         noResults={counter === 0}
         style={{
           width: columnWidth - 20,
+          height,
         }}
       >
         <div style={{position: 'relative'}}>

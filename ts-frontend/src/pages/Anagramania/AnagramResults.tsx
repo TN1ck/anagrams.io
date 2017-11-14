@@ -94,14 +94,19 @@ class AnagramResults extends React.Component<
 
     let reducedgroupedAnagrams = this.state.showAll ? groupedAnagrams : take(groupedAnagrams, MAX_NUMBER_FOR_BROWSER);
     let groupedAnagramsWithoutSolutions;
+    let groupedAnagramsThatAppearAbove;
 
     if (isDone) {
       const anagramsWithoutSolutions = reducedgroupedAnagrams.filter(a => {
         return a.counter === 0;
       });
+      const anagramsThatappearAbove = reducedgroupedAnagrams.filter(a => {
+        return a.counter > 0 && a.list.length === 0;
+      });
       groupedAnagramsWithoutSolutions = partitionArray(anagramsWithoutSolutions, this.state.numberOfColumns);
+      groupedAnagramsThatAppearAbove = partitionArray(anagramsThatappearAbove, this.state.numberOfColumns);
       reducedgroupedAnagrams = reducedgroupedAnagrams.filter(a => {
-        return a.counter > 0;
+        return a.list.length > 0;
       });
     }
 
@@ -110,6 +115,7 @@ class AnagramResults extends React.Component<
     return (
       <AnagramResultsContainer innerRef={this.setRef}>
         {groupedAngramsContainer.map((group, i) => {
+          const maxLengthInGroup = Math.max(...group.map(g => g.list.length));
           return (
             <AnagramResultRow key={i}>
               {group.map((d) => {
@@ -128,6 +134,7 @@ class AnagramResults extends React.Component<
                     word={word}
                     list={list}
                     counter={counter}
+                    maxLengthInGroup={maxLengthInGroup}
                   />
                 );
               })}
@@ -137,6 +144,33 @@ class AnagramResults extends React.Component<
         {
           isDone ? (
             <div>
+                {groupedAnagramsThatAppearAbove.length > 0 ? (
+                  <div>
+                    <div style={{float: 'left', width: '100%', marginLeft: '10px'}}>
+                      <SubTitle>{'Subanagrams that are included in the results above:'}</SubTitle>
+                    </div>
+                    {groupedAnagramsThatAppearAbove.map((group, i) => {
+                      return (
+                        <AnagramResultRow key={i}>
+                          {group.map((d) => {
+                            const {word, list, counter} = d;
+                            return (
+                              <AnagramResult
+                                key={word}
+                                columnWidth={this.state.columnWidth}
+                                result={AnagramResultState.solved}
+                                word={word}
+                                list={list}
+                                counter={counter}
+                                maxLengthInGroup={0}
+                              />
+                            );
+                          })}
+                        </AnagramResultRow>
+                      );
+                    })}
+                  </div>
+                ) : null}
               <div style={{float: 'left', width: '100%', marginLeft: '10px'}}>
                 <SubTitle>{'Subanagrams that had no solution:'}</SubTitle>
               </div>
@@ -153,6 +187,7 @@ class AnagramResults extends React.Component<
                           word={word}
                           list={list}
                           counter={counter}
+                          maxLengthInGroup={0}
                         />
                       );
                     })}
