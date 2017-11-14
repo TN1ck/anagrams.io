@@ -121,9 +121,9 @@ class AnagramResults extends React.Component<
               {group.map((d) => {
                 const {word, list, counter, wordIndex} = d;
                 let resultState = anagram.AnagramResultState.unsolved;
-                if (currentSubanagrams.find(index => wordIndex === index)) {
+                if (currentSubanagrams.find(index => wordIndex === index) !== undefined) {
                   resultState = anagram.AnagramResultState.active;
-                } else if (solvedSubanagrams.find(index => index === wordIndex)) {
+                } else if (solvedSubanagrams.find(index => index === wordIndex) !== undefined) {
                   resultState = anagram.AnagramResultState.solved;
                 }
                 return (
