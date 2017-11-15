@@ -6,6 +6,8 @@ import {withProps} from 'src/utility';
 
 import * as anagram from 'src/anagram';
 
+const MAX_ITEMS_TO_SHOW_AT_ONCE = 3;
+
 const ResultContainer = styled.div`
   color: black;
   white-space: nowrap;
@@ -118,9 +120,13 @@ class AnagramResult extends React.Component<AnagramResultProps,
 
     const minHeight = 17;
     const rowHeight = 21;
-    const maxHeight = 262;
+    const showAllSize = 40;
+    const paddingSize = 20;
+    const maxHeight = MAX_ITEMS_TO_SHOW_AT_ONCE * rowHeight + minHeight + paddingSize + showAllSize;
 
-    let height: any = (maxLengthInGroup > 10 ? maxHeight : minHeight + (rowHeight * maxLengthInGroup)) + 20;
+    const useMaxsize = maxLengthInGroup > MAX_ITEMS_TO_SHOW_AT_ONCE;
+
+    let height: any = useMaxsize ? maxHeight : (minHeight + maxLengthInGroup * rowHeight + paddingSize);
     height = this.state.showAll ? 'auto' : height;
 
     return (
@@ -137,16 +143,16 @@ class AnagramResult extends React.Component<AnagramResultProps,
             {word}
           </strong>
           <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div>
-          {take(list, !this.state.showAll ? 10 : list.length).map((a, i) => {
+          {take(list, !this.state.showAll ? MAX_ITEMS_TO_SHOW_AT_ONCE : list.length).map((a, i) => {
             return <Result key={i} result={a} index={i} />
           })}
           {
-            list.length > 10
+            list.length > MAX_ITEMS_TO_SHOW_AT_ONCE
               ? 
                 <ShowAllButton onClick={this.toggleShowAll}>
                   {this.state.showAll
-                    ? `... hide ${list.length - 10} items`
-                    : `... show ${list.length - 10} more`
+                    ? `... hide ${list.length - MAX_ITEMS_TO_SHOW_AT_ONCE} items`
+                    : `... show ${list.length - MAX_ITEMS_TO_SHOW_AT_ONCE} more`
                   }
                 </ShowAllButton>
               : null

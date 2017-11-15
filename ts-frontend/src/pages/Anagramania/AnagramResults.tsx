@@ -9,8 +9,6 @@ import * as anagram from 'src/anagram';
 import AnagramResult from './AnagramResult';
 import { AnagramResultState } from 'src/anagram';
 
-// import mockState from 'src/assets/anagramPageMock';
-
 function partitionArray<T>(array: T[], columns: number): T[][] {
   const partitionedArray: T[][] = [];
   let currentGroup: T[] = [];
