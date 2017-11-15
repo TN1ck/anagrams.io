@@ -120,8 +120,9 @@ class AnagramResult extends React.Component<AnagramResultProps,
 
     const minHeight = 17;
     const rowHeight = 21;
-    const showAllSize = 40;
+    const showAllSize = 30;
     const paddingSize = 20;
+
     const maxHeight = MAX_ITEMS_TO_SHOW_AT_ONCE * rowHeight + minHeight + paddingSize + showAllSize;
 
     const useMaxsize = maxLengthInGroup > MAX_ITEMS_TO_SHOW_AT_ONCE;

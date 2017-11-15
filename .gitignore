@@ -8,5 +8,6 @@ build
 ts-backend/dist
 ts-backend/node_modules
 ts-frontend/dist
+ts-frontend/dist.tar.gz
 ts-frontend/node_modules
 yarn.lock
