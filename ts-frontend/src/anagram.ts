@@ -38,7 +38,7 @@ export function stringToWord (str: string): Word {
   };
 }
 
-function nStringToString(nString: NString): string {
+export function nStringToString(nString: NString): string {
   let string = '';
 
   for (let c of nString) {
@@ -47,11 +47,77 @@ function nStringToString(nString: NString): string {
   return string;
 }
 
-// todo: can be made faster, only one pass should be needed
-function joinTwoNStrings(w1: NString, w2: NString) {
+// this is correct!
+export function joinTwoNStringsNaive(w1: NString, w2: NString) {
   const str1 = nStringToString(w1);
   const str2 = nStringToString(w2);
   return stringToWord(str1 + str2).set;
+
+}
+
+// w1 is the longer word
+// works now!
+export function joinTwoNStrings(w1: NString, w2: NString) {
+  const combined = [];
+  let index1 = 0;
+  let index2 = 0;
+  if (w1.length < w2.length) {
+    console.error('This method is optimized and only works correctly when w1 is larger or same as w2');
+  }
+  while (index1 < w1.length) {
+    const c1 = w1[index1];
+    const c2 = w2[index2];
+
+    if (c2 === undefined) {
+      while(index1 < w1.length) {
+        const c = w1[index1];
+        combined.push(c);
+        index1++;
+      }
+      break;
+    }
+
+    if (c1 < c2) {
+      combined.push(c1);
+      index1++;
+    } else if (c1 > c2) {
+      combined.push(c2);
+      index2++;
+    } else if (c1 === c2) {
+      const startChar = c1[0];
+      let char = startChar;
+      let index = 0;
+      while (char === startChar) {
+        combined.push(char + index);
+        index++;
+        char = w1[index1 + index];
+        if (char === undefined) {
+          break;
+        }
+        char = char[0];
+      }
+      index1 += index;
+      let newIndex = 0;
+      char = startChar;
+      while (char === startChar) {
+        combined.push(char + index);
+        index++;
+        newIndex++;
+        char = w2[index2 + newIndex];
+        if (char === undefined) {
+          break;
+        }
+        char = char[0];
+      }
+      index2 += newIndex;
+    }
+  }
+  while(index2 < w2.length) {
+    const c2 = w2[index2];
+    combined.push(c2);
+    index2++;
+  }
+  return combined;
 } 
 
 function isSubset(nStr1: NString, nStr2: NString): boolean {
@@ -230,7 +296,7 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
             const combinedWords = possibleSubanagrams.map(w => {
               return {
                 word: w,
-                combined: joinTwoNStrings(w.word.set, current.set)
+                combined: joinTwoNStrings(current.set, w.word.set)
               };
             });
     
