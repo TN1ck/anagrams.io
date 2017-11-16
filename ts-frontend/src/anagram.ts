@@ -242,7 +242,7 @@ export interface SerializedAnagramIteratorState {
 }
 
 export function serializeAnagramIteratorStateFactor(state: AnagramIteratorState): SerializedAnagramIteratorState {
-  const solutions = state.solutions.map(s => s.list.map(w => w.index).reverse());
+  const solutions = state.solutions.map(s => [...s.list.map(w => w.index)].reverse());
   return {
     counter: state.counter,
     numberOfPossibilitiesChecked: state.numberOfPossibilitiesChecked,
@@ -314,7 +314,7 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
             });
     
             for (let item of newStackItems) {
-              stack.unshift(item);
+              stack.push(item);
             }
           }
     
