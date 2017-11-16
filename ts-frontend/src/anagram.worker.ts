@@ -59,22 +59,55 @@ ctx.addEventListener('message', (message) => {
 
   const MINIMUM_TIME = 100;
 
-  for (state of mainGenerator) {
-    const currentDate = +(new Date());
-    const diff = currentDate - lastTimeSendDate;
-    if (lastTimeSend === null ||
-        diff > MINIMUM_TIME &&
-        ((lastTimeSend.counter + 2500) < state.counter ||
-        lastTimeSend.solutions.length !== state.solutions.length ||
-        lastTimeSend.currentSubanagrams.join(',') !== state.currentGenerators.map(c => c.subanagram.index).join(','))
-      ) {
-        lastTimeSend = anagram.serializeAnagramIteratorStateFactor(state);
-        lastTimeSendDate = +(new Date());
-        ctx.postMessage(lastTimeSend);
+  const getState = () => {
+    setTimeout(() => {
+      for (let i = 0; i < 10000; i++) {
+        const newState = mainGenerator.next().value;
+        if (!newState) {
+          ctx.postMessage(anagram.serializeAnagramIteratorStateFactor(state));
+          ctx.postMessage('finish');
+          break;
+        }
+        state = newState;
+        const currentDate = +(new Date());
+        const diff = currentDate - lastTimeSendDate;
+        if (lastTimeSend === null ||
+            diff > MINIMUM_TIME &&
+            ((lastTimeSend.counter + 2500) < state.counter ||
+            lastTimeSend.solutions.length !== state.solutions.length ||
+            lastTimeSend.currentSubanagrams.join(',') !== state.currentGenerators.map(c => c.subanagram.index).join(','))
+          ) {
+            lastTimeSend = anagram.serializeAnagramIteratorStateFactor(state);
+            lastTimeSendDate = +(new Date());
+            ctx.postMessage(lastTimeSend);
+          }
       }
+      getState();
+    // chrome will crash if we don't release some pressure from the GC
+    // ... or something like that. No clue really, but it works.
+    }, 2);
+    
   }
+  getState();
 
-  ctx.postMessage(anagram.serializeAnagramIteratorStateFactor(state));
-  ctx.postMessage('finish');
+  // This is the implementation that will crash chrome
+
+  // for (state of mainGenerator) {
+  //   const currentDate = +(new Date());
+  //   const diff = currentDate - lastTimeSendDate;
+  //   if (lastTimeSend === null ||
+  //       diff > MINIMUM_TIME &&
+  //       ((lastTimeSend.counter + 2500) < state.counter ||
+  //       lastTimeSend.solutions.length !== state.solutions.length ||
+  //       lastTimeSend.currentSubanagrams.join(',') !== state.currentGenerators.map(c => c.subanagram.index).join(','))
+  //     ) {
+  //       lastTimeSend = anagram.serializeAnagramIteratorStateFactor(state);
+  //       lastTimeSendDate = +(new Date());
+  //       ctx.postMessage(lastTimeSend);
+  //     }
+  // }
+
+  // ctx.postMessage(anagram.serializeAnagramIteratorStateFactor(state));
+  // ctx.postMessage('finish');
   
 });
