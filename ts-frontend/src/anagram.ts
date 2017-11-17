@@ -1,9 +1,7 @@
 import {sortBy, drop} from 'lodash';
 
-type NString = string[];
-
 export interface Word {
-  set: string[],
+  set: string,
   word: string;
 };
 
@@ -12,57 +10,30 @@ export function sanitizeQuery(str: string): string {
     .replace(/ü/g, 'ue')
     .replace(/ä/g, 'ae')
     .replace(/ö/g, 'oe')
-    .replace(/ /g, '');
+    .replace(/[^a-z]/g, '');
 }
 
 export function stringToWord (str: string): Word {
-  const sorted = sortBy([...str], d => d);
-  let i = 0;
-  let j = 0;
-  let newString = [];
-  for (let c of sorted) {
-    if (j !== 0) {
-      const lastChar = sorted[j - 1];
-      if (lastChar === c) {
-        i += 1;
-      } else {
-        i = 0;
-      }
-    }
-    newString.push(c + i);
-    j++;
-  }
+  const sorted = str.split('').sort().join('');
   return {
-    set: newString,
+    set: sorted,
     word: str,
   };
 }
 
-export function nStringToString(nString: NString): string {
-  let string = '';
-
-  for (let c of nString) {
-    string += c[0];
-  }
-  return string;
-}
 
 // this is correct!
-export function joinTwoNStringsNaive(w1: NString, w2: NString) {
-  const str1 = nStringToString(w1);
-  const str2 = nStringToString(w2);
-  return stringToWord(str1 + str2).set;
-
+export function joinTwoStringsNaive(w1: string, w2: string) {
+  return stringToWord(w1 + w2).set;
 }
 
 // w1 is the longer word
-// works now!
-export function joinTwoNStrings(w1: NString, w2: NString) {
-  const combined = [];
+export function joinTwoStrings(w1: string, w2: string): string {
+  let combined = '';
   let index1 = 0;
   let index2 = 0;
   if (w1.length < w2.length) {
-    console.error('This method is optimized and only works correctly when w1 is larger or same as w2');
+    return joinTwoStrings(w2, w1);
   }
   while (index1 < w1.length) {
     const c1 = w1[index1];
@@ -71,56 +42,54 @@ export function joinTwoNStrings(w1: NString, w2: NString) {
     if (c2 === undefined) {
       while(index1 < w1.length) {
         const c = w1[index1];
-        combined.push(c);
+        combined += (c);
         index1++;
       }
       break;
     }
 
     if (c1 < c2) {
-      combined.push(c1);
+      combined += (c1);
       index1++;
     } else if (c1 > c2) {
-      combined.push(c2);
+      combined += (c2);
       index2++;
     } else if (c1 === c2) {
-      const startChar = c1[0];
+      const startChar = c1;
       let char = startChar;
       let index = 0;
       while (char === startChar) {
-        combined.push(char + index);
+        combined += (char);
         index++;
         char = w1[index1 + index];
         if (char === undefined) {
           break;
         }
-        char = char[0];
       }
       index1 += index;
       let newIndex = 0;
       char = startChar;
       while (char === startChar) {
-        combined.push(char + index);
+        combined += (char);
         index++;
         newIndex++;
         char = w2[index2 + newIndex];
         if (char === undefined) {
           break;
         }
-        char = char[0];
       }
       index2 += newIndex;
     }
   }
   while(index2 < w2.length) {
     const c2 = w2[index2];
-    combined.push(c2);
+    combined += c2;
     index2++;
   }
   return combined;
 } 
 
-function isSubset(nStr1: NString, nStr2: NString): boolean {
+function isSubset(nStr1: string, nStr2: string): boolean {
   const length1 = nStr1.length;
   const length2 = nStr2.length;
 
@@ -140,17 +109,8 @@ function isSubset(nStr1: NString, nStr2: NString): boolean {
   return searchIndex === length1;
 }
 
-function isSame(nStr1: NString, nStr2: NString): boolean {
-  const sameSize = nStr1.length === nStr2.length;
-  if (sameSize) {
-    for (let i = 0; i < nStr1.length; i++) {
-      if (nStr1[i] !== nStr2[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-  return false;
+function isSame(nStr1: string, nStr2: string): boolean {
+  return nStr1 === nStr2;
 }
 
 export function findAnagrams(query: string, dictionary: Word[]): Word[] {
@@ -179,8 +139,7 @@ export interface IndexedWord {
 
 export interface AnagramSolution {
   list: IndexedWord[];
-  set: NString;
-  goodness: number;
+  set: string;
 }
 
 type OptimizedAnagramSolution = number[];
@@ -260,7 +219,7 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
 
   interface StackItem {
     list: IndexedWord[];
-    set: string[];
+    set: string;
     goodness: number;
   }
   
@@ -288,7 +247,7 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
     
             numberOfPossibilitiesChecked += droppedSubanagrams.length;
     
-            // first filter those out, that are two big
+            // first filter those out, that are too big
             const possibleSubanagrams = droppedSubanagrams.filter(s => {
               return s.word.word.length <= charsMissing;
             });
@@ -296,7 +255,7 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
             const combinedWords = possibleSubanagrams.map(w => {
               return {
                 word: w,
-                combined: joinTwoNStrings(current.set, w.word.set)
+                combined: joinTwoStrings(current.set, w.word.set)
               };
             });
     
@@ -308,7 +267,6 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
             const newStackItems: AnagramSolution[] = filterCombined.map(cw => {
               return {
                 list: [cw.word].concat(current.list),
-                goodness: current.goodness,
                 set: cw.combined,
               };
             });

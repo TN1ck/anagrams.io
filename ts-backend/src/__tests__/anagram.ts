@@ -17,7 +17,7 @@ export const TEST_WORD_SOLUTIONS = [
   'jet lap ah no no on vs',
   'jet lap ah no no no vs',
 ];
-const NUMBER_OF_SUBANAGRAMS = 112;
+const NUMBER_OF_SUBANAGRAMS = 113;
 
 describe('Anagram / findanagrams', () => {
   test('Should find the the anagrams', () => {
@@ -37,52 +37,47 @@ describe('Anagram / findanagrams', () => {
 
 describe('joinTwoStrings', () => {
   test('Should merge correctly two equal strings', () => {
-    const string1 = ['m0', 'o0', 't0'];
-    const string2 = ['m0', 'o0', 't0'];
-    const expectedResult = ['m0', 'm1', 'o0', 'o1', 't0', 't1'];
-    const result = anagram.joinTwoNStrings(string1, string2);
+    const string1 = 'mot';
+    const string2 = 'mot';
+    const expectedResult = 'mmoott';
+    const result = anagram.joinTwoStrings(string1, string2);
     expect(result).toEqual(expectedResult);
   });
   test('Should merge correctly were one letter occurs multiple times', () => {
-    const string1 = ['m0', 'o0', 'o1', 'o2', 't0'];
-    const string2 = ['m0', 'o0', 't0'];
-    const expectedResult = ['m0', 'm1', 'o0', 'o1', 'o2', 'o3', 't0', 't1'];
-    const result = anagram.joinTwoNStrings(string1, string2);
-    expect(result).toEqual(expectedResult);
-  });
-  test('Should merge correctly were one letter occurs multiple times 2', () => {
-    const string1 = ['a0', 'a1', 'm0', 'o0', 'o1', 'o2', 'o3', 't0'];
-    const string2 = ['m0', 'o0', 't0'];
-    const expectedResult = ['a0', 'a1', 'm0', 'm1', 'o0', 'o1', 'o2', 'o3', 'o4', 't0', 't1'];
-    const result = anagram.joinTwoNStrings(string1, string2);
-    expect(result).toEqual(expectedResult);
-  });
-  test('Should merge correctly were one letter occurs multiple times 2', () => {
-    const string1 = ['a0', 'a1', 'm0', 'o0', 't0'];
-    const string2 = ['a0', 'c0', 'z0', 'z1'];
-    const expectedResult = ['a0', 'a1', 'a2', 'c0', 'm0', 'o0', 't0', 'z0', 'z1'];
-    const result = anagram.joinTwoNStrings(string1, string2);
+    const string1 = 'mooot';
+    const string2 = 'mot';
+    const expectedResult = 'mmoooott';
+    const result = anagram.joinTwoStrings(string1, string2);
     expect(result).toEqual(expectedResult);
   });
 
   test('Should merge correctly when the the second word is exhausted quickly', () => {
     const string1 = anagram.stringToWord('ab');
     const string2 = anagram.stringToWord('a');
-    const expectedResult = anagram.joinTwoNStringsNaive(string1.set, string2.set);
-    const result = anagram.joinTwoNStrings(string1.set, string2.set);
+    const expectedResult = anagram.joinTwoStringsNaive(string1.set, string2.set);
+    const result = anagram.joinTwoStrings(string1.set, string2.set);
     expect(result).toEqual(expectedResult);
-  })
+  });
 
   // was only needed to verify the new joinTwoNString implementation
   // test('every word in the dictionary!', () => {
   //   const dictionary = dictionaries.find(d => d.id === 'eng-us-3k');
   //   let currentMerge = ["a0", "a1", "a2", "a3", "a4", "a5", "b0", "b1", "b2", "d0", "e0", "i0", "i1", "l0", "l1", "n0", "n1", "o0", "t0", "y0"];
   //   for (let c of dictionary.dict) {
-  //    const resultExpected = anagram.joinTwoNStringsNaive(currentMerge, c.set);
-  //    const result = anagram.joinTwoNStrings(currentMerge, c.set);
+  //    const resultExpected = anagram.joinTwoStringsNaive(currentMerge, c.set);
+  //    const result = anagram.joinTwoStrings(currentMerge, c.set);
   //    expect(result).toEqual(resultExpected);
   //    currentMerge = resultExpected; 
   //   }
   // });
 
+});
+
+describe('sanitizeQuery', () => {
+  test('Should remove everything but letters', () => {
+    const string1 = '  . !, testö ü ä 112233';
+    const expectedResult = 'testoeueae';
+    const result = anagram.sanitizeQuery(string1);
+    expect(result).toBe(expectedResult);
+  })
 });

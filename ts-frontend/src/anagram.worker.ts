@@ -3,8 +3,7 @@ import * as anagram from './anagram';
 const ctx: Worker = self as any;
 
 ctx.addEventListener('message', (message) => {
-  console.log('in webworker', message);
-  ctx.postMessage('this is the response ' + message.data);
+
   const data = message.data;
   const {query, subanagrams} = data;
   const generators = anagram.findAnagramSentences(query, subanagrams);
@@ -13,8 +12,6 @@ ctx.addEventListener('message', (message) => {
   function* getSolutions (state: anagram.AnagramIteratorState) {
     
     while (!state.breakLoop && state.unsolvedGenerators.length !== 0) {
-      
-      // console.log(state.counter, state);
       
       let currentGenerators = state.currentGenerators;
       let unsolvedGenerators = state.unsolvedGenerators;
@@ -25,16 +22,19 @@ ctx.addEventListener('message', (message) => {
       }
 
       currentGenerators = currentGenerators.filter((g) => {
-        const value = g.generator.next();
-        state.counter++;
-        if (!value || value.done) {
-          solvedGenerators.push(g);
-          return false;
-        }
-        if (value.value.solution) {
-          state.solutions.push(value.value.current);
-          state.numberOfPossibilitiesChecked += value.value.numberOfPossibilitiesChecked;
-        }
+        // let i = 0;
+        // for (; i <= 1000; i++) {
+          const value = g.generator.next();
+          state.counter++;
+          if (!value || value.done) {
+            solvedGenerators.push(g);
+            return false;
+          }
+          if (value.value.solution) {
+            state.solutions.push(value.value.current);
+            state.numberOfPossibilitiesChecked += value.value.numberOfPossibilitiesChecked;
+          }
+        // }
         return true;
       });
 
@@ -57,57 +57,21 @@ ctx.addEventListener('message', (message) => {
   let lastTimeSend: anagram.SerializedAnagramIteratorState = null;
   let lastTimeSendDate = +(new Date());
 
-  const MINIMUM_TIME = 100;
+  const MINIMUM_TIME = 200;
 
-  const getState = () => {
-    setTimeout(() => {
-      for (let i = 0; i < 10000; i++) {
-        const newState = mainGenerator.next().value;
-        if (!newState) {
-          ctx.postMessage(anagram.serializeAnagramIteratorStateFactor(state));
-          ctx.postMessage('finish');
-          break;
-        }
-        state = newState;
-        const currentDate = +(new Date());
-        const diff = currentDate - lastTimeSendDate;
-        if (lastTimeSend === null ||
-            diff > MINIMUM_TIME &&
-            ((lastTimeSend.counter + 2500) < state.counter ||
-            lastTimeSend.solutions.length !== state.solutions.length ||
-            lastTimeSend.currentSubanagrams.join(',') !== state.currentGenerators.map(c => c.subanagram.index).join(','))
-          ) {
-            lastTimeSend = anagram.serializeAnagramIteratorStateFactor(state);
-            lastTimeSendDate = +(new Date());
-            ctx.postMessage(lastTimeSend);
-          }
+  for (state of mainGenerator) {
+    const currentDate = +(new Date());
+    const diff = currentDate - lastTimeSendDate;
+    if (lastTimeSend === null ||
+        diff > MINIMUM_TIME
+      ) {
+        lastTimeSend = anagram.serializeAnagramIteratorStateFactor(state);
+        lastTimeSendDate = +(new Date());
+        ctx.postMessage(lastTimeSend);
       }
-      getState();
-    // chrome will crash if we don't release some pressure from the GC
-    // ... or something like that. No clue really, but it works.
-    }, 2);
-    
   }
-  getState();
 
-  // This is the implementation that will crash chrome
-
-  // for (state of mainGenerator) {
-  //   const currentDate = +(new Date());
-  //   const diff = currentDate - lastTimeSendDate;
-  //   if (lastTimeSend === null ||
-  //       diff > MINIMUM_TIME &&
-  //       ((lastTimeSend.counter + 2500) < state.counter ||
-  //       lastTimeSend.solutions.length !== state.solutions.length ||
-  //       lastTimeSend.currentSubanagrams.join(',') !== state.currentGenerators.map(c => c.subanagram.index).join(','))
-  //     ) {
-  //       lastTimeSend = anagram.serializeAnagramIteratorStateFactor(state);
-  //       lastTimeSendDate = +(new Date());
-  //       ctx.postMessage(lastTimeSend);
-  //     }
-  // }
-
-  // ctx.postMessage(anagram.serializeAnagramIteratorStateFactor(state));
-  // ctx.postMessage('finish');
+  ctx.postMessage(anagram.serializeAnagramIteratorStateFactor(state));
+  ctx.postMessage('finish');
   
 });
