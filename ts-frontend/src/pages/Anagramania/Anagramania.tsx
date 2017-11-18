@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import Select from 'react-select';
-// import {throttle} from 'lodash';
+import {throttle} from 'lodash';
 
 import Footer from 'src/components/Footer';
 import Form from 'src/components/Form';
@@ -96,7 +96,6 @@ class AnagramInfoArea extends React.Component<{
       currentSubanagrams,
       numberOfPossibilitiesChecked,
       unsolvedSubanagrams,
-      counter,
       solutions,
     } = anagramIteratorState;
 
@@ -121,7 +120,6 @@ class AnagramInfoArea extends React.Component<{
         <Strong>
           {`Checked ${numberOfPossibilitiesChecked} possibilities.`}
         </Strong>
-        <Strong>{` ${counter} iterations.`}</Strong>
         <br />
         <Strong>{` ${solutions.length} solutions.`}</Strong>
         <br/>
@@ -209,7 +207,6 @@ class Anagramania extends React.Component<{}, {
   selectedDictionaries: string;
 }> {
   worker: Worker;
-  workers: Worker[] = [];
   finished: boolean;
   constructor(props: any) {
     super(props);
@@ -263,9 +260,6 @@ class Anagramania extends React.Component<{}, {
 
     if (this.worker) {
       this.worker.terminate();
-      this.workers.forEach(w => {
-        w.terminate();
-      });
     }
 
     this.finished = false;
@@ -274,10 +268,6 @@ class Anagramania extends React.Component<{}, {
 
     const result = await getSubAnagrams(cleanedQuery, this.state.selectedDictionaries);
     const {anagrams: subanagrams} = result.data;
-
-    this.workers = subanagrams.map(() => {
-      return new AnagramWorker();
-    });
 
     const initialAnagramIteratorState = anagram.serializeAnagramIteratorStateFactor(
       anagram.angagramIteratorStateFactory()
@@ -293,19 +283,14 @@ class Anagramania extends React.Component<{}, {
       anagramIteratorState: initialAnagramIteratorState,
     });
     
-    // const updateState = throttle((state: anagram.AnagramGeneratorStepSerialized) => {
-    //   if (this.finished) {
-    //     return;
-    //   }
-
-    //   this.setState({
-    //     anagramIteratorState: state,
-    //   });
-    // }, 50);
-
-
-
-    // let oldState = initialState;
+    const updateState = throttle((state: anagram.AnagramGeneratorStepSerialized) => {
+      if (this.finished) {
+        return;
+      }
+      this.state.anagramIteratorState.solutions.push(...state.solutions);
+      this.state.anagramIteratorState.numberOfPossibilitiesChecked += state.numberOfPossibilitiesChecked;
+      this.setState({});
+    }, 50);
 
     const startNextWorker = () => {
       if (this.state.anagramIteratorState.unsolvedSubanagrams.length === 0) {
@@ -315,7 +300,8 @@ class Anagramania extends React.Component<{}, {
       this.state.anagramIteratorState.currentSubanagrams.push(nextWorkerIndex);
       this.setState({});
       
-      const worker = this.workers[nextWorkerIndex];
+      const worker = new AnagramWorker();
+
       worker.addEventListener('message', message => {
         if (message.data === 'finish') {
           this.state.anagramIteratorState.solvedSubanagrams.push(nextWorkerIndex);
@@ -325,22 +311,16 @@ class Anagramania extends React.Component<{}, {
           return;
         }
         const newState: anagram.AnagramGeneratorStepSerialized = message.data;
-        const solutions = this.state.anagramIteratorState.solutions.concat(newState.solutions);
-        const numberOfPossibilitiesChecked = this.state.anagramIteratorState.numberOfPossibilitiesChecked + newState.numberOfPossibilitiesChecked;
-        this.setState({
-          anagramIteratorState: {
-            ...this.state.anagramIteratorState,
-            solutions,
-            numberOfPossibilitiesChecked,
-          }
-        });
+        updateState(newState)
       });
+
       worker.postMessage({
         type: 'start',
         query: cleanedQuery,
         subanagram: subanagrams[nextWorkerIndex],
         subanagrams,
       });
+
     };
 
     startNextWorker();
