@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import Select from 'react-select';
-import {throttle} from 'lodash';
+// import {throttle} from 'lodash';
 
 import Footer from 'src/components/Footer';
 import Form from 'src/components/Form';
@@ -209,6 +209,7 @@ class Anagramania extends React.Component<{}, {
   selectedDictionaries: string;
 }> {
   worker: Worker;
+  workers: Worker[] = [];
   finished: boolean;
   constructor(props: any) {
     super(props);
@@ -262,6 +263,9 @@ class Anagramania extends React.Component<{}, {
 
     if (this.worker) {
       this.worker.terminate();
+      this.workers.forEach(w => {
+        w.terminate();
+      });
     }
 
     this.finished = false;
@@ -271,49 +275,71 @@ class Anagramania extends React.Component<{}, {
     const result = await getSubAnagrams(cleanedQuery, this.state.selectedDictionaries);
     const {anagrams: subanagrams} = result.data;
 
-    const initialState = anagram.serializeAnagramIteratorStateFactor(anagram.angagramIteratorStateFactory([]));
+    this.workers = subanagrams.map(() => {
+      return new AnagramWorker();
+    });
+
+    const initialAnagramIteratorState = anagram.serializeAnagramIteratorStateFactor(
+      anagram.angagramIteratorStateFactory()
+    );
+
+    initialAnagramIteratorState.unsolvedSubanagrams = subanagrams.map((_, i) => i);
 
     this.setState({
       subanagrams,
       queryStatus: RequestStatus.loading,
       cleanedQuery,
       // TODO
-      anagramIteratorState: initialState,
+      anagramIteratorState: initialAnagramIteratorState,
     });
-
-    const worker: Worker = new AnagramWorker();
     
-    const updateState = throttle((state: anagram.SerializedAnagramIteratorState) => {
-      if (this.finished) {
+    // const updateState = throttle((state: anagram.AnagramGeneratorStepSerialized) => {
+    //   if (this.finished) {
+    //     return;
+    //   }
+
+    //   this.setState({
+    //     anagramIteratorState: state,
+    //   });
+    // }, 50);
+
+
+
+    // let oldState = initialState;
+
+    const startNextWorker = () => {
+      if (this.state.anagramIteratorState.unsolvedSubanagrams.length === 0) {
         return;
       }
-      this.setState({
-        anagramIteratorState: state,
+      const nextWorkerIndex = this.state.anagramIteratorState.unsolvedSubanagrams.shift();
+      
+      const worker = this.workers[nextWorkerIndex];
+      worker.addEventListener('message', message => {
+        if (message.data === 'finish') {
+          startNextWorker();
+          return;
+        }
+        const newState: anagram.AnagramGeneratorStepSerialized = message.data;
+        console.log(newState);
+        // const solutions = this.state.anagramIteratorState.solutions.concat(newState.solutions);
+        // const numberOfPossibilitiesChecked = this.state.anagramIteratorState.numberOfPossibilitiesChecked + newState.numberOfPossibilitiesChecked;
+        // this.setState({
+        //   anagramIteratorState: {
+        //     ...this.state.anagramIteratorState,
+        //     solutions,
+        //     numberOfPossibilitiesChecked,
+        //   }
+        // });
       });
-    }, 50);
+      worker.postMessage({
+        type: 'start',
+        query: cleanedQuery,
+        subanagrams,
+        subanagram: subanagrams[nextWorkerIndex],
+      });
+    };
 
-    let oldState = initialState;
-    worker.addEventListener('message', message => {
-      const newState: anagram.SerializedAnagramIteratorState = message.data;
-      if (newState.currentSubanagrams) {
-        oldState = newState;
-        updateState(newState);
-      // kind of archaic, but it works good enough
-      } else if ((newState as any) === 'finish') {
-        this.finished = true;
-        // finished
-        this.setState({
-          anagramIteratorState: {
-            ...oldState,
-            solvedSubanagrams: subanagrams.map(s => s.index),
-            unsolvedSubanagrams: [],
-            currentSubanagrams: [],
-          },
-        })
-      }
-    });
-    worker.postMessage({type: 'start', query: cleanedQuery, subanagrams});
-    this.worker = worker;
+    startNextWorker();
 
   }
   render() {

@@ -1,9 +1,79 @@
 import {sortBy, drop} from 'lodash';
 
+//
+// interfaces
+//
+
 export interface Word {
   set: string,
   word: string;
 };
+
+export interface IndexedWord {
+  word: Word;
+  index: number;
+}
+
+export interface AnagramSolution {
+  list: IndexedWord[];
+  set: string;
+  goodness: number;
+}
+
+type OptimizedAnagramSolution = number[];
+
+export interface AnagramGeneratorStep {
+  solutions: AnagramSolution[],
+  numberOfPossibilitiesChecked: number,
+};
+
+export type AnagramGenerator = IterableIterator<AnagramGeneratorStep>;
+
+export interface SubanagramSolver {
+  subanagram: IndexedWord;
+  generator: AnagramGenerator;
+}
+
+interface StackItem {
+  list: IndexedWord[];
+  set: string;
+  goodness: number;
+}
+
+export interface AnagramIteratorState {
+  breakLoop: boolean;
+  counter: number;
+  numberOfPossibilitiesChecked: number;
+  unsolvedGenerators: SubanagramSolver[];
+  solvedGenerators: SubanagramSolver[];
+  currentGenerators: SubanagramSolver[];
+  solutions: AnagramSolution[];
+}
+
+export interface SerializedAnagramIteratorState {
+  counter: number;
+  numberOfPossibilitiesChecked: number;
+  unsolvedSubanagrams: number[];
+  solvedSubanagrams: number[];
+  currentSubanagrams: number[];
+  solutions: OptimizedAnagramSolution[];
+}
+
+export interface GroupedAnagramSolutions {
+  list: IndexedWord[][],
+  word: string,
+  counter: number,
+  wordIndex: number;
+};
+
+export interface AnagramGeneratorStepSerialized {
+  solutions: number[][];
+  numberOfPossibilitiesChecked: number;
+}
+
+//
+// functions
+//
 
 export function sanitizeQuery(str: string): string {
   return str.toLowerCase()
@@ -131,20 +201,6 @@ export function sortWordList(wordList: Word[]) {
   return sortBy(wordList, w => -w.word.length);
 }
 
-
-export interface IndexedWord {
-  word: Word;
-  index: number;
-}
-
-export interface AnagramSolution {
-  list: IndexedWord[];
-  set: string;
-  goodness: number;
-}
-
-type OptimizedAnagramSolution = number[];
-
 export function findSortedSubAnagrmns(query: string, dictionary: Word[]): IndexedWord[] {
   const _subanagrams = findSubAnagrams(query, dictionary);
   // we like long words more
@@ -156,26 +212,6 @@ export function findSortedSubAnagrmns(query: string, dictionary: Word[]): Indexe
     };
   });
   return subanagrams;
-}
-
-export type AnagramGenerator = IterableIterator<{
-  solutions: AnagramSolution[],
-  numberOfPossibilitiesChecked: number,
-}>;
-
-export interface SubanagramSolver {
-  subanagram: IndexedWord;
-  generator: AnagramGenerator;
-}
-
-export interface AnagramIteratorState {
-  breakLoop: boolean;
-  counter: number;
-  numberOfPossibilitiesChecked: number;
-  unsolvedGenerators: SubanagramSolver[];
-  solvedGenerators: SubanagramSolver[];
-  currentGenerators: SubanagramSolver[];
-  solutions: AnagramSolution[];
 }
 
 export function angagramIteratorStateFactory(unsolvedGenerators = []) {
@@ -191,15 +227,6 @@ export function angagramIteratorStateFactory(unsolvedGenerators = []) {
   return state;
 }
 
-export interface SerializedAnagramIteratorState {
-  counter: number;
-  numberOfPossibilitiesChecked: number;
-  unsolvedSubanagrams: number[];
-  solvedSubanagrams: number[];
-  currentSubanagrams: number[];
-  solutions: OptimizedAnagramSolution[];
-}
-
 export function serializeAnagramIteratorStateFactor(state: AnagramIteratorState): SerializedAnagramIteratorState {
   const solutions = state.solutions.map(s => [...s.list.map(w => w.index)].reverse());
   return {
@@ -211,13 +238,6 @@ export function serializeAnagramIteratorStateFactor(state: AnagramIteratorState)
     // use numbers to reduce memory footprint
     solutions,
   }
-}
-
-
-interface StackItem {
-  list: IndexedWord[];
-  set: string;
-  goodness: number;
 }
 
 export function findAnagramSentencesForInitialStack(
@@ -321,13 +341,6 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
 
   return subanagramsGenerators;
 }
-
-export interface GroupedAnagramSolutions {
-  list: IndexedWord[][],
-  word: string,
-  counter: number,
-  wordIndex: number;
-};
 
 export function groupAnagramsByStartWord(
   subanagrams: IndexedWord[],

@@ -2,10 +2,14 @@ import * as anagram from './anagram';
 
 const ctx: Worker = self as any;
 
-
-let workerState = {
-  running: false,
-};
+function serializeAnagramStep(step: anagram.AnagramGeneratorStep): anagram.AnagramGeneratorStepSerialized {
+  return {
+    solutions: step.solutions.map(s => {
+      return s.list.map(w => w.index).reverse();
+    }),
+    numberOfPossibilitiesChecked: step.numberOfPossibilitiesChecked
+  };
+}
 
 ctx.addEventListener('message', (message) => {
 
@@ -13,80 +17,40 @@ ctx.addEventListener('message', (message) => {
     return;
   }
 
-  if (message.data.type === 'pause') {
-    console.log('PAUSE');
-    workerState.running = false;
-    return;
-  }
+  const data: {
+    query: string;
+    subanagrams: anagram.IndexedWord[];
+    subanagram: anagram.IndexedWord;
+  } = message.data;
 
-  workerState.running = true;
-  const data = message.data;
-  const {query, subanagrams} = data;
-  const generators = anagram.findAnagramSentences(query, subanagrams);
-  const initialState = anagram.angagramIteratorStateFactory(generators);
+  const {query, subanagrams, subanagram} = data;
+  const anagramSolver = anagram.findAnagramSentencesForSubAnagram(query, subanagrams, subanagram);
+
+  const {generator} = anagramSolver;
   
-  function* getSolutions (state: anagram.AnagramIteratorState) {
-    
-    while (!state.breakLoop && state.unsolvedGenerators.length !== 0) {
-      
-      let currentGenerators = state.currentGenerators;
-      let solvedGenerators = state.solvedGenerators;
-
-      if (currentGenerators.length === 0) {
-        currentGenerators.push(state.unsolvedGenerators.shift());
-      }
-
-      currentGenerators = currentGenerators.filter((g) => {
-        // let i = 0;
-        // for (; i <= 1000; i++) {
-          const value = g.generator.next();
-          state.counter++;
-          if (!value || value.done) {
-            solvedGenerators.push(g);
-            return false;
-          }
-          state.solutions = state.solutions.concat(value.value.solutions);
-          state.numberOfPossibilitiesChecked += value.value.numberOfPossibilitiesChecked;
-        // }
-        return true;
-      });
-
-      if (currentGenerators.length === 0) {
-        currentGenerators = [state.unsolvedGenerators.shift()];
-      }
-
-      state.currentGenerators = currentGenerators;
-      yield state;
-      
-    }
+  let state: anagram.AnagramGeneratorStep = {
+    solutions: [],
+    numberOfPossibilitiesChecked: 0,
   };
-  
-  const mainGenerator = getSolutions({...initialState});
-  this.mainGenerator = mainGenerator;
-  
-  let state: anagram.AnagramIteratorState = null;
-  let lastTimeSend: anagram.SerializedAnagramIteratorState = null;
   let lastTimeSendDate = +(new Date());
 
   const MINIMUM_TIME = 200;
 
-  for (state of mainGenerator) {
+  for (let stateStep of generator) {
+    state.solutions = state.solutions.concat(stateStep.solutions);
+    state.numberOfPossibilitiesChecked += stateStep.numberOfPossibilitiesChecked;
     const currentDate = +(new Date());
     const diff = currentDate - lastTimeSendDate;
-    if (lastTimeSend === null ||
-        diff > MINIMUM_TIME
+    if (diff > MINIMUM_TIME
       ) {
-        lastTimeSend = anagram.serializeAnagramIteratorStateFactor(state);
+        // const lastTimeSend = serializeAnagramStep(state);
         lastTimeSendDate = +(new Date());
-        ctx.postMessage(lastTimeSend);
-      }
-    
-      if (!workerState.running) {
-        break;
+        // ctx.postMessage(lastTimeSend);
       }
   }
 
-  ctx.postMessage(anagram.serializeAnagramIteratorStateFactor(state));
+  ctx.postMessage(serializeAnagramStep(state));
   ctx.postMessage('finish');
+  self.close()
   
 });
