@@ -312,30 +312,34 @@ class Anagramania extends React.Component<{}, {
         return;
       }
       const nextWorkerIndex = this.state.anagramIteratorState.unsolvedSubanagrams.shift();
+      this.state.anagramIteratorState.currentSubanagrams.push(nextWorkerIndex);
+      this.setState({});
       
       const worker = this.workers[nextWorkerIndex];
       worker.addEventListener('message', message => {
         if (message.data === 'finish') {
+          this.state.anagramIteratorState.solvedSubanagrams.push(nextWorkerIndex);
+          this.state.anagramIteratorState.currentSubanagrams.shift();
+          worker.terminate();
           startNextWorker();
           return;
         }
         const newState: anagram.AnagramGeneratorStepSerialized = message.data;
-        console.log(newState);
-        // const solutions = this.state.anagramIteratorState.solutions.concat(newState.solutions);
-        // const numberOfPossibilitiesChecked = this.state.anagramIteratorState.numberOfPossibilitiesChecked + newState.numberOfPossibilitiesChecked;
-        // this.setState({
-        //   anagramIteratorState: {
-        //     ...this.state.anagramIteratorState,
-        //     solutions,
-        //     numberOfPossibilitiesChecked,
-        //   }
-        // });
+        const solutions = this.state.anagramIteratorState.solutions.concat(newState.solutions);
+        const numberOfPossibilitiesChecked = this.state.anagramIteratorState.numberOfPossibilitiesChecked + newState.numberOfPossibilitiesChecked;
+        this.setState({
+          anagramIteratorState: {
+            ...this.state.anagramIteratorState,
+            solutions,
+            numberOfPossibilitiesChecked,
+          }
+        });
       });
       worker.postMessage({
         type: 'start',
         query: cleanedQuery,
-        subanagrams,
         subanagram: subanagrams[nextWorkerIndex],
+        subanagrams,
       });
     };
 

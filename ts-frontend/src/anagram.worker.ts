@@ -4,9 +4,7 @@ const ctx: Worker = self as any;
 
 function serializeAnagramStep(step: anagram.AnagramGeneratorStep): anagram.AnagramGeneratorStepSerialized {
   return {
-    solutions: step.solutions.map(s => {
-      return s.list.map(w => w.index).reverse();
-    }),
+    solutions: step.solutions.map(s => s[0].slice().reverse()),
     numberOfPossibilitiesChecked: step.numberOfPossibilitiesChecked
   };
 }
@@ -43,14 +41,16 @@ ctx.addEventListener('message', (message) => {
     const diff = currentDate - lastTimeSendDate;
     if (diff > MINIMUM_TIME
       ) {
-        // const lastTimeSend = serializeAnagramStep(state);
+        const lastTimeSend = serializeAnagramStep(state);
         lastTimeSendDate = +(new Date());
-        // ctx.postMessage(lastTimeSend);
+        ctx.postMessage(lastTimeSend);
+        state.solutions = [];
+        state.numberOfPossibilitiesChecked = 0;
       }
   }
 
   ctx.postMessage(serializeAnagramStep(state));
   ctx.postMessage('finish');
-  self.close()
+  self.close();
   
 });

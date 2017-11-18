@@ -1,4 +1,4 @@
-import {sortBy, drop} from 'lodash';
+import {sortBy, drop, uniqBy} from 'lodash';
 
 //
 // interfaces
@@ -14,11 +14,7 @@ export interface IndexedWord {
   index: number;
 }
 
-export interface AnagramSolution {
-  list: IndexedWord[];
-  set: string;
-  goodness: number;
-}
+type AnagramSolution = [number[], string];
 
 type OptimizedAnagramSolution = number[];
 
@@ -34,11 +30,7 @@ export interface SubanagramSolver {
   generator: AnagramGenerator;
 }
 
-interface StackItem {
-  list: IndexedWord[];
-  set: string;
-  goodness: number;
-}
+type StackItem = AnagramSolution;
 
 export interface AnagramIteratorState {
   breakLoop: boolean;
@@ -192,9 +184,10 @@ export function findAnagrams(query: string, dictionary: Word[]): Word[] {
 
 export function findSubAnagrams(query: string, dictionary: Word[]): Word[] {
   const nQuery = stringToWord(query);
-  return dictionary.filter(nStr => {
+  // not sure why uniqBy is needed, have to investigate
+  return uniqBy(dictionary.filter(nStr => {
     return isSubset(nStr.set, nQuery.set);
-  })
+  }), w => w.set);
 }
 
 export function sortWordList(wordList: Word[]) {
@@ -228,7 +221,7 @@ export function angagramIteratorStateFactory(unsolvedGenerators = []) {
 }
 
 export function serializeAnagramIteratorStateFactor(state: AnagramIteratorState): SerializedAnagramIteratorState {
-  const solutions = state.solutions.map(s => [...s.list.map(w => w.index)].reverse());
+  const solutions = state.solutions.map(s => [...s[0]].reverse());
   return {
     counter: state.counter,
     numberOfPossibilitiesChecked: state.numberOfPossibilitiesChecked,
@@ -251,22 +244,22 @@ export function findAnagramSentencesForInitialStack(
 
     let numberOfPossibilitiesChecked = initialStack.length;
 
-    let ITERATIONS = 100;
-    let index = 0;
     let newSolutions: AnagramSolution[] = [];
+    let numberOfSolutions = 0;
+    const MAX_SOLUTIONS = 100;
 
-    while(stack.length !== 0) {
+    while(stack.length !== 0 && numberOfSolutions < MAX_SOLUTIONS) {
       const current = stack.shift() as AnagramSolution;
 
-      if (isSame(nQuery.set, current.set)) {
+      if (isSame(nQuery.set, current[1])) {
         // solutions.push(current);
         newSolutions.push(current);
       } else {
 
-        const charsMissing = queryLength - current.set.length;
+        const charsMissing = queryLength - current[1].length;
 
         // drop all subanagrams that were before index
-        const droppedSubanagrams = drop(subanagrams, current.list[0].index); 
+        const droppedSubanagrams = drop(subanagrams, current[0][0]); 
 
         numberOfPossibilitiesChecked += droppedSubanagrams.length;
 
@@ -278,7 +271,7 @@ export function findAnagramSentencesForInitialStack(
         const combinedWords = possibleSubanagrams.map(w => {
           return {
             word: w,
-            combined: joinTwoStrings(current.set, w.word.set)
+            combined: joinTwoStrings(current[1], w.word.set)
           };
         });
 
@@ -288,44 +281,35 @@ export function findAnagramSentencesForInitialStack(
         });
 
         const newStackItems: AnagramSolution[] = filterCombined.map(cw => {
-          return {
-            list: [cw.word].concat(current.list),
-            goodness: current.goodness,
-            set: cw.combined,
-          };
+          return [
+            [cw.word.index].concat(current[0]),
+            cw.combined,
+          ] as AnagramSolution;
         });
 
-        for (let item of newStackItems) {
-          stack.push(item);
-        }
+        stack.unshift(...newStackItems);
       }
 
-      if (current.list[current.list.length - 1].word.word === 'any') {
-      }
-      if (index > ITERATIONS) {
-        yield {
-          solutions: newSolutions,
-          numberOfPossibilitiesChecked,
-        };
-        newSolutions = [];
-        index = 0;
-      }
-      index++;
+      yield {
+        solutions: newSolutions,
+        numberOfPossibilitiesChecked,
+      };
+      numberOfSolutions += newSolutions.length;
+      newSolutions = [];
     }
-    yield {
-      solutions: newSolutions,
-      numberOfPossibilitiesChecked,
-    };
+
   }
+
   return generator();
 }
 
 export function findAnagramSentencesForSubAnagram(query: string, subanagrams: IndexedWord[], subanagram: IndexedWord): SubanagramSolver {
-  const initialStack = [{
-    list: [subanagram],
-    set: subanagram.word.set,
-    goodness: 0,
-  }];
+  const initialStack: AnagramSolution[] = [
+    [
+      [subanagram.index],
+      subanagram.word.set,
+    ]
+  ];
   const generator = findAnagramSentencesForInitialStack(query, initialStack, subanagrams);
   return {
     subanagram,
