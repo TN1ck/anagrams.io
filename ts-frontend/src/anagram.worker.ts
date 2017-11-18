@@ -2,8 +2,24 @@ import * as anagram from './anagram';
 
 const ctx: Worker = self as any;
 
+
+let workerState = {
+  running: false,
+};
+
 ctx.addEventListener('message', (message) => {
 
+  if (message.data.type !== 'start') {
+    return;
+  }
+
+  if (message.data.type === 'pause') {
+    console.log('PAUSE');
+    workerState.running = false;
+    return;
+  }
+
+  workerState.running = true;
   const data = message.data;
   const {query, subanagrams} = data;
   const generators = anagram.findAnagramSentences(query, subanagrams);
@@ -14,11 +30,10 @@ ctx.addEventListener('message', (message) => {
     while (!state.breakLoop && state.unsolvedGenerators.length !== 0) {
       
       let currentGenerators = state.currentGenerators;
-      let unsolvedGenerators = state.unsolvedGenerators;
       let solvedGenerators = state.solvedGenerators;
 
       if (currentGenerators.length === 0) {
-        currentGenerators = [state.unsolvedGenerators.shift()];
+        currentGenerators.push(state.unsolvedGenerators.shift());
       }
 
       currentGenerators = currentGenerators.filter((g) => {
@@ -30,10 +45,8 @@ ctx.addEventListener('message', (message) => {
             solvedGenerators.push(g);
             return false;
           }
-          if (value.value.solution) {
-            state.solutions.push(value.value.current);
-            state.numberOfPossibilitiesChecked += value.value.numberOfPossibilitiesChecked;
-          }
+          state.solutions = state.solutions.concat(value.value.solutions);
+          state.numberOfPossibilitiesChecked += value.value.numberOfPossibilitiesChecked;
         // }
         return true;
       });
@@ -41,9 +54,7 @@ ctx.addEventListener('message', (message) => {
       if (currentGenerators.length === 0) {
         currentGenerators = [state.unsolvedGenerators.shift()];
       }
-      
-      state.unsolvedGenerators = unsolvedGenerators;
-      state.solvedGenerators = solvedGenerators;
+
       state.currentGenerators = currentGenerators;
       yield state;
       
@@ -68,6 +79,10 @@ ctx.addEventListener('message', (message) => {
         lastTimeSend = anagram.serializeAnagramIteratorStateFactor(state);
         lastTimeSendDate = +(new Date());
         ctx.postMessage(lastTimeSend);
+      }
+    
+      if (!workerState.running) {
+        break;
       }
   }
 

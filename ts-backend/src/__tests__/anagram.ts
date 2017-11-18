@@ -27,7 +27,7 @@ describe('Anagram / findanagrams', () => {
     const generators = anagram.findAnagramSentences(TEST_WORD, subanagrams);
     const subanagramSolutions = generators.map(({generator}) => {
       const gen = generator;
-      const values = [...gen].filter(v => v.solution);
+      const values = [...gen].map(v => v.solutions);
       return values;
     });
     const values = flatten(subanagramSolutions);

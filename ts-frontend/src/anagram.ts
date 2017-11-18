@@ -140,6 +140,7 @@ export interface IndexedWord {
 export interface AnagramSolution {
   list: IndexedWord[];
   set: string;
+  goodness: number;
 }
 
 type OptimizedAnagramSolution = number[];
@@ -158,8 +159,7 @@ export function findSortedSubAnagrmns(query: string, dictionary: Word[]): Indexe
 }
 
 export type AnagramGenerator = IterableIterator<{
-  current: AnagramSolution,
-  solution: boolean,
+  solutions: AnagramSolution[],
   numberOfPossibilitiesChecked: number,
 }>;
 
@@ -228,16 +228,20 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
   const createGenerator = (initialStack: StackItem[]) => {
     const generator = function* () {
         let stack: AnagramSolution[] = initialStack;
-        const solutions: AnagramSolution[] = [];
+        // const solutions: AnagramSolution[] = [];
     
         let numberOfPossibilitiesChecked = initialStack.length;
+
+        let ITERATIONS = 100;
+        let index = 0;
+        let newSolutions: AnagramSolution[] = [];
+
         while(stack.length !== 0) {
           const current = stack.shift() as AnagramSolution;
-          let solution = false;
     
           if (isSame(nQuery.set, current.set)) {
-            solutions.push(current);
-            solution = true;
+            // solutions.push(current);
+            newSolutions.push(current);
           } else {
     
             const charsMissing = queryLength - current.set.length;
@@ -267,6 +271,7 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
             const newStackItems: AnagramSolution[] = filterCombined.map(cw => {
               return {
                 list: [cw.word].concat(current.list),
+                goodness: current.goodness,
                 set: cw.combined,
               };
             });
@@ -275,13 +280,23 @@ export function findAnagramSentences(query: string, subanagrams: IndexedWord[]):
               stack.push(item);
             }
           }
-    
-          yield {
-            current,
-            solution,
-            numberOfPossibilitiesChecked,
-          };
+
+          if (current.list[current.list.length - 1].word.word === 'any') {
+          }
+          if (index > ITERATIONS) {
+            yield {
+              solutions: newSolutions,
+              numberOfPossibilitiesChecked,
+            };
+            newSolutions = [];
+            index = 0;
+          }
+          index++;
         }
+        yield {
+          solutions: newSolutions,
+          numberOfPossibilitiesChecked,
+        };
       }
       return generator();
   }

@@ -19,7 +19,7 @@ export function testPerformanceOne(): PerformanceWithSolutions {
   const generators = anagram.findAnagramSentences(test.string, test.subanagrams);
   generators.map(({generator}) => {
     const gen = generator;
-    const values = [...gen].filter(v => v.solution).map(v => v.current);
+    const values = [...gen].map(v => v.solutions);
     return values;
   });
   const end = performance.now();
