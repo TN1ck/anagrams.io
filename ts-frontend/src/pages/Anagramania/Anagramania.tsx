@@ -204,7 +204,7 @@ class Anagramania extends React.Component<{}, {
       query: '',
       cleanedQuery: '',
       dictionaries: [],
-      selectedDictionaries: 'eng-us-3k',
+      selectedDictionaries: 'eng-us-50k',
       subanagrams: [],
       anagramIteratorState: null,
     };
