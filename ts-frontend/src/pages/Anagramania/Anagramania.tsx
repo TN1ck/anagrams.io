@@ -60,7 +60,7 @@ class ActiveSubanagrams extends React.Component<{
     } = this.props;
     return (
       <span>
-        {`Currently checking the subanagrams: ${currentSubanagrams.map(i => subanagrams[i].word.word).join(', ')}.`}
+        {`Checking: ${currentSubanagrams.map(i => subanagrams[i].word.word).join(', ')}`}
       </span>
     );
   }
@@ -106,11 +106,12 @@ class AnagramInfoArea extends React.Component<{
           />
         </Strong>
         <br/>
+        <br/>
         <Strong>
           {`Checked ${numberOfPossibilitiesChecked} possibilities.`}
         </Strong>
         <br />
-        <Strong>{` ${solutions.length} solutions.`}</Strong>
+        <Strong>{`Found ${solutions.length} solutions.`}</Strong>
         <br/>
         {
           isDone ? (
@@ -138,6 +139,7 @@ interface AnagramaniaHeaderProps {
 };
 
 class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
+  input: HTMLInputElement;
   shouldComponentUpdate(newProps: AnagramaniaHeaderProps) {
     if (
       this.props.selectedDictionaries !== newProps.selectedDictionaries ||
@@ -146,6 +148,12 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
       return true;
     }
     return false;
+  }
+  setInput(dom: HTMLInputElement) {
+    this.input = dom;
+  }
+  componentDidMount() {
+    this.input.focus();
   }
   render() {
     const {
@@ -164,6 +172,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
           <Form onSubmit={onSubmit}>
             <Input
               type="text"
+              innerRef={(e) => this.setInput(e)}
               onChange={onQueryChange}
             />
             <SearchButton>
