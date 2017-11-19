@@ -92,56 +92,62 @@ export function joinTwoStrings(w1: string, w2: string): string {
   let combined = '';
   let index1 = 0;
   let index2 = 0;
-  if (w1.length < w2.length) {
+  const w1Length = w1.length;
+  const w2Length = w2.length;
+  if (w1Length < w2Length) {
     return joinTwoStrings(w2, w1);
   }
-  while (index1 < w1.length) {
+  while (index1 < w1Length) {
+
+    if (index2 >= w2Length) {
+      while(index1 < w1Length) {
+        const c = w1[index1];
+        combined += c;
+        index1++;
+      }
+      return combined;
+    }
     const c1 = w1[index1];
     const c2 = w2[index2];
 
-    if (c2 === undefined) {
-      while(index1 < w1.length) {
-        const c = w1[index1];
-        combined += (c);
-        index1++;
-      }
-      break;
-    }
-
     if (c1 < c2) {
-      combined += (c1);
+      combined += c1;
       index1++;
     } else if (c1 > c2) {
-      combined += (c2);
+      combined += c2;
       index2++;
     } else if (c1 === c2) {
       const startChar = c1;
       let char = startChar;
       let index = 0;
       while (char === startChar) {
-        combined += (char);
+        combined += char;
         index++;
-        char = w1[index1 + index];
-        if (char === undefined) {
+        const newIndex = index1 + index;
+        if (newIndex >= w1Length) {
           break;
         }
+        char = w1[newIndex];
       }
       index1 += index;
       let newIndex = 0;
       char = startChar;
       while (char === startChar) {
-        combined += (char);
+        combined += char;
         index++;
         newIndex++;
-        char = w2[index2 + newIndex];
-        if (char === undefined) {
+        // checking the index instead of char === undefined 10%
+        const newIndex2 = index2 + newIndex;
+        if (newIndex2 >= w2Length) {
           break;
         }
+        char = w2[newIndex2];
       }
       index2 += newIndex;
     }
   }
-  while(index2 < w2.length) {
+  // substr is not faster
+  while(index2 < w2Length) {
     const c2 = w2[index2];
     combined += c2;
     index2++;
