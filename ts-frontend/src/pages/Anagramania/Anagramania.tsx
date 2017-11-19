@@ -289,6 +289,7 @@ class Anagramania extends React.Component<{}, {
       this.setState({});
       
       const worker = new AnagramWorker();
+      this.worker = worker;
 
       worker.addEventListener('message', message => {
         if (message.data === 'finish') {
