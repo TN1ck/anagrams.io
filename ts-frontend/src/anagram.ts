@@ -30,8 +30,6 @@ export interface SubanagramSolver {
   generator: AnagramGenerator;
 }
 
-type StackItem = AnagramSolution;
-
 export interface AnagramIteratorState {
   breakLoop: boolean;
   counter: number;
@@ -187,7 +185,8 @@ export function findSubAnagrams(query: string, dictionary: Word[]): Word[] {
   // not sure why uniqBy is needed, have to investigate
   return uniqBy(dictionary.filter(nStr => {
     return isSubset(nStr.set, nQuery.set);
-  }), w => w.set);
+  // w.set should be used, but we have to do some stuff for it
+  }), w => w.word);
 }
 
 export function sortWordList(wordList: Word[]) {
@@ -234,7 +233,7 @@ export function serializeAnagramIteratorStateFactor(state: AnagramIteratorState)
 }
 
 export function findAnagramSentencesForInitialStack(
-  query: string, initialStack: StackItem[], subanagrams: IndexedWord[],
+  query: string, initialStack: AnagramSolution[], subanagrams: IndexedWord[],
 ) {
   const nQuery = stringToWord(query);
   const queryLength = nQuery.word.length;
@@ -280,14 +279,14 @@ export function findAnagramSentencesForInitialStack(
           return isSubset(cw.combined, nQuery.set);
         });
 
-        const newStackItems: AnagramSolution[] = filterCombined.map(cw => {
+        const newAnagramSolutions: AnagramSolution[] = filterCombined.map(cw => {
           return [
             [cw.word.index].concat(current[0]),
             cw.combined,
           ] as AnagramSolution;
         });
 
-        stack.unshift(...newStackItems);
+        stack.unshift(...newAnagramSolutions);
       }
 
       yield {

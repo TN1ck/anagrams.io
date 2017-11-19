@@ -35,17 +35,6 @@ const Strong = styled.strong`
   color: white;
 `;
 
-const WaitButton = styled.button`
-  background: none;
-  color: white;
-  padding: 10px;
-  font-size: 14px;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.4);
-  }
-`;
-
 class AnagramPercentage extends React.Component<{
   numberOfSolvedSubanagrams: number;
   numberOfAnagrams: number;
@@ -251,10 +240,9 @@ class Anagramania extends React.Component<{}, {
   }
   pauseWorker() {
     console.log('pause');
-    this.worker.postMessage({type: 'pause'});
   }
   continueWorker() {
-    this.worker.postMessage({type: 'continue'});
+    console.log('continue');
   }
   async requestAnagram() {
 
@@ -307,6 +295,10 @@ class Anagramania extends React.Component<{}, {
           this.state.anagramIteratorState.solvedSubanagrams.push(nextWorkerIndex);
           this.state.anagramIteratorState.currentSubanagrams.shift();
           worker.terminate();
+          // stop!
+          if (this.state.anagramIteratorState.solvedSubanagrams.length === subanagrams.length) {
+            return;
+          }
           startNextWorker();
           return;
         }
@@ -340,12 +332,6 @@ class Anagramania extends React.Component<{}, {
           selectedDictionaries={this.state.selectedDictionaries}
         />
         <InnerContainer>
-          <WaitButton onClick={this.pauseWorker}>
-            {'Pause'}
-          </WaitButton>
-          <WaitButton onClick={this.continueWorker}>
-            {'Continue'}
-          </WaitButton>
           <AnagramInfoArea
             anagramIteratorState={state}
             subanagrams={this.state.subanagrams}
