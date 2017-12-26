@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-
+const MinifyPlugin = require("babel-minify-webpack-plugin");
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
@@ -26,17 +26,15 @@ const basePlugins = [
 ];
 
 const prodPlugins = [
-  new webpack.optimize.UglifyJsPlugin({
-    mangle: true,
-    sourceMap: false,
-    compress: {
-      screw_ie8: true,
-      warnings: false
-    },
-    output: {
-      comments: false,
-    }
-  }),
+  new MinifyPlugin({}, {}),
+  // new UglifyJSPlugin({
+  //   uglifyOptions: {
+  //     beautify: false,
+  //     ecma: 6,
+  //     compress: true,
+  //     comments: false
+  //   }
+  // }),
   new webpack.LoaderOptionsPlugin({
     minimize: true,
     debug: false
@@ -54,7 +52,7 @@ const plugins = basePlugins.concat(
 console.log('IS PRODUCTION', IS_PRODUCTION);
 
 module.exports = {
-  devtool: 'eval',
+  devtool: IS_PRODUCTION ? 'none' : 'eval',
   entry: IS_PRODUCTION ? ['./src/index'] : [
     'webpack-dev-server/client?http://localhost:3001',
     'webpack/hot/dev-server',

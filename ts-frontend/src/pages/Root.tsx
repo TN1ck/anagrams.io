@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Anagramania from './Anagramania/Anagramania';
 import Performance from './Performance';
+import Share from './Share/Share';
 
 const Root: React.StatelessComponent<{}> = () => {
   const location = window.location;
@@ -12,6 +13,8 @@ const Root: React.StatelessComponent<{}> = () => {
   switch (page) {
     case 'performance':
       return <Performance />;
+    case 'share':
+      return <Share />;
     default:
       return <Anagramania />;
   }

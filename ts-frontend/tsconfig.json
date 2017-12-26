@@ -3,7 +3,7 @@
   "buildOnSave": false,
   "compileOnSave": false,
   "compilerOptions": {
-    "lib": ["dom","es2017"],
+    "lib": ["dom", "es2017"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "module": "commonjs",
@@ -21,7 +21,7 @@
     "noImplicitAny": false,
     "removeComments": false,
     "sourceMap": false,
-    "inlineSourceMap": true
+    "inlineSourceMap": false
   },
   "exclude": [
     "node_modules",
