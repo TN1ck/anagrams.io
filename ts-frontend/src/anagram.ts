@@ -65,12 +65,17 @@ export interface AnagramGeneratorStepSerialized {
 // functions
 //
 
-export function sanitizeQuery(str: string): string {
-  return str.toLowerCase()
+export function sanitizeQuery(str: string, removeSpaces: boolean = true): string {
+  const umlauts = str.toLowerCase()
     .replace(/ü/g, 'ue')
     .replace(/ä/g, 'ae')
-    .replace(/ö/g, 'oe')
-    .replace(/[^a-z]/g, '');
+    .replace(/ö/g, 'oe');
+  
+  if (removeSpaces) {
+    return umlauts.replace(/[^a-z]/g, '');
+  } else {
+    return umlauts.replace(/[^a-z\s]/g, '')
+  }
 }
 
 export function stringToWord (str: string): Word {

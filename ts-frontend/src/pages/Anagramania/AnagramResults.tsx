@@ -43,7 +43,8 @@ class AnagramResults extends React.Component<
     average: number;
     min: number;
     max: number;
-  }
+  },
+  query: string;
 },
 {
   columnWidth: number;
@@ -87,7 +88,7 @@ class AnagramResults extends React.Component<
     this.dom = dom;
   }
   render() {
-    const {anagramIteratorState, subanagrams} = this.props;
+    const {anagramIteratorState, subanagrams, query} = this.props;
     const {solutions, currentSubanagrams, solvedSubanagrams, unsolvedSubanagrams} = anagramIteratorState;
     const isDone = unsolvedSubanagrams.length === 0;
     // only show 500 subanagrams, browser would die else
@@ -139,6 +140,7 @@ class AnagramResults extends React.Component<
                     counter={counter}
                     maxLengthInGroup={maxLengthInGroup}
                     wordStats={this.props.wordStats}
+                    query={query}
                   />
                 );
               })}
@@ -168,6 +170,7 @@ class AnagramResults extends React.Component<
                                 counter={counter}
                                 maxLengthInGroup={0}
                                 wordStats={this.props.wordStats}
+                                query={query}
                               />
                             );
                           })}
@@ -194,6 +197,7 @@ class AnagramResults extends React.Component<
                           counter={counter}
                           maxLengthInGroup={0}
                           wordStats={this.props.wordStats}
+                          query={query}
                         />
                       );
                     })}

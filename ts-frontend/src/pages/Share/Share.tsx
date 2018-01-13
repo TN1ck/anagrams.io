@@ -3,11 +3,14 @@ import styled from 'styled-components';
 
 import Header from 'src/components/Header';
 import Title from 'src/components/Title';
+import HeaderContainer from 'src/components/HeaderContainer';
 import InnerContainer from 'src/components/InnerContainer';
+import { YELLOW, ORANGE } from 'src/constants';
 
 const WordContainer = styled.div`
   padding-top: 20px;
-  text-align: center;
+  display: flex;
+  justify-content: center;
 `;
 
 const Word = styled.strong`
@@ -27,8 +30,22 @@ const Character = styled.span`
   transition: left 0.3s ease-out;
 `;
 
+const CTAButton = styled.a`
+  background: none;
+  padding-bottom: 2px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  outline: none;
+  color: black;
+  border-bottom: 4px solid ${YELLOW};
+  text-decoration: none;
+  &:hover {
+    border-bottom: 4px solid ${ORANGE};
+  }
+`;
+
 const ExplainText = styled.p`
-  text-align: center;
   color: black;
 `;
 
@@ -100,7 +117,12 @@ function getAangramMapping(w1: string, w2: string): number[] {
   const resultMapping = [];
   // let index1 = 0;
   // let index2 = 0;
+  // let index = 0;
   for (let s of w1) {
+    if (s === ' ') {
+      resultMapping.push(undefined);
+      continue;
+    }
     // check if the char was already used once
     let chars = mapping[s] || [];
     mapping[s] = chars;
@@ -112,6 +134,7 @@ function getAangramMapping(w1: string, w2: string): number[] {
     const sInW2 = w2.indexOf(s, lastPosition);
     chars.push(sInW2);
     resultMapping.push(sInW2);
+    // index++;
   }
   return resultMapping;
 }
@@ -131,54 +154,68 @@ const Share: React.StatelessComponent<{
     <div>
       <Header>
         <InnerContainer>
-          <Title>
-            {'Anagramania.io'}
-          </Title>
-          <ExplainText
-            dangerouslySetInnerHTML={{
-              __html: `Did you know that <strong>${word}</strong> is an anagram of <strong>${anagram}</strong>?`
-            }}
-          />
+          <HeaderContainer>
+            <Title>
+              {'Anagramania.io'}
+            </Title>
+            <ExplainText
+              dangerouslySetInnerHTML={{
+                __html: `Did you know that <strong>${word}</strong> is an anagram of <strong>${anagram}</strong>?`
+              }}
+            />
+          </HeaderContainer>
         </InnerContainer>
       </Header>
-      <InnerContainer>
-        <WordContainer>
-          <Word>
-            {word}
-            {[...word].map((c, i) => {
-              const left = i * CHARACTER_WIDTH;
-              return <Character style={{left}}>{c}</Character>
-            })}
-          </Word>
-          <div>
-            <svg height="400px" width={WORD_WIDTH} style={{overflow: 'visible'}}>
-              {mapping.map((newIndex, index) => {
-                const x1 = (index * CHARACTER_WIDTH) + CHARACTER_WIDTH / 2;
-                const y1 = 0;
-                const x2 = (newIndex * CHARACTER_WIDTH) + CHARACTER_WIDTH / 2;
-                const y2 = 400;
-                const opacity = 1 - (0.05 * index);
-                return (
-                  <path
-                    opacity={opacity}
-                    stroke="black"
-                    fill="transparent"
-                    strokeWidth={STROKE_WIDTH}
-                    d={drawPath(x1, y1, x2, y2, index)}
-                  />
-                );
-              })}
-            </svg>
+      <Header>
+        <InnerContainer>
+          <WordContainer>
+            <div>
+              <Word>
+                {word}
+                {[...word].map((c, i) => {
+                  const left = i * CHARACTER_WIDTH;
+                  return <Character style={{left}}>{c}</Character>
+                })}
+              </Word>
+              <div>
+                <svg height="400px" width={WORD_WIDTH} style={{overflow: 'visible'}}>
+                  {mapping.map((newIndex, index) => {
+                    if (newIndex === undefined) {
+                      return null;
+                    }
+                    const x1 = (index * CHARACTER_WIDTH) + CHARACTER_WIDTH / 2;
+                    const y1 = 0;
+                    const x2 = (newIndex * CHARACTER_WIDTH) + CHARACTER_WIDTH / 2;
+                    const y2 = 400;
+                    const opacity = 1 - (0.05 * index);
+                    return (
+                      <path
+                        opacity={opacity}
+                        stroke="black"
+                        fill="transparent"
+                        strokeWidth={STROKE_WIDTH}
+                        d={drawPath(x1, y1, x2, y2, index)}
+                      />
+                    );
+                  })}
+                </svg>
+              </div>
+              <Word>
+                {anagram}
+                {[...anagram].map((c, i) => {
+                  const left = i * CHARACTER_WIDTH;
+                  return <Character style={{left}}>{c}</Character>
+                })}
+              </Word>
+            </div>
+          </WordContainer>
+          <div style={{display: 'flex', justifyContent: 'center', marginTop: '40px'}}>
+            <CTAButton href="/">
+              {'Find your own anagram now!'}
+            </CTAButton>
           </div>
-          <Word>
-            {anagram}
-            {[...anagram].map((c, i) => {
-              const left = i * CHARACTER_WIDTH;
-              return <Character style={{left}}>{c}</Character>
-            })}
-          </Word>
-        </WordContainer>
-      </InnerContainer>
+        </InnerContainer>
+      </Header>
     </div>
   );
 };

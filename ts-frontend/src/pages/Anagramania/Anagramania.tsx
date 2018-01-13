@@ -9,6 +9,7 @@ import Input from 'src/components/Input';
 import SearchButton from 'src/components/SearchButton';
 import SubTitle from 'src/components/SubTitle';
 import Title from 'src/components/Title';
+import HeaderContainer from 'src/components/HeaderContainer';
 import LoadingBar from 'src/components/LoadingBar';
 
 import {RequestStatus, getSubAnagrams, getDictionaries, Dictionary} from 'src/api';
@@ -18,7 +19,6 @@ import * as anagram from 'src/anagram';
 import AnagramResults from './AnagramResults';
 import {
   Strong,
-  HeaderContainer,
   DictionaryButton,
 } from './components';
 
@@ -27,21 +27,7 @@ const AnagramWorker = require('../../anagram.worker');
 import 'src/assets/styles.css';
 
 import mockState from 'src/assets/anagramPageMock';
-const TESTING = true;
-
-// class AnagramPercentage extends React.Component<{
-//   numberOfSolvedSubanagrams: number;
-//   numberOfAnagrams: number;
-// }> {
-//   render() {
-//     const {numberOfSolvedSubanagrams, numberOfAnagrams} = this.props;
-//     return (
-//       <span>
-//         {`Checked ${Math.ceil(((numberOfSolvedSubanagrams)/ numberOfAnagrams) * 100)} %.`}
-//       </span>
-//     );
-//   }
-// }
+const TESTING = false;
 
 class ActiveSubanagrams extends React.Component<{
   currentSubanagrams: number[];
@@ -68,11 +54,13 @@ class ActiveSubanagrams extends React.Component<{
 class AnagramInfoArea extends React.Component<{
   anagramIteratorState: anagram.SerializedAnagramIteratorState;
   subanagrams: anagram.IndexedWord[];
+  query: string;
 }> {
   render() {
     const {
       anagramIteratorState,
       subanagrams,
+      query,
     } = this.props;
 
     if (!anagramIteratorState) {
@@ -131,6 +119,7 @@ class AnagramInfoArea extends React.Component<{
           anagramIteratorState={anagramIteratorState}
           isDone={isDone}
           wordStats={wordStats}
+          query={query}
         />
       </div>
     );
@@ -209,6 +198,7 @@ class Anagramania extends React.Component<{}, {
   queryStatus: RequestStatus;
   query: string;
   cleanedQuery: string;
+  cleanedQueryWithSpaces: string;
   // anagrams: AnagramResult[];
   subanagrams: anagram.IndexedWord[];
   anagramIteratorState: anagram.SerializedAnagramIteratorState;
@@ -227,6 +217,7 @@ class Anagramania extends React.Component<{}, {
       selectedDictionaries: 'en',
       subanagrams: [],
       anagramIteratorState: null,
+      cleanedQueryWithSpaces: '',
     };
 
     this.onQueryChange = this.onQueryChange.bind(this);
@@ -237,7 +228,7 @@ class Anagramania extends React.Component<{}, {
 
     this.state = defaultState;
     if (TESTING) {
-      this.state = mockState as any;
+      // this.state = mockState as any;
     }
   }
   async componentWillMount() {
@@ -273,6 +264,7 @@ class Anagramania extends React.Component<{}, {
     this.finished = false;
   
     const cleanedQuery = anagram.sanitizeQuery(this.state.query);
+    const cleanedQueryWithSpaces = anagram.sanitizeQuery(this.state.query, false);
 
     const result = await getSubAnagrams(cleanedQuery, this.state.selectedDictionaries);
     const {anagrams: subanagrams} = result.data;
@@ -287,6 +279,7 @@ class Anagramania extends React.Component<{}, {
       subanagrams,
       queryStatus: RequestStatus.loading,
       cleanedQuery,
+      cleanedQueryWithSpaces,
       // TODO
       anagramIteratorState: initialAnagramIteratorState,
     });
@@ -348,6 +341,9 @@ class Anagramania extends React.Component<{}, {
 
     const state = this.state.anagramIteratorState;
 
+    const query = this.state.cleanedQueryWithSpaces;
+    console.log(query, 'query');
+
     return (
       <div>
         <AnagramaniaHeader
@@ -361,6 +357,7 @@ class Anagramania extends React.Component<{}, {
           <AnagramInfoArea
             anagramIteratorState={state}
             subanagrams={this.state.subanagrams}
+            query={query}
           />
           <Footer>
             {'Made by Tom Nick & Taisia Tikhnovetskaya'}

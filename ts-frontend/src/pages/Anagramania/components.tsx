@@ -11,24 +11,22 @@ export const ResultContainer = styled.div`
   margin-top: 5px;
 `;
 
-export const ShareButton = styled.div`
+export const ShareLink = styled.a`
   position: absolute;
   top: 0;
   right: 0;
   opacity: 0.2;
+  text-decoration: none;
+  color: black;
   &:hover {
     opacity: 1.0;
     cursor: pointer;
+    color: black;
   }
 `;
 
-export const HeaderContainer = styled.div`
-  max-width: 500px;
-  margin: 0 auto;
-`;
-
 export const Strong = styled.strong`
-  color: black;
+  color: white;
   font-size: 14px;
 `;
 

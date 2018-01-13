@@ -11,7 +11,7 @@ import {
   ResultContainer,
   AnagramResultGroup,
   ShowAllButton,
-  ShareButton,
+  ShareLink,
 } from './components';
 
 
@@ -26,26 +26,28 @@ class Result extends React.Component<{
   result: anagram.IndexedWord[];
   index: number;
   color: string;
+  query: string;
 }> {
   shouldComponentUpdate() {
     return false;
   }
   render() {
-    const {result, index, color} = this.props;
+    const {result, index, color, query} = this.props;
     return (
       <ResultContainer style={{backgroundColor: color}}>
         {(index + 1) + '. ' + result.map(w => {
           return w.word.word;
         }).join(' ')}
-        <ShareButton>
+        <ShareLink target="_blank" href={`/share?word=${query}&anagram=${result.map(w => w.word.word).join('%20')}`}>
           {'share'}
-        </ShareButton>
+        </ShareLink>
       </ResultContainer>
     );
   }
 }
 
 interface AnagramResultProps {
+  query: string;
   result: anagram.AnagramResultState;
   word: string;
   list: anagram.IndexedWord[][];
@@ -96,6 +98,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
       result,
       maxLengthInGroup,
       wordStats,
+      query,
     } = this.props;
 
     const minHeight = 17;
@@ -141,7 +144,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
           {/* <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div> */}
           {take(sortedList, !this.state.showAll ? MAX_ITEMS_TO_SHOW_AT_ONCE : list.length).map((a, i) => {
             const color = colorScale(scale(a.length));
-            return <Result key={i} result={a} index={i} color={color} />
+            return <Result key={i} result={a} index={i} color={color} query={query} />
           })}
           {
             list.length > MAX_ITEMS_TO_SHOW_AT_ONCE
