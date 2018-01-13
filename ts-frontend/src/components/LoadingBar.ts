@@ -8,6 +8,7 @@ const LoadingBar = withProps<{
   position: relative;
   border: 1px solid grey;
   padding 10px;
+  box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.1);
   background: ${props => {
     return `linear-gradient(to right, ${YELLOW} 0%, ${YELLOW} ${props.progress}%, #CCC ${props.progress}%, #CCC 100%);`;
   }}

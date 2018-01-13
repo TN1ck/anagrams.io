@@ -11,11 +11,12 @@ import {
   ResultContainer,
   AnagramResultGroup,
   ShowAllButton,
+  ShareButton,
 } from './components';
 
 
 const colorScale = d3Interpolate.interpolateLab(
-  '#00DD22',
+  '#FFFFFF',
   '#FFFFFF',
 );
 
@@ -36,6 +37,9 @@ class Result extends React.Component<{
         {(index + 1) + '. ' + result.map(w => {
           return w.word.word;
         }).join(' ')}
+        <ShareButton>
+          {'share'}
+        </ShareButton>
       </ResultContainer>
     );
   }
@@ -134,7 +138,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
           <strong>
             {word}
           </strong>
-          <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div>
+          {/* <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div> */}
           {take(sortedList, !this.state.showAll ? MAX_ITEMS_TO_SHOW_AT_ONCE : list.length).map((a, i) => {
             const color = colorScale(scale(a.length));
             return <Result key={i} result={a} index={i} color={color} />
@@ -148,6 +152,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
                     : `... show ${list.length - MAX_ITEMS_TO_SHOW_AT_ONCE} more`
                   }
                 </ShowAllButton>
+
               : null
           }
         </div>

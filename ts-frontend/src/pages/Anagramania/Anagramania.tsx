@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {throttle} from 'lodash';
+import {throttle, min, max} from 'lodash';
 
 import Footer from 'src/components/Footer';
 import Form from 'src/components/Form';
@@ -91,8 +91,8 @@ class AnagramInfoArea extends React.Component<{
     const numberOfWordsPerSolution = solutions.map(s => s.length);
     const numberOfWords = numberOfWordsPerSolution.reduce((a, b) => a + b, 0);
     const averageNumberOfWords = (numberOfWords / solutions.length);
-    const minNumberOfWords = Math.min(...numberOfWordsPerSolution);
-    const maxNumberOfWords = Math.max(...numberOfWordsPerSolution);
+    const minNumberOfWords = min(numberOfWordsPerSolution);
+    const maxNumberOfWords = max(numberOfWordsPerSolution);
     const wordStats = {
       average: averageNumberOfWords,
       min: minNumberOfWords,
@@ -107,7 +107,7 @@ class AnagramInfoArea extends React.Component<{
     return (
       <div>
         <SubTitle>
-          {`I found ${subanagrams.length} subanagrams. `}
+          {`Found ${subanagrams.length} subanagrams. `}
         </SubTitle>
         <LoadingBar progress={progress}>
           <ActiveSubanagrams
@@ -116,7 +116,7 @@ class AnagramInfoArea extends React.Component<{
           />
           {' '}
           <div style={{position: 'absolute', right: 10, top: 10}}>
-            {`${progress} %.`}
+            {`${progress} %`}
           </div>
         </LoadingBar>
         <br />

@@ -23,13 +23,13 @@ const Character = styled.span`
   position: absolute;
   top: 0;
   left: 0;
-  color: white;
+  color: black;
   transition: left 0.3s ease-out;
 `;
 
 const ExplainText = styled.p`
   text-align: center;
-  color: white;
+  color: black;
 `;
 
 function parseSearch(search: string) {
@@ -132,16 +132,16 @@ const Share: React.StatelessComponent<{
       <Header>
         <InnerContainer>
           <Title>
-            {'Share'}
+            {'Anagramania.io'}
           </Title>
+          <ExplainText
+            dangerouslySetInnerHTML={{
+              __html: `Did you know that <strong>${word}</strong> is an anagram of <strong>${anagram}</strong>?`
+            }}
+          />
         </InnerContainer>
       </Header>
       <InnerContainer>
-        <ExplainText
-          dangerouslySetInnerHTML={{
-            __html: `Did you know that <strong>${word}</strong> is an anagram of <strong>${anagram}</strong>?`
-          }}
-        />
         <WordContainer>
           <Word>
             {word}
@@ -161,7 +161,7 @@ const Share: React.StatelessComponent<{
                 return (
                   <path
                     opacity={opacity}
-                    stroke="white"
+                    stroke="black"
                     fill="transparent"
                     strokeWidth={STROKE_WIDTH}
                     d={drawPath(x1, y1, x2, y2, index)}

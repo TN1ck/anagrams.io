@@ -5,9 +5,21 @@ import {withProps} from 'src/utility';
 import {YELLOW} from 'src/constants';
 
 export const ResultContainer = styled.div`
+  position: relative;
   color: black;
   white-space: nowrap;
   margin-top: 5px;
+`;
+
+export const ShareButton = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: 0.2;
+  &:hover {
+    opacity: 1.0;
+    cursor: pointer;
+  }
 `;
 
 export const HeaderContainer = styled.div`
@@ -38,8 +50,8 @@ export const AnagramResultGroup = withProps<{
     background: white;
     margin: 10px;
     padding: 10px;
-    box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.3);
-    border-radius: 2px;
+    box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.2);
+    // border-radius: 2px;
     opacity: 0.3;
     ${(props: any) => anagram.AnagramResultState.solved === props.state && css`
       opacity: 1.0;
