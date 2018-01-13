@@ -1,5 +1,4 @@
 import * as React from 'react';
-import styled from 'styled-components';
 import {throttle} from 'lodash';
 
 import Footer from 'src/components/Footer';
@@ -16,24 +15,18 @@ import {RequestStatus, getSubAnagrams, getDictionaries, Dictionary} from 'src/ap
 import * as anagram from 'src/anagram';
 
 import AnagramResults from './AnagramResults';
+import {
+  Strong,
+  HeaderContainer,
+  DictionaryButton,
+} from './components';
 
 const AnagramWorker = require('../../anagram.worker');
-import {withProps} from 'src/utility';
 
 import 'src/assets/styles.css';
-import 'src/../node_modules/react-select/dist/react-select.css';
 
-const TESTING = false;
-// import mockState from 'src/assets/anagramPageMock';
-
-const SelectContainer = styled.div`
-  max-width: 500px;
-  margin: 0 auto;
-`;
-
-const Strong = styled.strong`
-  color: white;
-`;
+import mockState from 'src/assets/anagramPageMock';
+const TESTING = true;
 
 class AnagramPercentage extends React.Component<{
   numberOfSolvedSubanagrams: number;
@@ -154,22 +147,6 @@ interface AnagramaniaHeaderProps {
     selectedDictionaries: string;
 };
 
-const DictionaryButton = withProps<{active: boolean}>()(styled.button)`
-  background: none;
-  border: none;
-  color: white;
-  text-decoration: ${props => props.active ? 'underline' : 'none'};
-  margin-top: 10px;
-  margin-right: 5px;
-  padding: 5px;
-  outline: none;
-  text-transform: uppercase;
-  &:hover {
-    text-decoration: underline;
-    cursor: pointer;
-  }
-`;
-
 class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
   input: HTMLInputElement;
   shouldComponentUpdate(newProps: AnagramaniaHeaderProps) {
@@ -198,20 +175,22 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
     return (
       <Header>
         <InnerContainer>
-          <Title>
-            {'Anagramania.io'}
-          </Title>
-          <Form onSubmit={onSubmit}>
-            <Input
-              type="text"
-              innerRef={(e) => this.setInput(e)}
-              onChange={onQueryChange}
-            />
-            <SearchButton>
-              {'Go!'}
-            </SearchButton>
-          </Form>
-          <SelectContainer>
+          <HeaderContainer>
+            <Title>
+              {'Anagramania.io'}
+              <br />
+              <Strong>{'The best anagram generator in the world.'}</Strong>
+            </Title>
+            <Form onSubmit={onSubmit}>
+              <Input
+                type="text"
+                innerRef={(e) => this.setInput(e)}
+                onChange={onQueryChange}
+              />
+              <SearchButton>
+                {'Go!'}
+              </SearchButton>
+            </Form>
             {dictionaries.map(d => {
               return (
                 <DictionaryButton
@@ -223,7 +202,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
                 </DictionaryButton>
               );
             })}
-          </SelectContainer>
+          </HeaderContainer>
         </InnerContainer>
       </Header>
     );
@@ -262,7 +241,7 @@ class Anagramania extends React.Component<{}, {
 
     this.state = defaultState;
     if (TESTING) {
-      // this.state = mockState;
+      this.state = mockState as any;
     }
   }
   async componentWillMount() {
@@ -326,6 +305,7 @@ class Anagramania extends React.Component<{}, {
       }
       this.state.anagramIteratorState.solutions.push(...state.solutions);
       this.state.anagramIteratorState.numberOfPossibilitiesChecked += state.numberOfPossibilitiesChecked;
+      (window as any).applicationState = this.state;
       throttledSetState();
     };
 

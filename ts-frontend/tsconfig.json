@@ -23,6 +23,9 @@
     "sourceMap": false,
     "inlineSourceMap": false
   },
+  "awesomeTypescriptLoaderOptions": {
+    "errorsAsWarnings": true,
+  },
   "exclude": [
     "node_modules",
     "dist"

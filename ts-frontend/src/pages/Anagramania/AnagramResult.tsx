@@ -1,18 +1,25 @@
 import * as React from 'react';
-import styled, {css} from 'styled-components';
 import {take} from 'lodash';
-
-import {withProps} from 'src/utility';
+import * as d3Scale from 'd3-scale';
+import * as d3Interpolate from 'd3-interpolate';
+// import * as d3ScaleChromatic from 'd3-scale-chromatic';
 
 import * as anagram from 'src/anagram';
 
-const MAX_ITEMS_TO_SHOW_AT_ONCE = 3;
 
-const ResultContainer = styled.div`
-  color: black;
-  white-space: nowrap;
-  margin-top: 5px;
-`;
+import {
+  ResultContainer,
+  AnagramResultGroup,
+  ShowAllButton,
+} from './components';
+
+
+const colorScale = d3Interpolate.interpolateLab(
+  '#00DD22',
+  '#FFFFFF',
+);
+
+const MAX_ITEMS_TO_SHOW_AT_ONCE = 3;
 
 class Result extends React.Component<{
   result: anagram.IndexedWord[];
@@ -33,44 +40,6 @@ class Result extends React.Component<{
     );
   }
 }
-
-const AnagramResultGroup = withProps<{
-  state: anagram.AnagramResultState;
-  noResults: boolean;
-}>()(styled.div)`
-  float: left;
-  width: 300px;
-  background: white;
-  margin: 10px;
-  padding: 10px;
-  box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.3);
-  border-radius: 2px;
-  opacity: 0.3;
-  ${(props: any) => anagram.AnagramResultState.solved === props.state && css`
-    opacity: 1.0;
-  `}
-  ${(props: any) => props.noResults && css`
-    opacity: 0.3;
-  `}
-  ${(props: any) => anagram.AnagramResultState.active === props.state && css`
-    opacity: 1.0;
-    background: #2ecc71;
-  `}
-`;
-
-const ShowAllButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 12px;
-  font-weight: bold;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  outline: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
 
 interface AnagramResultProps {
   result: anagram.AnagramResultState;
@@ -122,7 +91,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
       columnWidth,
       result,
       maxLengthInGroup,
-      wordStats,
+      // wordStats,
     } = this.props;
 
     const minHeight = 17;
@@ -148,11 +117,9 @@ class AnagramResult extends React.Component<AnagramResultProps,
     });
 
     // wordLength => 0, 1
-    const scale = function(words: anagram.IndexedWord[]) {
-      const length = words.length;
-      const range = wordStats.max - wordStats.min;
-      return ((length - wordStats.min) / range);
-    }
+    const scale = d3Scale.scaleLinear()
+      .domain([1, 4])
+      .range([0, 1]);
 
     return (
       <AnagramResultGroup
@@ -169,8 +136,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
           </strong>
           <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div>
           {take(sortedList, !this.state.showAll ? MAX_ITEMS_TO_SHOW_AT_ONCE : list.length).map((a, i) => {
-            const opacity = scale(a);
-            const color = `rgba(17, 218, 17, ${1 - opacity})`
+            const color = colorScale(scale(a.length));
             return <Result key={i} result={a} index={i} color={color} />
           })}
           {

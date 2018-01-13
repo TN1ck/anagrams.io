@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 
 const AnagramaniaTitle = styled.h1`
-color: white;
+color: black;
+font-weight: bold;
 font-size: 2.5rem;
-text-align: center;
-font-weight: 300;
-margin: 2.5rem;
+text-align: left;
+/* margin: 2.5rem; */
 padding: 0;
 
 @media (max-width: 899px) {

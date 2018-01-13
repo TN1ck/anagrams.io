@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import {YELLOW} from 'src/constants';
 
 const AnagramaniaInput = styled.input`
 border: 1px solid rgba(0, 0, 0, 0.4);
@@ -12,7 +13,7 @@ border-top-left-radius: 5px;
 border-bottom-left-radius: 5px;
 
 &:focus {
-  border-color: #5cb3fd;
+  border-color: ${YELLOW};
   outline: 0;
 }
 `;

@@ -5,7 +5,7 @@ opacity: 0.7;
 position: fixed;
 bottom: 20px;
 right: 20px;
-color: white;
+color: black;
 display: flex;
 justify-content: center;
 font-size: 10px;
