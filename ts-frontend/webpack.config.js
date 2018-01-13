@@ -42,7 +42,8 @@ const prodPlugins = [
 ];
 
 const devPlugins = [
-  new webpack.HotModuleReplacementPlugin()
+  new webpack.HotModuleReplacementPlugin(),
+  new webpack.NoEmitOnErrorsPlugin(),
 ];
 
 const plugins = basePlugins.concat(

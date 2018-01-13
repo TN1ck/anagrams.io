@@ -55,11 +55,11 @@ function parseSearch(search: string) {
 //
 
 const ARC_RADIUS = 10;
-const STROKE_WIDTH = 3;
+const STROKE_WIDTH = 10;
 
 
 function drawPath(x1: number, y1: number, x2: number, y2: number, yOffset: number): string {
-  const xDistance = Math.abs(x2 - x1);
+  // const xDistance = Math.abs(x2 - x1);
   const yDistance = Math.abs(y2 - y1);
   const intermediateY = y1 + ((yDistance / 2) + yOffset * STROKE_WIDTH);
   
@@ -98,8 +98,8 @@ function getAangramMapping(w1: string, w2: string): number[] {
   w2 = w2.toLowerCase();
   const mapping = {};
   const resultMapping = [];
-  let index1 = 0;
-  let index2 = 0;
+  // let index1 = 0;
+  // let index2 = 0;
   for (let s of w1) {
     // check if the char was already used once
     let chars = mapping[s] || [];
@@ -151,21 +151,23 @@ const Share: React.StatelessComponent<{
             })}
           </Word>
           <div>
-            <svg height="100px" width={WORD_WIDTH} style={{overflow: 'visible'}}>
+            <svg height="400px" width={WORD_WIDTH} style={{overflow: 'visible'}}>
               {mapping.map((newIndex, index) => {
                 const x1 = (index * CHARACTER_WIDTH) + CHARACTER_WIDTH / 2;
                 const y1 = 0;
                 const x2 = (newIndex * CHARACTER_WIDTH) + CHARACTER_WIDTH / 2;
-                const y2 = 100;
+                const y2 = 400;
+                const opacity = 1 - (0.05 * index);
                 return (
                   <path
+                    opacity={opacity}
                     stroke="white"
                     fill="transparent"
-                    strokeWidth="2"
+                    strokeWidth={STROKE_WIDTH}
                     d={drawPath(x1, y1, x2, y2, index)}
                   />
                 );
-              }}
+              })}
             </svg>
           </div>
           <Word>

@@ -17,14 +17,15 @@ const ResultContainer = styled.div`
 class Result extends React.Component<{
   result: anagram.IndexedWord[];
   index: number;
+  color: string;
 }> {
   shouldComponentUpdate() {
     return false;
   }
   render() {
-    const {result, index} = this.props;
+    const {result, index, color} = this.props;
     return (
-      <ResultContainer>
+      <ResultContainer style={{backgroundColor: color}}>
         {(index + 1) + '. ' + result.map(w => {
           return w.word.word;
         }).join(' ')}
@@ -72,12 +73,17 @@ const ShowAllButton = styled.button`
 `;
 
 interface AnagramResultProps {
-    result: anagram.AnagramResultState;
-    word: string;
-    list: anagram.IndexedWord[][];
-    counter: number;
-    columnWidth: number;
-    maxLengthInGroup: number;
+  result: anagram.AnagramResultState;
+  word: string;
+  list: anagram.IndexedWord[][];
+  counter: number;
+  columnWidth: number;
+  maxLengthInGroup: number;
+  wordStats: {
+    average: number;
+    min: number;
+    max: number;
+  }
 };
 
 class AnagramResult extends React.Component<AnagramResultProps,
@@ -116,6 +122,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
       columnWidth,
       result,
       maxLengthInGroup,
+      wordStats,
     } = this.props;
 
     const minHeight = 17;
@@ -129,6 +136,23 @@ class AnagramResult extends React.Component<AnagramResultProps,
 
     let height: any = useMaxsize ? maxHeight : (minHeight + maxLengthInGroup * rowHeight + paddingSize);
     height = this.state.showAll ? 'auto' : height;
+
+    const sortedList = list.sort((a, b) => {
+      if (a.length < b.length) {
+        return -1;
+      } else if (a.length === b.length) {
+        return 0;
+      } else {
+        return 1;
+      }
+    });
+
+    // wordLength => 0, 1
+    const scale = function(words: anagram.IndexedWord[]) {
+      const length = words.length;
+      const range = wordStats.max - wordStats.min;
+      return ((length - wordStats.min) / range);
+    }
 
     return (
       <AnagramResultGroup
@@ -144,8 +168,10 @@ class AnagramResult extends React.Component<AnagramResultProps,
             {word}
           </strong>
           <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div>
-          {take(list, !this.state.showAll ? MAX_ITEMS_TO_SHOW_AT_ONCE : list.length).map((a, i) => {
-            return <Result key={i} result={a} index={i} />
+          {take(sortedList, !this.state.showAll ? MAX_ITEMS_TO_SHOW_AT_ONCE : list.length).map((a, i) => {
+            const opacity = scale(a);
+            const color = `rgba(17, 218, 17, ${1 - opacity})`
+            return <Result key={i} result={a} index={i} color={color} />
           })}
           {
             list.length > MAX_ITEMS_TO_SHOW_AT_ONCE

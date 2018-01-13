@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import Select from 'react-select';
 import {throttle} from 'lodash';
 
 import Footer from 'src/components/Footer';
@@ -19,6 +18,7 @@ import * as anagram from 'src/anagram';
 import AnagramResults from './AnagramResults';
 
 const AnagramWorker = require('../../anagram.worker');
+import {withProps} from 'src/utility';
 
 import 'src/assets/styles.css';
 import 'src/../node_modules/react-select/dist/react-select.css';
@@ -89,6 +89,16 @@ class AnagramInfoArea extends React.Component<{
     } = anagramIteratorState;
 
     const isDone = unsolvedSubanagrams.length === 0;
+    const numberOfWordsPerSolution = solutions.map(s => s.length);
+    const numberOfWords = numberOfWordsPerSolution.reduce((a, b) => a + b, 0);
+    const averageNumberOfWords = (numberOfWords / solutions.length);
+    const minNumberOfWords = Math.min(...numberOfWordsPerSolution);
+    const maxNumberOfWords = Math.max(...numberOfWordsPerSolution);
+    const wordStats = {
+      average: averageNumberOfWords,
+      min: minNumberOfWords,
+      max: maxNumberOfWords,
+    };
     
     return (
       <div>
@@ -111,6 +121,10 @@ class AnagramInfoArea extends React.Component<{
           {`Checked ${numberOfPossibilitiesChecked} possibilities.`}
         </Strong>
         <br />
+        <Strong>
+          {`Average words per solution: ${averageNumberOfWords.toFixed(2)}`}
+        </Strong>
+        <br/>
         <Strong>{`Found ${solutions.length} solutions.`}</Strong>
         <br/>
         {
@@ -120,10 +134,12 @@ class AnagramInfoArea extends React.Component<{
             </SubTitle>
           ) : null
         }
+        <br/>
         <AnagramResults
           subanagrams={subanagrams}
           anagramIteratorState={anagramIteratorState}
           isDone={isDone}
+          wordStats={wordStats}
         />
       </div>
     );
@@ -137,6 +153,22 @@ interface AnagramaniaHeaderProps {
     dictionaries: Dictionary[];
     selectedDictionaries: string;
 };
+
+const DictionaryButton = withProps<{active: boolean}>()(styled.button)`
+  background: none;
+  border: none;
+  color: white;
+  text-decoration: ${props => props.active ? 'underline' : 'none'};
+  margin-top: 10px;
+  margin-right: 5px;
+  padding: 5px;
+  outline: none;
+  text-transform: uppercase;
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+`;
 
 class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
   input: HTMLInputElement;
@@ -180,13 +212,17 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
             </SearchButton>
           </Form>
           <SelectContainer>
-            <Select
-              options={dictionaries.map(d => {
-                return {value: d.id, label: d.name};
-              })}
-              value={selectedDictionaries}
-              onChange={onSelectChange}
-            />
+            {dictionaries.map(d => {
+              return (
+                <DictionaryButton
+                  key={d.id}
+                  onClick={() => onSelectChange(d.id)}
+                  active={selectedDictionaries === d.id}
+                >
+                  {d.name}
+                </DictionaryButton>
+              );
+            })}
           </SelectContainer>
         </InnerContainer>
       </Header>
@@ -213,7 +249,7 @@ class Anagramania extends React.Component<{}, {
       query: '',
       cleanedQuery: '',
       dictionaries: [],
-      selectedDictionaries: 'eng-us-50k',
+      selectedDictionaries: 'en',
       subanagrams: [],
       anagramIteratorState: null,
     };
@@ -245,7 +281,7 @@ class Anagramania extends React.Component<{}, {
     this.requestAnagram();
   }
   onSelectChange(value) {
-    this.setState({selectedDictionaries: value.value});
+    this.setState({selectedDictionaries: value});
   }
   pauseWorker() {
     console.log('pause');
@@ -279,15 +315,19 @@ class Anagramania extends React.Component<{}, {
       // TODO
       anagramIteratorState: initialAnagramIteratorState,
     });
+
+    const throttledSetState = throttle(() => {
+      this.setState({});
+    }, 100);
     
-    const updateState = throttle((state: anagram.AnagramGeneratorStepSerialized) => {
+    const updateState = (state: anagram.AnagramGeneratorStepSerialized) => {
       if (this.finished) {
         return;
       }
       this.state.anagramIteratorState.solutions.push(...state.solutions);
       this.state.anagramIteratorState.numberOfPossibilitiesChecked += state.numberOfPossibilitiesChecked;
-      this.setState({});
-    }, 50);
+      throttledSetState();
+    };
 
     const startNextWorker = () => {
       if (this.state.anagramIteratorState.unsolvedSubanagrams.length === 0) {

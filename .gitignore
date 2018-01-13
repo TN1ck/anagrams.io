@@ -4,6 +4,7 @@
 cljs.js
 node_modules
 dist
+dist.zip
 build
 ts-backend/dist
 ts-backend/node_modules

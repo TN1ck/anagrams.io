@@ -26,6 +26,7 @@ router.get(
       return {
         id: d.id,
         name: d.name,
+        language: d.language,
       };
     });
     response.json({success: true, dictionaries: dictionarieList});

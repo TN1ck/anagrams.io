@@ -39,6 +39,11 @@ class AnagramResults extends React.Component<
   anagramIteratorState: anagram.SerializedAnagramIteratorState;
   isDone: boolean;
   subanagrams: anagram.IndexedWord[];
+  wordStats: {
+    average: number;
+    min: number;
+    max: number;
+  }
 },
 {
   columnWidth: number;
@@ -133,6 +138,7 @@ class AnagramResults extends React.Component<
                     list={list}
                     counter={counter}
                     maxLengthInGroup={maxLengthInGroup}
+                    wordStats={this.props.wordStats}
                   />
                 );
               })}
@@ -161,6 +167,7 @@ class AnagramResults extends React.Component<
                                 list={list}
                                 counter={counter}
                                 maxLengthInGroup={0}
+                                wordStats={this.props.wordStats}
                               />
                             );
                           })}
@@ -186,6 +193,7 @@ class AnagramResults extends React.Component<
                           list={list}
                           counter={counter}
                           maxLengthInGroup={0}
+                          wordStats={this.props.wordStats}
                         />
                       );
                     })}
