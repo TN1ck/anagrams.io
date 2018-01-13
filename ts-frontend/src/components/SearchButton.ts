@@ -8,8 +8,6 @@ background: rgba(0, 10, 25, 0.5);
 font-size: 1.25rem;
 color: white;
 box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.3);
-border-top-right-radius: 5px;
-border-bottom-right-radius: 5px;
 padding: 0 1.5rem;
 
 &:hover {

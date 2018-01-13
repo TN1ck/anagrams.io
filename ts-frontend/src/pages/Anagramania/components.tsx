@@ -2,6 +2,7 @@ import styled, {css} from 'styled-components';
 import * as anagram from 'src/anagram';
 
 import {withProps} from 'src/utility';
+import {YELLOW} from 'src/constants';
 
 export const ResultContainer = styled.div`
   color: black;
@@ -67,17 +68,16 @@ export const ShowAllButton = styled.button`
 `;
 
 export const DictionaryButton = withProps<{active: boolean}>()(styled.button)`
-  background: none;
+  background: ${props => props.active ? YELLOW : 'none'};
   border: none;
   color: black;
-  text-decoration: ${props => props.active ? 'underline' : 'none'};
   margin-top: 10px;
   margin-right: 5px;
-  padding: 5px;
+  padding: 5px 5pxpx;
   outline: none;
   text-transform: uppercase;
   &:hover {
-    text-decoration: underline;
+    background: ${YELLOW};
     cursor: pointer;
   }
 `;

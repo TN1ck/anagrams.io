@@ -91,7 +91,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
       columnWidth,
       result,
       maxLengthInGroup,
-      // wordStats,
+      wordStats,
     } = this.props;
 
     const minHeight = 17;
@@ -118,7 +118,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
 
     // wordLength => 0, 1
     const scale = d3Scale.scaleLinear()
-      .domain([1, 4])
+      .domain([wordStats.min, wordStats.min + 2])
       .range([0, 1]);
 
     return (

@@ -9,6 +9,7 @@ import Input from 'src/components/Input';
 import SearchButton from 'src/components/SearchButton';
 import SubTitle from 'src/components/SubTitle';
 import Title from 'src/components/Title';
+import LoadingBar from 'src/components/LoadingBar';
 
 import {RequestStatus, getSubAnagrams, getDictionaries, Dictionary} from 'src/api';
 
@@ -28,19 +29,19 @@ import 'src/assets/styles.css';
 import mockState from 'src/assets/anagramPageMock';
 const TESTING = true;
 
-class AnagramPercentage extends React.Component<{
-  numberOfSolvedSubanagrams: number;
-  numberOfAnagrams: number;
-}> {
-  render() {
-    const {numberOfSolvedSubanagrams, numberOfAnagrams} = this.props;
-    return (
-      <span>
-        {`Checked ${Math.ceil(((numberOfSolvedSubanagrams)/ numberOfAnagrams) * 100)} %.`}
-      </span>
-    );
-  }
-}
+// class AnagramPercentage extends React.Component<{
+//   numberOfSolvedSubanagrams: number;
+//   numberOfAnagrams: number;
+// }> {
+//   render() {
+//     const {numberOfSolvedSubanagrams, numberOfAnagrams} = this.props;
+//     return (
+//       <span>
+//         {`Checked ${Math.ceil(((numberOfSolvedSubanagrams)/ numberOfAnagrams) * 100)} %.`}
+//       </span>
+//     );
+//   }
+// }
 
 class ActiveSubanagrams extends React.Component<{
   currentSubanagrams: number[];
@@ -51,6 +52,11 @@ class ActiveSubanagrams extends React.Component<{
       currentSubanagrams,
       subanagrams,
     } = this.props;
+
+    if (currentSubanagrams.length === 0) {
+      return null;
+    }
+
     return (
       <span>
         {`Checking: ${currentSubanagrams.map(i => subanagrams[i].word.word).join(', ')}`}
@@ -92,41 +98,33 @@ class AnagramInfoArea extends React.Component<{
       min: minNumberOfWords,
       max: maxNumberOfWords,
     };
+
+    const numberOfSolvedSubanagrams = solvedSubanagrams.length;
+    const numberOfAnagrams = subanagrams.length;
+
+    const progress = Math.ceil(((numberOfSolvedSubanagrams)/ numberOfAnagrams) * 100);
     
     return (
       <div>
         <SubTitle>
           {`I found ${subanagrams.length} subanagrams. `}
-          <AnagramPercentage
-            numberOfSolvedSubanagrams={solvedSubanagrams.length}
-            numberOfAnagrams={subanagrams.length}
-          />
         </SubTitle>
-        <Strong>
+        <LoadingBar progress={progress}>
           <ActiveSubanagrams
             subanagrams={subanagrams}
             currentSubanagrams={currentSubanagrams}
           />
-        </Strong>
-        <br/>
-        <br/>
-        <Strong>
-          {`Checked ${numberOfPossibilitiesChecked} possibilities.`}
-        </Strong>
+          {' '}
+          <div style={{position: 'absolute', right: 10, top: 10}}>
+            {`${progress} %.`}
+          </div>
+        </LoadingBar>
         <br />
         <Strong>
           {`Average words per solution: ${averageNumberOfWords.toFixed(2)}`}
         </Strong>
         <br/>
         <Strong>{`Found ${solutions.length} solutions.`}</Strong>
-        <br/>
-        {
-          isDone ? (
-            <SubTitle>
-              {`Finished: found ${solutions.length} solutions.`}
-            </SubTitle>
-          ) : null
-        }
         <br/>
         <AnagramResults
           subanagrams={subanagrams}
@@ -178,8 +176,6 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
           <HeaderContainer>
             <Title>
               {'Anagramania.io'}
-              <br />
-              <Strong>{'The best anagram generator in the world.'}</Strong>
             </Title>
             <Form onSubmit={onSubmit}>
               <Input
