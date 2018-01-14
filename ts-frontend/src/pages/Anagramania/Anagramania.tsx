@@ -19,7 +19,7 @@ import * as anagram from 'src/anagram';
 import AnagramResults from './AnagramResults';
 import {
   Strong,
-  DictionaryButton,
+  SmallButton,
 } from './components';
 
 const AnagramWorker = require('../../anagram.worker');
@@ -178,13 +178,13 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
             </Form>
             {dictionaries.map(d => {
               return (
-                <DictionaryButton
+                <SmallButton
                   key={d.id}
                   onClick={() => onSelectChange(d.id)}
                   active={selectedDictionaries === d.id}
                 >
                   {d.name}
-                </DictionaryButton>
+                </SmallButton>
               );
             })}
           </HeaderContainer>

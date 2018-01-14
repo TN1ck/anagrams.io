@@ -77,13 +77,13 @@ export const ShowAllButton = styled.button`
   }
 `;
 
-export const DictionaryButton = withProps<{active: boolean}>()(styled.button)`
+export const SmallButton = withProps<{active: boolean}>()(styled.button)`
   background: ${props => props.active ? YELLOW : 'none'};
   border: none;
   color: black;
   margin-top: 10px;
   margin-right: 5px;
-  padding: 5px 5pxpx;
+  padding: 2px 5px;
   outline: none;
   text-transform: uppercase;
   &:hover {
