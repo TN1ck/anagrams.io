@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {YELLOW} from 'src/constants';
+// import {YELLOW} from 'src/constants';
 
 const AnagramaniaHeader = styled.div`
     background: #DDDDDD;

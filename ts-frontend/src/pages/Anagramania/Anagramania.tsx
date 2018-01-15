@@ -18,7 +18,7 @@ import * as anagram from 'src/anagram';
 
 import AnagramResults from './AnagramResults';
 import {
-  Strong,
+  // Strong,
   SmallButton,
 } from './components';
 
@@ -27,7 +27,7 @@ const AnagramWorker = require('../../anagram.worker');
 import 'src/assets/styles.css';
 
 import mockState from 'src/assets/anagramPageMock';
-const TESTING = false;
+const TESTING = true;
 
 class ActiveSubanagrams extends React.Component<{
   currentSubanagrams: number[];
@@ -70,7 +70,7 @@ class AnagramInfoArea extends React.Component<{
     const {
       solvedSubanagrams,
       currentSubanagrams,
-      numberOfPossibilitiesChecked,
+      // numberOfPossibilitiesChecked,
       unsolvedSubanagrams,
       solutions,
     } = anagramIteratorState;
@@ -95,7 +95,7 @@ class AnagramInfoArea extends React.Component<{
     return (
       <div>
         <SubTitle>
-          {`Found ${subanagrams.length} subanagrams. `}
+          {`Found `}<strong>{`${solutions.length}`}</strong>{` solutions. `}
         </SubTitle>
         <LoadingBar progress={progress}>
           <ActiveSubanagrams
@@ -108,12 +108,12 @@ class AnagramInfoArea extends React.Component<{
           </div>
         </LoadingBar>
         <br />
-        <Strong>
+        {/* <Strong>
           {`Average words per solution: ${averageNumberOfWords.toFixed(2)}`}
         </Strong>
         <br/>
         <Strong>{`Found ${solutions.length} solutions.`}</Strong>
-        <br/>
+        <br/> */}
         <AnagramResults
           subanagrams={subanagrams}
           anagramIteratorState={anagramIteratorState}
@@ -228,7 +228,7 @@ class Anagramania extends React.Component<{}, {
 
     this.state = defaultState;
     if (TESTING) {
-      // this.state = mockState as any;
+      this.state = mockState as any;
     }
   }
   async componentWillMount() {

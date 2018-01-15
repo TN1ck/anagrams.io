@@ -88,7 +88,7 @@ const ARC_RADIUS = 10;
 
 function drawPath(x1: number, y1: number, x2: number, y2: number, yOffset: number): string {
   // const xDistance = Math.abs(x2 - x1);
-  const yDistance = Math.abs(y2 - y1);
+  // const yDistance = Math.abs(y2 - y1);
   const intermediateY = y1 + (yOffset);
   
   if (x2 > x1) {
@@ -159,7 +159,7 @@ class Share extends React.Component<{
   render() {
     const {word, anagram} = this.props;
     const CHARACTER_WIDTH = 22;
-    const WORD_WIDTH = word.length * CHARACTER_WIDTH;
+    const WORD_WIDTH = Math.max(word.length, anagram.length) * CHARACTER_WIDTH;
 
     const mapping = getAangramMapping(word, anagram);
 
@@ -168,6 +168,12 @@ class Share extends React.Component<{
     const PADDING_BOTTOM = 20;
     const HEIGHT_PER_CHARACTER = STROKE_WIDTH * 1.8
     const HEIGHT = PADDING_TOP + word.length * HEIGHT_PER_CHARACTER + PADDING_BOTTOM;
+
+    const opacityScale = (index) => {
+      return 0.2 + (0.8 / word.length * (word.length - index));
+    };
+
+    const minWidth = WORD_WIDTH + 30 * 2;
 
     return (
       <div>
@@ -180,7 +186,7 @@ class Share extends React.Component<{
             </HeaderContainer>
           </InnerContainer>
         </Header>
-        <Card>
+        <Card style={{minWidth}}>
           <InnerContainer>
             <ExplainText
               style={{textAlign: 'center'}}
@@ -207,7 +213,7 @@ class Share extends React.Component<{
                       const y1 = 0;
                       const x2 = (newIndex * CHARACTER_WIDTH) + CHARACTER_WIDTH / 2;
                       const y2 = HEIGHT;
-                      const opacity = 1 - (0.05 * index);
+                      const opacity = opacityScale(index);
                       const yOffset = PADDING_TOP + HEIGHT_PER_CHARACTER * index;
                       const path = drawPath(x1, y1, x2, y2, yOffset);
                       return (

@@ -1,6 +1,7 @@
 export default {
     "queryStatus": "loading",
     "query": "klaas neumann",
+    "cleanedQueryWithSpaces": "Klaas Neumann",
     "cleanedQuery": "klaasneumann",
     "dictionaries": [
       {
