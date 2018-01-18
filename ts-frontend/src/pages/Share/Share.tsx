@@ -28,10 +28,21 @@ const Card = styled.div`
 
 const Word = styled.strong`
   display: inline-block;
-  color: transparent;
+  /* color: transparent; */
   font-size: 36px;
   position: relative;
   font-family: monospace;
+  letter-spacing: 0.5px;
+  & span {
+    display: inline-block;
+    margin-bottom: -2px;
+    height: 38px;
+    width: 100%;
+    &.edit {
+      outline: none;
+      border-bottom: 4px dashed grey;
+    }
+  }
 `;
 
 const Character = styled.span`
@@ -155,7 +166,48 @@ console.log(getAangramMapping('OOOscar Wilde', 'OCowards LieO'));
 class Share extends React.Component<{
   word: string;
   anagram: string;
+  save: (word: string, anagram: string) => any;
+}, {
+  mode: string;
+  currentWord: string;
+  currentAnagram: string;
 }> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      // mode: 'view',
+      mode: 'edit',
+      currentWord: this.props.word,
+      currentAnagram: this.props.anagram,
+    };
+    this.edit = this.edit.bind(this);
+    this.save = this.save.bind(this);
+    this.onChangeAnagram = this.onChangeAnagram.bind(this);
+    this.onChangeWord = this.onChangeWord.bind(this);
+  }
+  edit() {
+    this.setState({
+      mode: 'edit',
+    });
+  }
+  save() {
+    this.props.save(this.state.currentWord, this.state.currentAnagram);
+    this.setState({
+      mode: 'view',
+    });
+  }
+  onChangeWord(e) {
+    const currentWord = e.target.innerText;
+    this.setState({
+      currentWord,
+    })
+  }
+  onChangeAnagram(e) {
+    const currentAnagram = e.target.innerText;
+    this.setState({
+      currentAnagram,
+    })
+  }
   render() {
     const {word, anagram} = this.props;
     const CHARACTER_WIDTH = 22;
@@ -174,6 +226,7 @@ class Share extends React.Component<{
     };
 
     const minWidth = WORD_WIDTH + 30 * 2;
+    const editable = this.state.mode === 'edit';
 
     return (
       <div>
@@ -196,12 +249,14 @@ class Share extends React.Component<{
             />
             <WordContainer>
               <div>
-                <Word>
-                  {word}
-                  {[...word].map((c, i) => {
+                <Word style={{minWidth: WORD_WIDTH}}>
+                  <span onInput={this.onChangeWord} id="word-span" className={editable ? 'edit' : ''} contentEditable={editable}>
+                    {word}
+                  </span>
+                  {/* {[...word].map((c, i) => {
                     const left = i * CHARACTER_WIDTH;
                     return <Character style={{left}}>{c}</Character>
-                  })}
+                  })} */}
                 </Word>
                 <div>
                   <svg height={HEIGHT} width={WORD_WIDTH} style={{overflow: 'visible'}}>
@@ -228,12 +283,14 @@ class Share extends React.Component<{
                     })}
                   </svg>
                 </div>
-                <Word>
-                  {anagram}
-                  {[...anagram].map((c, i) => {
+                <Word style={{minWidth: WORD_WIDTH}}>
+                  <span onInput={this.onChangeAnagram} id="anagram-span" className={editable ? 'edit' : ''} contentEditable={editable}>
+                    {anagram}
+                  </span>
+                  {/* {[...anagram].map((c, i) => {
                     const left = i * CHARACTER_WIDTH;
                     return <Character style={{left}}>{c}</Character>
-                  })}
+                  })} */}
                 </Word>
               </div>
             </WordContainer>
@@ -244,9 +301,10 @@ class Share extends React.Component<{
             </div>
           </InnerContainer>
           <SmallButton
+            onClick={editable ? this.save : this.edit}
             style={{position: 'absolute', bottom: '5px', left: '5px'}}
             active={false}
-          >{'Edit'}</SmallButton>
+          >{editable ? 'Save': 'Edit'}</SmallButton>
         </Card>
       </div>
     );
@@ -264,6 +322,7 @@ class ShareContainer extends React.Component<{}, {
       anagram: '',
       word: '',
     };
+    this.save = this.save.bind(this);
   }
   componentWillMount() {
     const location = window.location;
@@ -276,12 +335,19 @@ class ShareContainer extends React.Component<{}, {
       });
     }
   }
+  save(word: string, anagram: string) {
+    this.setState({
+      word,
+      anagram,
+    });
+  }
   render() {
     const {word, anagram} = this.state;
     return (
       <Share
         word={word}
         anagram={anagram}
+        save={this.save}
       />
     );
   }
