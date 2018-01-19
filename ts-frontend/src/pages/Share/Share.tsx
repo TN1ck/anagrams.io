@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import {stringToWord, sanitizeQuery} from 'src/anagram';
 
 import Header from 'src/components/Header';
 import Title from 'src/components/Title';
@@ -71,6 +72,7 @@ const CTAButton = styled.a`
 
 const ExplainText = styled.p`
   color: black;
+  text-align: center;
 `;
 
 function parseSearch(search: string) {
@@ -161,8 +163,6 @@ function getAangramMapping(w1: string, w2: string): number[] {
   return resultMapping;
 }
 
-console.log(getAangramMapping('OOOscar Wilde', 'OCowards LieO'));
-
 class Share extends React.Component<{
   word: string;
   anagram: string;
@@ -209,7 +209,22 @@ class Share extends React.Component<{
     })
   }
   render() {
-    const {word, anagram} = this.props;
+
+    let {word, anagram} = this.props;
+    const {currentAnagram, currentWord} = this.state;
+
+    const anagramWord = stringToWord(sanitizeQuery(currentAnagram));
+    const wordWord = stringToWord(sanitizeQuery(currentWord));
+    const isCorrectAnagram = anagramWord.set === wordWord.set;
+
+    const editable = this.state.mode === 'edit';
+    const useState = editable && isCorrectAnagram;
+
+    if (useState) {
+      word = currentWord;
+      anagram = currentAnagram;
+    }
+
     const CHARACTER_WIDTH = 22;
     const WORD_WIDTH = Math.max(word.length, anagram.length) * CHARACTER_WIDTH;
 
@@ -226,7 +241,6 @@ class Share extends React.Component<{
     };
 
     const minWidth = WORD_WIDTH + 30 * 2;
-    const editable = this.state.mode === 'edit';
 
     return (
       <div>
@@ -239,19 +253,33 @@ class Share extends React.Component<{
             </HeaderContainer>
           </InnerContainer>
         </Header>
-        <Card style={{minWidth}}>
+        <Card style={{minWidth, ...(editable ? {border: '2px dashed grey'} : {})}}>
           <InnerContainer>
-            <ExplainText
-              style={{textAlign: 'center'}}
-              dangerouslySetInnerHTML={{
-                __html: `Did you know that <strong>${word}</strong><br/>is an anagram of <strong>${anagram}</strong>?`
-              }}
-            />
+            {
+              editable ?
+              <ExplainText
+                dangerouslySetInnerHTML={{
+                  __html: `
+                    You are in edit mode.
+                    Here you can change both anagrams and save it.
+                    Change the <strong>order</strong>, <strong>capitalisation</strong> or add some <strong>spaces</strong>.
+                    <br/>
+                    You're current edit is
+                    ${isCorrectAnagram ? "<strong style='color: green'>valid</strong>" : "<strong style='color: red'>invalid</strong>"}.
+                    `
+                }}
+              />
+              : <ExplainText
+                dangerouslySetInnerHTML={{
+                  __html: `Did you know that <strong>${word}</strong><br/>is an anagram of <strong>${anagram}</strong>?`
+                }}
+              />
+            }
             <WordContainer>
               <div>
                 <Word style={{minWidth: WORD_WIDTH}}>
                   <span onInput={this.onChangeWord} id="word-span" className={editable ? 'edit' : ''} contentEditable={editable}>
-                    {word}
+                    {this.props.word}
                   </span>
                   {/* {[...word].map((c, i) => {
                     const left = i * CHARACTER_WIDTH;
@@ -285,7 +313,7 @@ class Share extends React.Component<{
                 </div>
                 <Word style={{minWidth: WORD_WIDTH}}>
                   <span onInput={this.onChangeAnagram} id="anagram-span" className={editable ? 'edit' : ''} contentEditable={editable}>
-                    {anagram}
+                    {this.props.anagram}
                   </span>
                   {/* {[...anagram].map((c, i) => {
                     const left = i * CHARACTER_WIDTH;
