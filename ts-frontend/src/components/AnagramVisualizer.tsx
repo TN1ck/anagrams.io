@@ -1,10 +1,9 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { YELLOW, ORANGE } from 'src/constants';
+import { YELLOW, ORANGE, FRONTEND_URL } from 'src/constants';
 import {drawPath} from 'src/utility';
 import {getAangramMapping, stringToWord, sanitizeQuery} from 'src/anagram';
 import Card from './Card';
-import InnerContainer from './InnerContainer';
 
 import {
   SmallButton,
@@ -36,21 +35,6 @@ const Word = styled.strong`
   }
 `;
 
-const CTAButton = styled.a`
-  background: none;
-  padding-bottom: 2px;
-  font-size: 18px;
-  font-weight: bold;
-  border: none;
-  outline: none;
-  color: black;
-  border-bottom: 4px solid ${YELLOW};
-  text-decoration: none;
-  &:hover {
-    border-bottom: 4px solid ${ORANGE};
-  }
-`;
-
 const ShareSection = styled.div`
   margin-top: 20px;
   text-align: center;
@@ -72,7 +56,7 @@ const CopyInput = styled.input`
   outline: none;
   font-size: 12px;
   padding: 4px;
-  min-width: 200px;
+  min-width: 190px;
 `;
 
 const ExplainText = styled.p`
@@ -152,7 +136,7 @@ class AnagramVisualizer extends React.Component<{
       anagram = currentAnagram;
     }
 
-    const MAX_WIDTH = Math.min(700, window.innerWidth - 60);
+    const MAX_WIDTH = Math.min(700, window.innerWidth - (60 + 30) );
 
     const WORD_LENGTH = Math.max(word.length, anagram.length);
     const CHARACTER_WIDTH = Math.min(MAX_WIDTH / WORD_LENGTH, 22);
@@ -160,7 +144,7 @@ class AnagramVisualizer extends React.Component<{
 
     const mapping = getAangramMapping(word, anagram);
 
-    const STROKE_WIDTH = 10;
+    const STROKE_WIDTH = CHARACTER_WIDTH / 2;
     const PADDING_TOP = 20;
     const PADDING_BOTTOM = 20;
     const HEIGHT_PER_CHARACTER = STROKE_WIDTH * 1.8
@@ -175,7 +159,7 @@ class AnagramVisualizer extends React.Component<{
 
     const minWidth = WORD_WIDTH + 30 * 2;
 
-    const LINK = `${window.location.hostname}/share?anagram=${encodeURIComponent(currentAnagram)}&word=${encodeURIComponent(currentWord)}`;
+    const LINK = `${FRONTEND_URL}/share?anagram=${encodeURIComponent(currentAnagram)}&word=${encodeURIComponent(currentWord)}`;
 
     return (
       <Card style={{minWidth, paddingBottom: 60, ...(editable ? {border: '2px dashed grey'} : {})}}>

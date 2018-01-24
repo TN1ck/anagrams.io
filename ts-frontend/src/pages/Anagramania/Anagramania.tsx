@@ -28,8 +28,8 @@ import {
 
 const AnagramWorker = require('../../anagram.worker');
 
-import mockState from 'src/assets/anagramPageMock';
-const TESTING = true;
+// import mockState from 'src/assets/anagramPageMock';
+// // const TESTING = true;
 
 class ActiveSubanagrams extends React.Component<{
   currentSubanagrams: number[];
@@ -161,7 +161,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
       <Header>
         <InnerContainer>
           <HeaderContainer>
-            <Title>
+            <Title href="/">
               {'Anagramania.io'}
             </Title>
             <Form onSubmit={onSubmit}>
@@ -236,9 +236,9 @@ class Anagramania extends React.Component<{}, {
     this.saveAnagram = this.saveAnagram.bind(this);
 
     this.state = defaultState;
-    if (TESTING) {
-      this.state = mockState as any;
-    }
+    // if (TESTING) {
+    //   this.state = mockState as any;
+    // }
   }
   async componentWillMount() {
     const location = window.location;
@@ -395,7 +395,8 @@ class Anagramania extends React.Component<{}, {
           style={{
             overlay: {backgroundColor: 'rgba(0, 0, 0, 0.3)'},
             content: {
-              padding: 0,
+              padding: 15,
+              background: 'none',
               borderRadius: 0,
               border: 'none',
               top: '50%',
@@ -437,11 +438,10 @@ class Anagramania extends React.Component<{}, {
         {
           appState === 'anagramViewer' ?
             <InnerContainer>
-              <div style={{marginTop: 40}}>
+              <div style={{marginTop: 30}}>
                 <AnagramVisualizer
                   anagram={this.state.modalAnagram}
                   word={this.state.modalWord}
-                  close={this.closeModal}
                   save={this.saveAnagram}
                 />
               </div>
