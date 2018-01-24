@@ -3,6 +3,8 @@ import * as ReactDom from 'react-dom';
 
 import Root from './pages/Root';
 
+import 'src/assets/styles.css';
+
 //
 // https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
 // disable zooming on ios 10.3+

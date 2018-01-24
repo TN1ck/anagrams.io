@@ -372,3 +372,33 @@ export enum AnagramResultState {
   unsolved = "unsolved",
   solved = "solved",
 }
+
+
+export function getAangramMapping(w1: string, w2: string): number[] {
+  w1 = w1.toLowerCase();
+  w2 = w2.toLowerCase();
+  const mapping = {};
+  const resultMapping = [];
+  // let index1 = 0;
+  // let index2 = 0;
+  // let index = 0;
+  for (let s of w1) {
+    if (s === ' ') {
+      resultMapping.push(undefined);
+      continue;
+    }
+    // check if the char was already used once
+    let chars = mapping[s] || [];
+    mapping[s] = chars;
+    let lastPosition = 0;
+    if (chars.length > 0) {
+      // add +1 to search starting from the next string
+      lastPosition = chars[chars.length - 1] + 1;
+    }
+    const sInW2 = w2.indexOf(s, lastPosition);
+    chars.push(sInW2);
+    resultMapping.push(sInW2);
+    // index++;
+  }
+  return resultMapping;
+}

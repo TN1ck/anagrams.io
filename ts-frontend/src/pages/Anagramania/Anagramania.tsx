@@ -11,8 +11,12 @@ import SubTitle from 'src/components/SubTitle';
 import Title from 'src/components/Title';
 import HeaderContainer from 'src/components/HeaderContainer';
 import LoadingBar from 'src/components/LoadingBar';
+import AnagramVisualizer from 'src/components/AnagramVisualizer';
+import * as ReactModal from 'react-modal';
+ReactModal.setAppElement('body');
 
 import {RequestStatus, getSubAnagrams, getDictionaries, Dictionary} from 'src/api';
+import {parseSearch} from 'src/utility';
 
 import * as anagram from 'src/anagram';
 
@@ -23,8 +27,6 @@ import {
 } from './components';
 
 const AnagramWorker = require('../../anagram.worker');
-
-import 'src/assets/styles.css';
 
 import mockState from 'src/assets/anagramPageMock';
 const TESTING = true;
@@ -55,6 +57,7 @@ class AnagramInfoArea extends React.Component<{
   anagramIteratorState: anagram.SerializedAnagramIteratorState;
   subanagrams: anagram.IndexedWord[];
   query: string;
+  share: (anagram: string, word: string) => any;
 }> {
   render() {
     const {
@@ -108,13 +111,8 @@ class AnagramInfoArea extends React.Component<{
           </div>
         </LoadingBar>
         <br />
-        {/* <Strong>
-          {`Average words per solution: ${averageNumberOfWords.toFixed(2)}`}
-        </Strong>
-        <br/>
-        <Strong>{`Found ${solutions.length} solutions.`}</Strong>
-        <br/> */}
         <AnagramResults
+          share={this.props.share}
           subanagrams={subanagrams}
           anagramIteratorState={anagramIteratorState}
           isDone={isDone}
@@ -204,6 +202,10 @@ class Anagramania extends React.Component<{}, {
   anagramIteratorState: anagram.SerializedAnagramIteratorState;
   dictionaries: Dictionary[];
   selectedDictionaries: string;
+  showModal: boolean;
+  modalAnagram: string;
+  modalWord: string;
+  appState: string;
 }> {
   worker: Worker;
   finished: boolean;
@@ -218,6 +220,10 @@ class Anagramania extends React.Component<{}, {
       subanagrams: [],
       anagramIteratorState: null,
       cleanedQueryWithSpaces: '',
+      showModal: false,
+      modalAnagram: '',
+      modalWord: '',
+      appState: 'search',
     };
 
     this.onQueryChange = this.onQueryChange.bind(this);
@@ -225,6 +231,9 @@ class Anagramania extends React.Component<{}, {
     this.onSelectChange = this.onSelectChange.bind(this);
     this.pauseWorker = this.pauseWorker.bind(this);
     this.continueWorker = this.continueWorker.bind(this);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.saveAnagram = this.saveAnagram.bind(this);
 
     this.state = defaultState;
     if (TESTING) {
@@ -232,6 +241,17 @@ class Anagramania extends React.Component<{}, {
     }
   }
   async componentWillMount() {
+    const location = window.location;
+    const search = location.search;
+    const parsedSearch = parseSearch(search);
+    if (parsedSearch.anagram && parsedSearch.word) {
+      this.setState ({
+        modalWord: parsedSearch.word,
+        modalAnagram: parsedSearch.anagram,
+        appState: 'anagramViewer',
+      });
+    }
+
     const result = await getDictionaries();
     this.setState({
       dictionaries: result.data.dictionaries,
@@ -244,6 +264,9 @@ class Anagramania extends React.Component<{}, {
   }
   onSubmit(e) {
     e.preventDefault();
+    this.setState({
+      appState: 'search',
+    });
     this.requestAnagram();
   }
   onSelectChange(value) {
@@ -254,6 +277,24 @@ class Anagramania extends React.Component<{}, {
   }
   continueWorker() {
     console.log('continue');
+  }
+  openModal(anagram: string, word: string) {
+    this.setState({
+      showModal: true,
+      modalAnagram: anagram,
+      modalWord: word,
+    });
+  }
+  closeModal() {
+    this.setState({
+      showModal: false,
+    });
+  }
+  saveAnagram(anagram: string, word: string) {
+    this.setState({
+      modalAnagram: anagram,
+      modalWord: word,
+    });
   }
   async requestAnagram() {
 
@@ -342,10 +383,39 @@ class Anagramania extends React.Component<{}, {
     const state = this.state.anagramIteratorState;
 
     const query = this.state.cleanedQueryWithSpaces;
-    console.log(query, 'query');
+    const appState = this.state.appState;
 
     return (
       <div>
+        <ReactModal
+          isOpen={this.state.showModal}
+          onRequestClose={this.closeModal}
+          shouldCloseOnEsc
+          shouldCloseOnOverlayClick
+          style={{
+            overlay: {backgroundColor: 'rgba(0, 0, 0, 0.3)'},
+            content: {
+              padding: 0,
+              borderRadius: 0,
+              border: 'none',
+              top: '50%',
+              bottom: 'auto',
+              left: '50%',
+              right: 'auto',
+              maxWidth: '800px',
+              width: '100%',
+              transform: `translate(-50%, -50%)`,
+            }
+          }}
+        >
+          <AnagramVisualizer
+            anagram={this.state.modalAnagram}
+            word={this.state.modalWord}
+            close={this.closeModal}
+            save={this.saveAnagram}
+          />
+        </ReactModal>
+
         <AnagramaniaHeader
           onSubmit={this.onSubmit}
           onQueryChange={this.onQueryChange}
@@ -353,16 +423,35 @@ class Anagramania extends React.Component<{}, {
           dictionaries={this.state.dictionaries}
           selectedDictionaries={this.state.selectedDictionaries}
         />
-        <InnerContainer>
-          <AnagramInfoArea
-            anagramIteratorState={state}
-            subanagrams={this.state.subanagrams}
-            query={query}
-          />
-          <Footer>
-            {'Made by Tom Nick & Taisia Tikhnovetskaya'}
-          </Footer>
-        </InnerContainer>
+        {appState === 'search' ?
+          <InnerContainer>
+            <AnagramInfoArea
+              anagramIteratorState={state}
+              subanagrams={this.state.subanagrams}
+              query={query}
+              share={this.openModal}
+            />
+          </InnerContainer> :
+          null
+        }
+        {
+          appState === 'anagramViewer' ?
+            <InnerContainer>
+              <div style={{marginTop: 40}}>
+                <AnagramVisualizer
+                  anagram={this.state.modalAnagram}
+                  word={this.state.modalWord}
+                  close={this.closeModal}
+                  save={this.saveAnagram}
+                />
+              </div>
+            </InnerContainer>
+          : null
+        }
+
+        <Footer>
+          {'Made by Tom Nick & Taisia Tikhnovetskaya'}
+        </Footer>
       </div>
     );
   }

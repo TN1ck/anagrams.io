@@ -45,6 +45,7 @@ class AnagramResults extends React.Component<
     max: number;
   },
   query: string;
+  share: (anagram: string, word: string) => any;
 },
 {
   columnWidth: number;
@@ -133,6 +134,7 @@ class AnagramResults extends React.Component<
                 return (
                   <AnagramResult
                     key={word}
+                    share={this.props.share}
                     columnWidth={this.state.columnWidth}
                     result={resultState}
                     word={word}
@@ -163,6 +165,7 @@ class AnagramResults extends React.Component<
                             return (
                               <AnagramResult
                                 key={word}
+                                share={this.props.share}
                                 columnWidth={this.state.columnWidth}
                                 result={AnagramResultState.solved}
                                 word={word}

@@ -1,4 +1,7 @@
 export default {
+    "showModal": true,
+    "modalAnagram": "Klaas Neumann",
+    "modalWord": "Kann ausmalen",
     "queryStatus": "loading",
     "query": "klaas neumann",
     "cleanedQueryWithSpaces": "Klaas Neumann",

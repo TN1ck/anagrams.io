@@ -27,18 +27,18 @@ class Result extends React.Component<{
   index: number;
   color: string;
   query: string;
+  share?: (anagram: string, word: string) => any;
 }> {
   shouldComponentUpdate() {
     return false;
   }
   render() {
     const {result, index, color, query} = this.props;
+    const word = result.map(w => w.word.word).join(' ');
     return (
       <ResultContainer style={{backgroundColor: color}}>
-        {(index + 1) + '. ' + result.map(w => {
-          return w.word.word;
-        }).join(' ')}
-        <ShareLink target="_blank" href={`/share?word=${query}&anagram=${result.map(w => w.word.word).join('%20')}`}>
+        {(index + 1) + '. ' + word}
+        <ShareLink onClick={() => this.props.share(word, query)}>
           {'share'}
         </ShareLink>
       </ResultContainer>
@@ -47,6 +47,7 @@ class Result extends React.Component<{
 }
 
 interface AnagramResultProps {
+  share?: (anagram: string, word: string) => any;
   query: string;
   result: anagram.AnagramResultState;
   word: string;
@@ -144,7 +145,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
           {/* <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div> */}
           {take(sortedList, !this.state.showAll ? MAX_ITEMS_TO_SHOW_AT_ONCE : list.length).map((a, i) => {
             const color = colorScale(scale(a.length));
-            return <Result key={i} result={a} index={i} color={color} query={query} />
+            return <Result key={i} result={a} index={i} color={color} query={query} share={this.props.share} />
           })}
           {
             list.length > MAX_ITEMS_TO_SHOW_AT_ONCE

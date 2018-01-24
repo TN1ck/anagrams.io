@@ -10,3 +10,11 @@ body {
   font-size: 14px;
   padding-bottom: 100px;
 }
+
+/*
+When the modal is opened a ReactModal__Body--open class is added to the body tag.
+You can use this to remove scrolling on the body while the modal is open.
+*/
+.ReactModal__Body--open {
+  overflow: hidden;
+}
