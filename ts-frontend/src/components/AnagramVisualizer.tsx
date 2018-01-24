@@ -135,7 +135,9 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     this.setSpanContent(this.props);
   }
   componentWillReceiveProps(props) {
-    this.setSpanContent(props);
+    if (this.props.word !== props.word || this.props.anagram !== this.props.anagram) {
+      this.setSpanContent(props);
+    }
   }
   setSpanContent(props: AnagramVisualizerProps) {
     this.anagramSpan.innerHTML = props.anagram;

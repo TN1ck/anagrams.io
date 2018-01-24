@@ -350,6 +350,7 @@ class Anagramania extends React.Component<{}, {
 
     const startNextWorker = () => {
       if (this.state.anagramIteratorState.unsolvedSubanagrams.length === 0) {
+        this.setState({});
         return;
       }
       const nextWorkerIndex = this.state.anagramIteratorState.unsolvedSubanagrams.shift();
@@ -366,13 +367,14 @@ class Anagramania extends React.Component<{}, {
           worker.terminate();
           // stop!
           if (this.state.anagramIteratorState.solvedSubanagrams.length === subanagrams.length) {
+            this.setState({});
             return;
           }
           startNextWorker();
           return;
         }
         const newState: anagram.AnagramGeneratorStepSerialized = message.data;
-        updateState(newState)
+        updateState(newState);
       });
 
       worker.postMessage({
