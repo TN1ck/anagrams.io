@@ -404,7 +404,7 @@ class Anagramania extends React.Component<{}, {
           shouldCloseOnEsc
           shouldCloseOnOverlayClick
           style={{
-            overlay: {backgroundColor: 'rgba(0, 0, 0, 0.3)'},
+            overlay: {backgroundColor: 'rgba(0, 0, 0, 0.3)', zIndex: 99},
             content: {
               padding: 15,
               background: 'none',

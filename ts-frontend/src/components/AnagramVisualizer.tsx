@@ -18,7 +18,7 @@ const Copyright = styled.div`
 `;
 
 const WordContainer = styled.div`
-  padding-top: 20px;
+  padding-top: 10px;
   display: flex;
   justify-content: center;
 `;
@@ -163,7 +163,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     const MAX_WIDTH = Math.min(700, window.innerWidth - (60 + 30) );
 
     const WORD_LENGTH = Math.max(word.length, anagram.length);
-    const CHARACTER_WIDTH = Math.min(MAX_WIDTH / WORD_LENGTH, 22);
+    const CHARACTER_WIDTH = Math.min(MAX_WIDTH / (WORD_LENGTH * 1.5), 22);
     const WORD_WIDTH = WORD_LENGTH * CHARACTER_WIDTH;
 
     const mapping = getAangramMapping(word, anagram);
@@ -236,7 +236,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
                     const y2 = HEIGHT;
                     const opacity = opacityScale(index);
                     const yOffset = PADDING_TOP + HEIGHT_PER_CHARACTER * index;
-                    const path = drawPath(x1, y1, x2, y2, yOffset);
+                    const path = drawPath(x1, y1, x2, y2, yOffset, STROKE_WIDTH);
                     return (
                       <path
                         key={index}
