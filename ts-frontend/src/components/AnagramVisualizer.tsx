@@ -9,6 +9,14 @@ import {
   SmallButton,
 } from '../pages/Anagramania/components';
 
+const Copyright = styled.div`
+  font-size: 12px;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  opacity: 0.3;
+`;
+
 const WordContainer = styled.div`
   padding-top: 20px;
   display: flex;
@@ -64,16 +72,20 @@ const ExplainText = styled.p`
   text-align: center;
 `;
 
-class AnagramVisualizer extends React.Component<{
+interface AnagramVisualizerProps {
   word: string;
   anagram: string;
   save?: (word: string, anagram: string) => any;
   close?: () => any;
-}, {
+}
+
+class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
   mode: string;
   currentWord: string;
   currentAnagram: string;
 }> {
+  wordSpan: HTMLSpanElement;
+  anagramSpan: HTMLSpanElement;
   constructor(props) {
     super(props);
     this.state = {
@@ -118,6 +130,16 @@ class AnagramVisualizer extends React.Component<{
     } catch(err) {
       console.log('Copy did not work');
     }
+  }
+  componentDidMount() {
+    this.setSpanContent(this.props);
+  }
+  componentWillReceiveProps(props) {
+    this.setSpanContent(props);
+  }
+  setSpanContent(props: AnagramVisualizerProps) {
+    this.anagramSpan.innerHTML = props.anagram;
+    this.wordSpan.innerHTML = props.word;
   }
   render() {
 
@@ -188,9 +210,13 @@ class AnagramVisualizer extends React.Component<{
           <WordContainer>
             <div>
               <Word style={{minWidth: WORD_WIDTH, fontSize: FONT_SIZE}}>
-                <span onInput={this.onChangeWord} id="word-span" className={editable ? 'edit' : ''} contentEditable={editable}>
-                  {this.props.word}
-                </span>
+                <span
+                  onInput={this.onChangeWord}
+                  id="word-span"
+                  className={editable ? 'edit' : ''}
+                  contentEditable={editable}
+                  ref={(dom) => this.wordSpan = dom}
+                />
                 {/* {[...word].map((c, i) => {
                   const left = i * CHARACTER_WIDTH;
                   return <Character style={{left}}>{c}</Character>
@@ -223,9 +249,13 @@ class AnagramVisualizer extends React.Component<{
                 </svg>
               </div>
               <Word style={{minWidth: WORD_WIDTH, fontSize: FONT_SIZE}}>
-                <span onInput={this.onChangeAnagram} id="anagram-span" className={editable ? 'edit' : ''} contentEditable={editable}>
-                  {this.props.anagram}
-                </span>
+                <span
+                  onInput={this.onChangeAnagram}
+                  id="anagram-span"
+                  className={editable ? 'edit' : ''}
+                  contentEditable={editable}
+                  ref={(dom) => this.anagramSpan = dom}
+                />
                 {/* {[...anagram].map((c, i) => {
                   const left = i * CHARACTER_WIDTH;
                   return <Character style={{left}}>{c}</Character>
@@ -235,7 +265,7 @@ class AnagramVisualizer extends React.Component<{
           </WordContainer>
         <ShareSection>
           {`Share it using this Link: `}
-          <CopyInput id="link-input" type="text" value={LINK} />
+          <CopyInput readOnly id="link-input" type="text" value={LINK} />
           <CopyButton onClick={this.copyToClipboard}>{'COPY'}</CopyButton>
         </ShareSection>
         {this.props.close ? <SmallButton
@@ -252,6 +282,9 @@ class AnagramVisualizer extends React.Component<{
         >
           {editable ? 'Save': 'Edit'}
         </SmallButton>
+        <Copyright>
+          {'Anagramania.io'}
+        </Copyright>
       </Card>
     );
   }

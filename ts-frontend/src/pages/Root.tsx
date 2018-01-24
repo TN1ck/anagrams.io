@@ -8,7 +8,6 @@ const Root: React.StatelessComponent<{}> = () => {
   const pathArray = path.split('/');
   const page = pathArray[1];
 
-  console.log(page, pathArray);
   switch (page) {
     case 'performance':
       return <Performance />;

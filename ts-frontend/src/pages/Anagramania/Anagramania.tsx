@@ -1,4 +1,5 @@
 import * as React from 'react';
+import styled from 'styled-components';
 import {throttle, min, max} from 'lodash';
 
 import Footer from 'src/components/Footer';
@@ -30,6 +31,11 @@ const AnagramWorker = require('../../anagram.worker');
 
 // import mockState from 'src/assets/anagramPageMock';
 // // const TESTING = true;
+
+const SmallTitle = styled.div`
+  margin-top: -15px;
+  margin-bottom: 20px;
+`;
 
 class ActiveSubanagrams extends React.Component<{
   currentSubanagrams: number[];
@@ -164,6 +170,9 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
             <Title href="/">
               {'Anagramania.io'}
             </Title>
+            <SmallTitle>
+              {'The best anagram finder in the world.'}
+            </SmallTitle>
             <Form onSubmit={onSubmit}>
               <Input
                 type="text"
