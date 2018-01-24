@@ -7,7 +7,7 @@ const MinifyPlugin = require("babel-minify-webpack-plugin");
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 const extractCss = new ExtractTextPlugin({
-  filename: 'style.[hash].css',
+  filename: '[name].[hash].css',
   allChunks: true,
   disable: !IS_PRODUCTION
 });
@@ -93,7 +93,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: IS_PRODUCTION ? ['style-loader', 'css-loader'] : extractCss.extract({
+        use: extractCss.extract({
           use: 'css-loader',
           fallback: 'style-loader',
         }),
