@@ -98,8 +98,8 @@ class AnagramInfoArea extends React.Component<{
     const progress = Math.ceil(((numberOfSolvedSubanagrams)/ numberOfAnagrams) * 100);
     
     return (
-      <div>
-        <SubTitle>
+      <div className="mt-3">
+        <SubTitle className="mb-2">
           {`Found `}<strong>{`${solutions.length}`}</strong>{` solutions. `}
         </SubTitle>
         <LoadingBar progress={progress}>
