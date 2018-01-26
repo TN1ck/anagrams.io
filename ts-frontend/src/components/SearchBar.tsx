@@ -17,6 +17,7 @@ const SearchBarInput = styled.input`
   font-size: ${THEME.font.sizeLarge};
   padding: ${THEME.margins.m2} ${THEME.margins.m2};
   color: ${THEME.colors.foregroundText};
+  border-radius: 0;
   border-top-left-radius: ${THEME.borderRadius};
   border-bottom-left-radius: ${THEME.borderRadius};
 
@@ -34,6 +35,7 @@ const SearchButton = styled.button`
   color: ${THEME.searchBar.buttonTextColor};
   box-shadow: ${THEME.dropShadow.s1};
   padding: 0 ${THEME.margins.m3};
+  border-radius: 0;
   border-top-right-radius: ${THEME.borderRadius};
   border-bottom-right-radius: ${THEME.borderRadius};
   margin: 0;
