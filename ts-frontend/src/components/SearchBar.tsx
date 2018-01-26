@@ -15,7 +15,9 @@ const SearchBarInput = styled.input`
   box-shadow: ${THEME.dropShadow.s1};
   font-size: ${THEME.font.sizeLarge};
   padding: ${THEME.margins.m2} ${THEME.margins.m2};
-  color: ${THEME.font.color};
+  color: ${THEME.colors.foregroundText};
+  border-top-left-radius: ${THEME.borderRadius};
+  border-bottom-left-radius: ${THEME.borderRadius};
 
   &:focus {
     outline: 0;
@@ -31,6 +33,8 @@ const SearchButton = styled.button`
   color: ${THEME.searchBar.buttonTextColor};
   box-shadow: ${THEME.dropShadow.s1};
   padding: 0 ${THEME.margins.m3};
+  border-top-right-radius: ${THEME.borderRadius};
+  border-bottom-right-radius: ${THEME.borderRadius};
 
   &:hover {
     background: ${THEME.searchBar.buttonColorHover};

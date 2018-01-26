@@ -4,7 +4,7 @@ import {THEME} from 'src/theme';
 export const Title = styled.a`
 z-index: 1;
 position: relative;
-color: ${THEME.font.color};
+color: ${THEME.colors.foregroundText};
 font-weight: bold;
 font-size: ${THEME.font.sizeTitle};
 text-align: left;
@@ -39,11 +39,12 @@ text-decoration: none;
 
 export const SubTitle = styled.h2`
   margin: ${THEME.margins.m2} 0;
-  color: ${THEME.font.color};
+  color: ${THEME.colors.backgroundText};
   display: inline-block;
 
   & strong {
-    background: ${THEME.font.highlightBackground};
+    background: ${THEME.colors.highlightBackground};
+    color: ${THEME.colors.highlightText};
     padding: ${THEME.margins.m1};
   }
 `;

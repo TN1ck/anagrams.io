@@ -6,7 +6,7 @@ import {THEME} from 'src/theme';
 
 export const ResultContainer = styled.div`
   position: relative;
-  color: ${THEME.font.color};
+  color: ${THEME.colors.foregroundText};
   white-space: nowrap;
   margin-top: ${THEME.margins.m1};
 `;

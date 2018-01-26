@@ -13,7 +13,7 @@ const LoadingBar = withProps<{
   box-shadow: ${THEME.dropShadow.s1};
   border-radius: ${THEME.borderRadius};
   background: ${props => {
-    return `linear-gradient(to right, ${THEME.colors.primary} 0%, ${THEME.colors.primary} ${props.progress}%, #CCC ${props.progress}%, #CCC 100%);`;
+    return `linear-gradient(to right, ${THEME.colors.primary} 0%, ${THEME.colors.primary} ${props.progress}%, ${THEME.colors.backgroundBright} ${props.progress}%, ${THEME.colors.backgroundBright} 100%);`;
   }}
   width: 100%;
 `;

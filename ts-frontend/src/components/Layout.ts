@@ -2,8 +2,8 @@ import styled from 'styled-components';
 import {THEME} from 'src/theme';
 
 export const Header = styled.div`
-  background: ${THEME.colors.foregroundBright};
-  color: ${THEME.font.color};
+  background: ${THEME.colors.backgroundBright};
+  color: ${THEME.colors.foregroundText};
   padding: ${THEME.margins.m4} 0 ${THEME.margins.m4};
   display: flex;
   justify-content: center;
@@ -30,7 +30,7 @@ export const InnerContainer = styled.div`
 
 export const Card = styled.div`
   background-color: ${THEME.colors.foreground};
-  color: ${THEME.font.color};
+  color: ${THEME.colors.foregroundText};
   padding: ${THEME.margins.m4};
   box-shadow: ${THEME.dropShadow.s1};
   position: relative;
@@ -41,7 +41,7 @@ export const Footer = styled.div`
   position: fixed;
   bottom: ${THEME.margins.m3};
   right: ${THEME.margins.m3};
-  color: ${THEME.font.color};
+  color: ${THEME.colors.foregroundText};
   display: flex;
   justify-content: center;
   font-size: ${THEME.font.sizeTiny};

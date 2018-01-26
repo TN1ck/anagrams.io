@@ -78,7 +78,7 @@ const CopyInput = styled.input`
 `;
 
 const ExplainText = styled.p`
-  color: ${THEME.font.color};
+  color: ${THEME.colors.foregroundText};
   text-align: center;
 `;
 

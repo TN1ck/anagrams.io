@@ -19,11 +19,12 @@ export const ShowAllButton = styled.button`
 export const SmallButton = withProps<{active: boolean}>()(styled.button)`
   background: ${props => props.active ? THEME.colors.primary : 'none'};
   border: none;
-  color: ${THEME.font.color};
+  color: ${props => props.active ? THEME.colors.primaryText : THEME.colors.foregroundText};
   margin: 0;
   padding: 2px 5px;
   outline: none;
   text-transform: uppercase;
+  border-radius: ${THEME.borderRadius};
   &:hover {
     background: ${THEME.colors.primary};
     cursor: pointer;
@@ -36,10 +37,10 @@ export const ShareButton = styled.a`
   right: 0;
   opacity: 0.2;
   text-decoration: none;
-  color: ${THEME.font.color};
+  color: ${THEME.colors.foregroundText};
   &:hover {
     opacity: 1.0;
     cursor: pointer;
-    color: ${THEME.font.color};
+    color: ${THEME.colors.foregroundText};
   }
 `;
