@@ -1,18 +1,16 @@
 import styled from 'styled-components';
-import {YELLOW} from 'src/constants';
+import {THEME} from 'src/theme';
 
 export const Title = styled.a`
 z-index: 1;
 position: relative;
-color: black;
+color: ${THEME.font.color};
 font-weight: bold;
-font-size: 2.5rem;
+font-size: ${THEME.font.sizeTitle};
 text-align: left;
 display: inline-block;
-/* margin: 2.5rem; */
 padding: 0;
 padding-bottom: 8px;
-margin-bottom: 20px;
 text-decoration: none;
 
 &:before {
@@ -21,7 +19,7 @@ text-decoration: none;
   content: '';
   display: block;
   height: 4px;
-  background: ${YELLOW};
+  background: ${THEME.colors.primary};
   width: 100%;
   bottom: 0px;
   transition: height 0.15s ease-out;
@@ -35,25 +33,21 @@ text-decoration: none;
 }
 
 @media (max-width: 899px) {
-  font-size: 1.5rem;
+  font-size: ${THEME.font.sizeTitleMobile};
 }
 `;
 
 export const SubTitle = styled.h2`
-  color: black;
-  /* padding: 5px 10px; */
-  /* background: ${YELLOW}; */
-  /* background: #FFF; */
+  margin: ${THEME.margins.m2} 0;
+  color: ${THEME.font.color};
   display: inline-block;
-  /* border: 1px solid grey; */
 
   & strong {
-    background: #DDD;
-    padding: 4px;
+    background: ${THEME.font.highlightBackground};
+    padding: ${THEME.margins.m1};
   }
 `;
 
 export const SmallTitle = styled.div`
-  margin-top: -15px;
-  margin-bottom: 20px;
+  font-weight: bold;
 `;

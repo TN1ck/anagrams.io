@@ -1,24 +1,25 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { YELLOW, ORANGE, FRONTEND_URL } from 'src/constants';
+import { FRONTEND_URL } from 'src/constants';
 import {drawPath} from 'src/utility';
 import {getAangramMapping, stringToWord, sanitizeQuery} from 'src/anagram';
 import {Card} from 'src/components/Layout';
+import {THEME} from 'src/theme';
 
 import {
   SmallButton,
 } from './Buttons';
 
 const Copyright = styled.div`
-  font-size: 12px;
+  font-size: ${THEME.font.sizeSmall};
   position: absolute;
-  top: 15px;
-  left: 15px;
+  top: ${THEME.margins.m2};
+  left: ${THEME.margins.m2};
   opacity: 0.3;
 `;
 
 const WordContainer = styled.div`
-  padding-top: 10px;
+  padding-top: ${THEME.margins.m2};
   display: flex;
   justify-content: center;
 `;
@@ -38,23 +39,26 @@ const Word = styled.strong`
     width: 100%;
     &.edit {
       outline: none;
-      border-bottom: 4px dashed grey;
+      border-bottom: 4px dashed ${THEME.colors.border};
     }
   }
 `;
 
 const ShareSection = styled.div`
-  margin-top: 20px;
+  margin-top: ${THEME.margins.m3};
   text-align: center;
 `;
 
 const CopyButton = styled.button`
-  background-color: ${YELLOW};
+  color: ${THEME.searchBar.buttonTextColor};
+  font-size: ${THEME.font.sizeSmall};
+  background-color: ${THEME.searchBar.buttonColor};
   outline: none;
   border: none;
-  padding: 6px;
+  padding: ${THEME.margins.m1} ${THEME.margins.m2};
+  border: 1px solid ${THEME.colors.border};
   &:hover {
-    background-color: ${ORANGE};
+    background-color: ${THEME.searchBar.buttonColorHover};
     cursor: pointer;
   }
 `;
@@ -62,13 +66,17 @@ const CopyButton = styled.button`
 const CopyInput = styled.input`
   display: inline-block;
   outline: none;
-  font-size: 12px;
-  padding: 4px;
+  border: 1px solid ${THEME.colors.border};
+  border-right: none;
+  font-size: ${THEME.font.sizeSmall};
+  padding: ${THEME.margins.m1};
+  border-radius: ${THEME.borderRadius};
+  margin: 0;
   min-width: 190px;
 `;
 
 const ExplainText = styled.p`
-  color: black;
+  color: ${THEME.font.color};
   text-align: center;
 `;
 
@@ -260,7 +268,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         <ShareSection>
           {`Share it using this Link: `}
           <CopyInput readOnly id="link-input" type="text" value={LINK} />
-          <CopyButton onClick={this.copyToClipboard}>{'COPY'}</CopyButton>
+          <CopyButton onClick={this.copyToClipboard}>{'Copy'}</CopyButton>
         </ShareSection>
         {this.props.close ? <SmallButton
           onClick={this.props.close}

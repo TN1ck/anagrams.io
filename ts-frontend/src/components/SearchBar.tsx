@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
+import {THEME} from 'src/theme';
 
 const SearchBarForm = styled.form`
   display: flex;
@@ -8,13 +9,13 @@ const SearchBarForm = styled.form`
 `;
 
 const SearchBarInput = styled.input`
-  border: 1px solid rgba(0, 0, 0, 0.4);
+  border: 1px solid ${THEME.colors.border};
   width: 100%;
-  background: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.3);
-  font-size: 1.25rem;
-  padding: 10px 10px;
-  color: black;
+  background: ${THEME.searchBar.barBackgroundColor};
+  box-shadow: ${THEME.dropShadow.s1};
+  font-size: ${THEME.font.sizeLarge};
+  padding: ${THEME.margins.m2} ${THEME.margins.m2};
+  color: ${THEME.font.color};
 
   &:focus {
     outline: 0;
@@ -23,22 +24,21 @@ const SearchBarInput = styled.input`
 
 const SearchButton = styled.button`
   transition: all 300ms ease-out;
-  border: 1px solid rgba(0, 0, 0, 0.4);
+  border: 1px solid ${THEME.colors.border};
   border-left: none;
-  background: rgba(0, 10, 25, 0.5);
-  font-size: 1.25rem;
-  color: white;
-  box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.3);
-  padding: 0 1.5rem;
+  background: ${THEME.searchBar.buttonColor};
+  font-size: ${THEME.font.sizeLarge};
+  color: ${THEME.searchBar.buttonTextColor};
+  box-shadow: ${THEME.dropShadow.s1};
+  padding: 0 ${THEME.margins.m3};
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background: ${THEME.searchBar.buttonColorHover};
     cursor: pointer;
   }
 
   &:focus {
     outline: 0;
-    box-shadow: 0 5px 12px -2px rgba(255, 255, 255, 0.3);
   }
 `;
 

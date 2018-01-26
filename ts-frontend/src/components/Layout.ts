@@ -1,16 +1,16 @@
 import styled from 'styled-components';
+import {THEME} from 'src/theme';
 
 export const Header = styled.div`
   background: #DDDDDD;
   color: black;
-  /* box-shadow: 0 10px 80px -2px rgba(0, 0, 0, 0.4); */
-  padding: 2rem 0 2rem;
+  padding: ${THEME.margins.m4} 0 ${THEME.margins.m4};
   display: flex;
   justify-content: center;
 `;
 
 export const HeaderContainer = styled.div`
-  max-width: 500px;
+  max-width: ${THEME.widths.headerContainer};
   margin: 0 auto;
 `;
 
@@ -29,20 +29,20 @@ export const InnerContainer = styled.div`
 `;
 
 export const Card = styled.div`
-  background-color: #FFF;
-  padding: 40px;
-  box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.2);
+  background-color: ${THEME.colors.foreground};
+  color: ${THEME.font.color};
+  padding: ${THEME.margins.m4};
+  box-shadow: ${THEME.dropShadow.s1};
   position: relative;
-
 `;
 
 export const Footer = styled.div`
   opacity: 0.7;
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  color: black;
+  bottom: ${THEME.margins.m3};
+  right: ${THEME.margins.m3};
+  background-color: ${THEME.font.color};
   display: flex;
   justify-content: center;
-  font-size: 10px;
+  font-size: ${THEME.font.sizeTiny};
 `;

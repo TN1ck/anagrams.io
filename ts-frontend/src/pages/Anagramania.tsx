@@ -107,10 +107,6 @@ class AnagramInfoArea extends React.Component<{
             subanagrams={subanagrams}
             currentSubanagrams={currentSubanagrams}
           />
-          {' '}
-          <div style={{position: 'absolute', right: 10, top: 10}}>
-            {`${progress} %`}
-          </div>
         </LoadingBar>
         <br />
         <AnagramResults
@@ -162,7 +158,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
             <Title href="/">
               {'Anagramania.io'}
             </Title>
-            <SmallTitle>
+            <SmallTitle className="mt-1 mb-3">
               {'The best anagram finder in the world.'}
             </SmallTitle>
             <SearchBar
@@ -172,6 +168,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
             {dictionaries.map(d => {
               return (
                 <SmallButton
+                  className="mr-1 mt-2"
                   key={d.id}
                   onClick={() => onSelectChange(d.id)}
                   active={selectedDictionaries === d.id}

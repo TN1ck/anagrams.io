@@ -2,17 +2,18 @@ import styled, {css} from 'styled-components';
 import {AnagramResultState} from 'src/anagram';
 
 import {withProps} from 'src/utility';
+import {THEME} from 'src/theme';
 
 export const ResultContainer = styled.div`
   position: relative;
-  color: black;
+  color: ${THEME.font.color};
   white-space: nowrap;
-  margin-top: 5px;
+  margin-top: ${THEME.margins.m1};
 `;
 
 export const AnagramResultsContainer = styled.div`
-  margin-left: -10px;
-  margin-right: -10px;
+  margin-left: -${THEME.margins.m2};
+  margin-right: -${THEME.margins.m2};
 `;
 
 export const AnagramResultRow = styled.div`
@@ -25,11 +26,11 @@ export const AnagramResultGroup = withProps<{
   }>()(styled.div)`
     float: left;
     width: 300px;
-    background: white;
-    margin: 10px;
-    padding: 10px;
-    box-shadow: 0 5px 12px -2px rgba(0, 0, 0, 0.2);
-    // border-radius: 2px;
+    background: ${THEME.colors.foreground};
+    margin: ${THEME.margins.m2};
+    padding: ${THEME.margins.m2};
+    box-shadow: ${THEME.dropShadow.s1};
+    border-radius: ${THEME.borderRadius};
     opacity: 0.3;
     ${(props: any) => AnagramResultState.solved === props.state && css`
       opacity: 1.0;
