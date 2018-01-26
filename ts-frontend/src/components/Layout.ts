@@ -37,11 +37,11 @@ export const Card = styled.div`
 `;
 
 export const Footer = styled.div`
-  opacity: 0.7;
+  opacity: 0.4;
   position: fixed;
   bottom: ${THEME.margins.m3};
   right: ${THEME.margins.m3};
-  background-color: ${THEME.font.color};
+  color: ${THEME.font.color};
   display: flex;
   justify-content: center;
   font-size: ${THEME.font.sizeTiny};
