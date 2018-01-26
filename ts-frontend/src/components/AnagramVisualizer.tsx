@@ -52,6 +52,7 @@ const ShareSection = styled.div`
 `;
 
 const CopyButton = styled.button`
+  margin: 0;
   color: ${THEME.searchBar.buttonTextColor};
   font-size: ${THEME.font.sizeSmall};
   background-color: ${THEME.searchBar.buttonColor};
@@ -66,6 +67,7 @@ const CopyButton = styled.button`
 `;
 
 const CopyInput = styled.input`
+  margin: 0;
   display: inline-block;
   outline: none;
   border: 1px solid ${THEME.colors.border};
@@ -275,14 +277,14 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         {this.props.close ? <SmallButton
           onClick={this.props.close}
           active={false}
-          style={{position: 'absolute', right: 10, top: 5}}
+          style={{position: 'absolute', right: THEME.margins.m2, top: THEME.margins.m2}}
         >
           {'Close'}
         </SmallButton> : null}
         <SmallButton
           onClick={editable ? this.save : this.edit}
           active={false}
-          style={{position: 'absolute', left: 10, bottom: 10}}
+          style={{position: 'absolute', left: THEME.margins.m2, bottom: THEME.margins.m2}}
         >
           {editable ? 'Save': 'Edit'}
         </SmallButton>

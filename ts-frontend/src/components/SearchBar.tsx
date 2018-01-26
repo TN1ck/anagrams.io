@@ -9,6 +9,7 @@ const SearchBarForm = styled.form`
 `;
 
 const SearchBarInput = styled.input`
+  margin: 0;
   border: 1px solid ${THEME.colors.border};
   width: 100%;
   background: ${THEME.searchBar.barBackgroundColor};
@@ -35,6 +36,7 @@ const SearchButton = styled.button`
   padding: 0 ${THEME.margins.m3};
   border-top-right-radius: ${THEME.borderRadius};
   border-bottom-right-radius: ${THEME.borderRadius};
+  margin: 0;
 
   &:hover {
     background: ${THEME.searchBar.buttonColorHover};
