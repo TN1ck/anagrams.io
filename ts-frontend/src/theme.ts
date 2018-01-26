@@ -25,12 +25,14 @@ const MARGINS = {
 export const LIGHT_THEME = {
   widths: {
     headerContainer: '500px',
+    innerContainer: '900px',
   },
   colors: {
     primary: COLORS.YELLOW,
     secondary: COLORS.ORANGE,
     background: COLORS.GREY_500,
     foreground: COLORS.WHITE,
+    foregroundBright: COLORS.GREY_200,
     border: COLORS.GREY_700,
   },
   borderRadius: '0px',

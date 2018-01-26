@@ -2,8 +2,8 @@ import styled from 'styled-components';
 import {THEME} from 'src/theme';
 
 export const Header = styled.div`
-  background: #DDDDDD;
-  color: black;
+  background: ${THEME.colors.foregroundBright};
+  color: ${THEME.font.color};
   padding: ${THEME.margins.m4} 0 ${THEME.margins.m4};
   display: flex;
   justify-content: center;
@@ -15,7 +15,7 @@ export const HeaderContainer = styled.div`
 `;
 
 export const InnerContainer = styled.div`
-  max-width: 900px;
+  max-width: ${THEME.widths.innerContainer};
   width: 100%;
   position: relative;
   margin-left: auto;
@@ -23,8 +23,8 @@ export const InnerContainer = styled.div`
 
   @media (max-width: 899px) {
     max-width: 100%;
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: ${THEME.margins.m2};
+    padding-right: ${THEME.margins.m2};
   }
 `;
 
