@@ -6,6 +6,22 @@ export function withProps<U>() {
   ): ThemedStyledFunction<P & U, T, O & U> => fn;
 }
 
+export function partitionArray<T>(array: T[], columns: number): T[][] {
+  const partitionedArray: T[][] = [];
+  let currentGroup: T[] = [];
+  for (let ga of array) {
+    currentGroup.push(ga);
+    if (currentGroup.length === columns) {
+      partitionedArray.push(currentGroup);
+      currentGroup = [];
+    }
+  }
+  if (currentGroup.length !== 0) {
+    partitionedArray.push(currentGroup);
+  }
+  return partitionedArray;
+}
+
 export function parseSearch(search: string) {
   const splitRe = /\?|&/g;
   const splitted = search.split(splitRe).filter(s => s.length > 0);

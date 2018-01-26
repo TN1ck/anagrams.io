@@ -1,9 +1,12 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import Header from 'src/components/Header';
-import Title from 'src/components/Title';
-import InnerContainer from 'src/components/InnerContainer';
+import {
+  Title,
+  InnerContainer,
+  Header,
+} from 'src/components';
+
 import * as performanceTest from 'src/performance/performance';
 import {postPerformance, getPerformances} from 'src/api';
 import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts';

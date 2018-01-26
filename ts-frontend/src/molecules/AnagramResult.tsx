@@ -5,15 +5,12 @@ import * as d3Interpolate from 'd3-interpolate';
 // import * as d3ScaleChromatic from 'd3-scale-chromatic';
 
 import * as anagram from 'src/anagram';
-
-
 import {
+  ShowAllButton,
+  ShareButton,
   ResultContainer,
   AnagramResultGroup,
-  ShowAllButton,
-  ShareLink,
-} from './components';
-
+} from 'src/components';
 
 const colorScale = d3Interpolate.interpolateLab(
   '#FFFFFF',
@@ -38,9 +35,9 @@ class Result extends React.Component<{
     return (
       <ResultContainer style={{backgroundColor: color}}>
         {(index + 1) + '. ' + word}
-        <ShareLink onClick={() => this.props.share(word, query)}>
+        <ShareButton onClick={() => this.props.share(word, query)}>
           {'share'}
-        </ShareLink>
+        </ShareButton>
       </ResultContainer>
     );
   }

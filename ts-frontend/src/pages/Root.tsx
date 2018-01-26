@@ -1,6 +1,7 @@
 import * as React from 'react';
-import Anagramania from './Anagramania/Anagramania';
+import Anagramania from './Anagramania';
 import Performance from './Performance';
+import Styleguide from './Styleguide';
 
 const Root: React.StatelessComponent<{}> = () => {
   const location = window.location;
@@ -11,6 +12,8 @@ const Root: React.StatelessComponent<{}> = () => {
   switch (page) {
     case 'performance':
       return <Performance />;
+    case 'styleguide':
+      return <Styleguide />;
     default:
       return <Anagramania />;
   }

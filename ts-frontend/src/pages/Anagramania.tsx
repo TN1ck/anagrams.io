@@ -1,18 +1,19 @@
 import * as React from 'react';
-import styled from 'styled-components';
 import {throttle, min, max} from 'lodash';
 
-import Footer from 'src/components/Footer';
-import Form from 'src/components/Form';
-import Header from 'src/components/Header';
-import InnerContainer from 'src/components/InnerContainer';
-import Input from 'src/components/Input';
-import SearchButton from 'src/components/SearchButton';
-import SubTitle from 'src/components/SubTitle';
-import Title from 'src/components/Title';
-import HeaderContainer from 'src/components/HeaderContainer';
-import LoadingBar from 'src/components/LoadingBar';
-import AnagramVisualizer from 'src/components/AnagramVisualizer';
+import {
+  Footer,
+  SearchBar,
+  Header,
+  InnerContainer,
+  SubTitle,
+  Title,
+  HeaderContainer,
+  LoadingBar,
+  AnagramVisualizer,
+  SmallTitle,
+} from 'src/components';
+
 import * as ReactModal from 'react-modal';
 ReactModal.setAppElement('body');
 
@@ -21,21 +22,16 @@ import {parseSearch} from 'src/utility';
 
 import * as anagram from 'src/anagram';
 
-import AnagramResults from './AnagramResults';
+import AnagramResults from 'src/molecules/AnagramResults';
 import {
   // Strong,
   SmallButton,
-} from './components';
+} from 'src/components';
 
-const AnagramWorker = require('../../anagram.worker');
+const AnagramWorker = require('../anagram.worker');
 
 // import mockState from 'src/assets/anagramPageMock';
 // // const TESTING = true;
-
-const SmallTitle = styled.div`
-  margin-top: -15px;
-  margin-bottom: 20px;
-`;
 
 class ActiveSubanagrams extends React.Component<{
   currentSubanagrams: number[];
@@ -139,7 +135,6 @@ interface AnagramaniaHeaderProps {
 };
 
 class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
-  input: HTMLInputElement;
   shouldComponentUpdate(newProps: AnagramaniaHeaderProps) {
     if (
       this.props.selectedDictionaries !== newProps.selectedDictionaries ||
@@ -149,12 +144,9 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
     }
     return false;
   }
-  setInput(dom: HTMLInputElement) {
-    this.input = dom;
-  }
-  componentDidMount() {
-    this.input.focus();
-  }
+  // componentDidMount() {
+  //   this.input.focus();
+  // }
   render() {
     const {
       dictionaries,
@@ -173,16 +165,10 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
             <SmallTitle>
               {'The best anagram finder in the world.'}
             </SmallTitle>
-            <Form onSubmit={onSubmit}>
-              <Input
-                type="text"
-                innerRef={(e) => this.setInput(e)}
-                onChange={onQueryChange}
-              />
-              <SearchButton>
-                {'Go!'}
-              </SearchButton>
-            </Form>
+            <SearchBar
+              onChange={onQueryChange}
+              onSubmit={onSubmit}
+            />
             {dictionaries.map(d => {
               return (
                 <SmallButton

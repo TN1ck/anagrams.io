@@ -1,38 +1,17 @@
 import * as React from 'react';
 import {take} from 'lodash';
-import styled from 'styled-components';
 
-import SubTitle from 'src/components/SubTitle';
+import {
+  SubTitle,
+  AnagramResultsContainer,
+  AnagramResultRow,
+} from 'src/components';
 
 import * as anagram from 'src/anagram';
+import {partitionArray} from 'src/utility';
 
 import AnagramResult from './AnagramResult';
 import { AnagramResultState } from 'src/anagram';
-
-function partitionArray<T>(array: T[], columns: number): T[][] {
-  const partitionedArray: T[][] = [];
-  let currentGroup: T[] = [];
-  for (let ga of array) {
-    currentGroup.push(ga);
-    if (currentGroup.length === columns) {
-      partitionedArray.push(currentGroup);
-      currentGroup = [];
-    }
-  }
-  if (currentGroup.length !== 0) {
-    partitionedArray.push(currentGroup);
-  }
-  return partitionedArray;
-}
-
-const AnagramResultsContainer = styled.div`
-  margin-left: -10px;
-  margin-right: -10px;
-`;
-
-const AnagramResultRow = styled.div`
-  float: left;
-`;
 
 class AnagramResults extends React.Component<
 {

@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import { YELLOW, ORANGE, FRONTEND_URL } from 'src/constants';
 import {drawPath} from 'src/utility';
 import {getAangramMapping, stringToWord, sanitizeQuery} from 'src/anagram';
-import Card from './Card';
+import {Card} from 'src/components/Layout';
 
 import {
   SmallButton,
-} from '../pages/Anagramania/components';
+} from './Buttons';
 
 const Copyright = styled.div`
   font-size: 12px;
@@ -219,10 +219,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
                   contentEditable={editable}
                   ref={(dom) => this.wordSpan = dom}
                 />
-                {/* {[...word].map((c, i) => {
-                  const left = i * CHARACTER_WIDTH;
-                  return <Character style={{left}}>{c}</Character>
-                })} */}
               </Word>
               <div>
                 <svg height={HEIGHT} width={WORD_WIDTH} style={{overflow: 'visible'}}>
@@ -258,10 +254,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
                   contentEditable={editable}
                   ref={(dom) => this.anagramSpan = dom}
                 />
-                {/* {[...anagram].map((c, i) => {
-                  const left = i * CHARACTER_WIDTH;
-                  return <Character style={{left}}>{c}</Character>
-                })} */}
               </Word>
             </div>
           </WordContainer>
