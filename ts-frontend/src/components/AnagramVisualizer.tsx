@@ -47,6 +47,8 @@ const Word = styled.strong`
 const ShareSection = styled.div`
   margin-top: ${THEME.margins.m3};
   text-align: center;
+  margin-left: -${THEME.margins.m4};
+  margin-right: -${THEME.margins.m4};
 `;
 
 const CopyButton = styled.button`

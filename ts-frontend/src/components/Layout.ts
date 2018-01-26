@@ -23,8 +23,8 @@ export const InnerContainer = styled.div`
 
   @media (max-width: 899px) {
     max-width: 100%;
-    padding-left: ${THEME.margins.m2};
-    padding-right: ${THEME.margins.m2};
+    padding-left: ${THEME.margins.m3};
+    padding-right: ${THEME.margins.m3};
   }
 `;
 

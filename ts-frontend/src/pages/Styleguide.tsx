@@ -6,7 +6,7 @@ import mockState from 'src/assets/anagramPageMock';
 import {THEME} from 'src/theme';
 
 const Card = styled.div`
-  margin-top: ${THEME.margins.m2};
+  margin-bottom: ${THEME.margins.m2};
   background-color: #FFF;
   padding: ${THEME.margins.m2};
   box-shadow: ${THEME.dropShadow.s1};
