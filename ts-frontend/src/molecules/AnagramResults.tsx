@@ -77,27 +77,41 @@ class AnagramResults extends React.Component<
     const groupedAnagrams = anagram.groupAnagramsByStartWord(subanagrams, solutions);
 
     let reducedgroupedAnagrams = (this.state.showAll || isDone) ? groupedAnagrams : take(groupedAnagrams, MAX_NUMBER_FOR_BROWSER);
+    const anagramsWithoutSolutions = isDone ? reducedgroupedAnagrams.filter(a => {
+      return a.counter === 0;
+    }) : [];
+    reducedgroupedAnagrams = reducedgroupedAnagrams.filter(a => a.list.length > 0);
+
     let groupedAnagramsWithoutSolutions;
     let groupedAnagramsThatAppearAbove;
 
     if (isDone) {
-      const anagramsWithoutSolutions = reducedgroupedAnagrams.filter(a => {
-        return a.counter === 0;
-      });
       const anagramsThatappearAbove = reducedgroupedAnagrams.filter(a => {
         return a.counter > 0 && a.list.length === 0;
       });
       groupedAnagramsWithoutSolutions = partitionArray(anagramsWithoutSolutions, this.state.numberOfColumns);
       groupedAnagramsThatAppearAbove = partitionArray(anagramsThatappearAbove, this.state.numberOfColumns);
-      reducedgroupedAnagrams = reducedgroupedAnagrams.filter(a => {
-        return a.list.length > 0;
-      });
     }
 
     const groupedAngramsContainer = partitionArray(reducedgroupedAnagrams, this.state.numberOfColumns);
 
     return (
       <AnagramResultsContainer innerRef={this.setRef}>
+        {
+          groupedAngramsContainer.length === 0 ? (
+            <AnagramResult
+              share={this.props.share}
+              columnWidth={this.state.columnWidth}
+              result={anagram.AnagramResultState.unsolved}
+              word={'No word found yet...'}
+              list={[]}
+              counter={0}
+              maxLengthInGroup={0}
+              wordStats={this.props.wordStats}
+              query={query}
+            />
+          ) : null
+        }
         {groupedAngramsContainer.map((group, i) => {
           const maxLengthInGroup = Math.max(...group.map(g => g.list.length));
           return (
@@ -188,17 +202,6 @@ class AnagramResults extends React.Component<
               })}
             </div>
           ) : null
-        }
-        {
-          someAreHidden
-            ? (
-              <div onClick={() => this.setState({showAll: !this.state.showAll})}>
-                <strong style={{color: 'white', padding: 10, float: 'left'}}>
-                  {`I hid ${subanagrams.length - MAX_NUMBER_FOR_BROWSER} additional groups. Click to show them all, it could cause slowdowns.`}
-                </strong>
-              </div>
-            )
-            : null
         }
       </AnagramResultsContainer>
     );

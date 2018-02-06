@@ -66,9 +66,10 @@ export interface AnagramGeneratorStepSerialized {
 //
 
 export function sanitizeQuery(str: string, removeSpaces: boolean = true): string {
-  const umlauts = str.replace(/ü/g, 'ue')
-    .replace(/ä/g, 'ae')
-    .replace(/ö/g, 'oe');
+
+  const umlauts = str.replace(/[üÜ]/g, 'ue')
+    .replace(/[äÄ]/g, 'ae')
+    .replace(/[öÖ]/g, 'oe');
   
   if (removeSpaces) {
     return umlauts.toLowerCase().replace(/[^a-z]/g, '');

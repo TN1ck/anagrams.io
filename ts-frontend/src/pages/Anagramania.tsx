@@ -156,7 +156,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
         <InnerContainer>
           <HeaderContainer>
             <Title href="/">
-              {'Anagramania.io'}
+              {'anagrams.io'}
             </Title>
             <SmallTitle className="mt-1 mb-3">
               {'The best anagram finder in the world.'}

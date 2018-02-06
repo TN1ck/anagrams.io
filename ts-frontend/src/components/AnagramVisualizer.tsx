@@ -289,7 +289,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
           {editable ? 'Save': 'Edit'}
         </SmallButton>
         <Copyright>
-          {'Anagramania.io'}
+          {'anagrams.io'}
         </Copyright>
       </Card>
     );

@@ -12,14 +12,14 @@ const deThree = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/d
 const enTwo = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/en-allowed-1-2.csv')));
 const enThree = parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/en-allowed-3.csv')));
 
-const deTest = deTwo.concat(deThree);
-const enTest = enTwo.concat(enThree);
+const deTwoThree = deTwo.concat(deThree);
+const enTwoThree = enTwo.concat(enThree);
 
 const dictionaries = [
   {
     dict: filterDictionaryFromDictionary(
-      parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/eng-us-50k.csv'))),
-      enTest
+      parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/eng-100k.csv'))),
+      enTwoThree
     ),
     language: 'en',
     id: 'en',
@@ -27,8 +27,8 @@ const dictionaries = [
   },
   {
     dict: filterDictionaryFromDictionary(
-      parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/de-50k.csv'))),
-      deTest
+      parseDictionary(readFile(path.join(NODE_PATH, '../dictionaries/de-100k.csv'))),
+      deTwoThree
     ),
     language: 'de',
     id: 'de',
