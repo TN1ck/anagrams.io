@@ -46,7 +46,7 @@ export const LIGHT_THEME = {
   font: {
     familySansSerif: `'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif`,
     sizeTitle: '40px',
-    sizeTitleMobile: '20px',
+    sizeTitleMobile: '30px',
     sizeLarge: '18px',
     sizeBase: '14px',
     sizeSmall: '12px',

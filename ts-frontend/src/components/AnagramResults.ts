@@ -14,6 +14,13 @@ export const ResultContainer = styled.div`
 export const AnagramResultsContainer = styled.div`
   margin-left: -${THEME.margins.m2};
   margin-right: -${THEME.margins.m2};
+
+  /* Clear Fix! */
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
 `;
 
 export const AnagramResultRow = styled.div`

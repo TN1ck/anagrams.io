@@ -444,7 +444,9 @@ class Anagramania extends React.Component<{}, {
         }
 
         <Footer>
-          {'Made by Tom Nick & Taisia Tikhnovetskaya'}
+          <span>{'Made by '}</span>
+          <a href="http://tomnick.org">{' Tom Nick '}</a>
+          <span>{' & Taisia Tikhnovetskaya'}</span>
         </Footer>
       </div>
     );

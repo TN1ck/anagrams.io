@@ -11,6 +11,10 @@ injectGlobal`
     box-sizing: border-box;
   }
 
+  html {
+    height: 100%;
+  }
+
   body {
     font-family: ${THEME.font.familySansSerif};
     margin: 0;
@@ -18,6 +22,8 @@ injectGlobal`
     background-color: ${THEME.colors.background};
     font-size: ${THEME.font.sizeBase};
     padding-bottom: 100px;
+    min-height: 100%;
+    position: relative;
   }
 
   /* Margin classes */

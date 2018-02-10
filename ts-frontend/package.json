@@ -10,15 +10,11 @@
     "test:watch": "NODE_PATH=./ jest --config .jestrc.json --watchAll"
   },
   "keywords": [
-    "pixel",
-    "ocd"
+    "anagrams"
   ],
   "author": "Tom Nick, Taisia Tikhnovetskaya",
   "license": "MIT",
   "devDependencies": {
-    "@types/d3-interpolate": "^1.1.6",
-    "@types/d3-scale": "^1.0.11",
-    "@types/d3-scale-chromatic": "^1.1.0",
     "@types/history": "^4.6.2",
     "@types/jest": "^21.1.5",
     "@types/keymaster": "1.6.28",
@@ -46,10 +42,6 @@
   "dependencies": {
     "@types/react-modal": "^3.1.1",
     "axios": "0.17.1",
-    "bignumber.js": "4.1.0",
-    "d3-interpolate": "^1.1.6",
-    "d3-scale": "^1.0.7",
-    "d3-scale-chromatic": "^1.1.1",
     "file-loader": "1.1.5",
     "history": "^4.7.2",
     "keymaster": "1.6.2",

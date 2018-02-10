@@ -38,11 +38,15 @@ export const Card = styled.div`
 
 export const Footer = styled.div`
   opacity: 0.4;
-  position: fixed;
+  position: absolute;
   bottom: ${THEME.margins.m3};
   right: ${THEME.margins.m3};
+  left: ${THEME.margins.m3};
   color: ${THEME.colors.foregroundText};
-  display: flex;
-  justify-content: center;
   font-size: ${THEME.font.sizeTiny};
+
+  a {
+    /* font-weight: bold; */
+    color: ${THEME.colors.foregroundText};
+  }
 `;

@@ -1,8 +1,5 @@
 import * as React from 'react';
 import {take} from 'lodash';
-import * as d3Scale from 'd3-scale';
-import * as d3Interpolate from 'd3-interpolate';
-// import * as d3ScaleChromatic from 'd3-scale-chromatic';
 
 import * as anagram from 'src/anagram';
 import {
@@ -12,17 +9,11 @@ import {
   AnagramResultGroup,
 } from 'src/components';
 
-const colorScale = d3Interpolate.interpolateLab(
-  '#FFFFFF',
-  '#FFFFFF',
-);
-
 const MAX_ITEMS_TO_SHOW_AT_ONCE = 3;
 
 class Result extends React.Component<{
   result: anagram.IndexedWord[];
   index: number;
-  color: string;
   query: string;
   share?: (anagram: string, word: string) => any;
 }> {
@@ -30,10 +21,10 @@ class Result extends React.Component<{
     return false;
   }
   render() {
-    const {result, index, color, query} = this.props;
+    const {result, index, query} = this.props;
     const word = result.map(w => w.word.word).join(' ');
     return (
-      <ResultContainer style={{backgroundColor: color}}>
+      <ResultContainer>
         {(index + 1) + '. ' + word}
         <ShareButton onClick={() => this.props.share(word, query)}>
           {'share'}
@@ -95,7 +86,6 @@ class AnagramResult extends React.Component<AnagramResultProps,
       columnWidth,
       result,
       maxLengthInGroup,
-      wordStats,
       query,
     } = this.props;
 
@@ -121,11 +111,6 @@ class AnagramResult extends React.Component<AnagramResultProps,
       }
     });
 
-    // wordLength => 0, 1
-    const scale = d3Scale.scaleLinear()
-      .domain([wordStats.min, wordStats.min + 2])
-      .range([0, 1]);
-
     return (
       <AnagramResultGroup
         state={result}
@@ -141,8 +126,15 @@ class AnagramResult extends React.Component<AnagramResultProps,
           </strong>
           {/* <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div> */}
           {take(sortedList, !this.state.showAll ? MAX_ITEMS_TO_SHOW_AT_ONCE : list.length).map((a, i) => {
-            const color = colorScale(scale(a.length));
-            return <Result key={i} result={a} index={i} color={color} query={query} share={this.props.share} />
+            return (
+              <Result
+                key={i}
+                result={a}
+                index={i}
+                query={query}
+                share={this.props.share}
+              />
+            )
           })}
           {
             list.length > MAX_ITEMS_TO_SHOW_AT_ONCE
