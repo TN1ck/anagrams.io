@@ -16,7 +16,7 @@ injectGlobal`
   }
 
   body {
-    font-family: ${THEME.font.familySansSerif};
+    font-family: ${THEME.font.family};
     margin: 0;
     padding: 0;
     background-color: ${THEME.colors.background};

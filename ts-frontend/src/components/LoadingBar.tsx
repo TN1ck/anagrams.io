@@ -8,7 +8,7 @@ const LoadingBar = withProps<{
     progress: number;
 }>()(styled.div)`
   position: relative;
-  border: 1px solid ${THEME.colors.border};
+  // border: 1px solid ${THEME.colors.border};
   padding ${THEME.margins.m2};
   box-shadow: ${THEME.dropShadow.s1};
   border-radius: ${THEME.borderRadius};
@@ -25,9 +25,7 @@ class LoadingBarWrapped extends React.Component<{
     return (
       <LoadingBar progress={this.props.progress}>
         {this.props.children}
-        {' '}
         <div style={{position: 'absolute', right: THEME.margins.m2, top: THEME.margins.m2}}>
-          {`${this.props.progress} %`}
         </div>
       </LoadingBar>
     );

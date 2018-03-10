@@ -7,13 +7,13 @@ position: relative;
 color: ${THEME.colors.foregroundText};
 font-weight: bold;
 font-size: ${THEME.font.sizeTitle};
-text-align: left;
+text-align: center;
 display: inline-block;
 padding: 0;
 padding-bottom: 8px;
 text-decoration: none;
 
-&:before {
+/* &:before {
   z-index: -1;
   position: absolute;
   content: '';
@@ -30,7 +30,7 @@ text-decoration: none;
   &:before {
     height: 100%;
   }
-}
+} */
 
 @media (max-width: 899px) {
   font-size: ${THEME.font.sizeTitleMobile};
@@ -40,13 +40,13 @@ text-decoration: none;
 export const SubTitle = styled.h2`
   margin: ${THEME.margins.m2} 0;
   color: ${THEME.colors.backgroundText};
-  display: inline-block;
+  text-align: center;
 
-  & strong {
+  /* & strong {
     background: ${THEME.colors.highlightBackground};
     color: ${THEME.colors.highlightText};
     padding: ${THEME.margins.m1};
-  }
+  } */
 `;
 
 export const SmallTitle = styled.div`

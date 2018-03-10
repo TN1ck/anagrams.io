@@ -89,7 +89,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
       query,
     } = this.props;
 
-    const minHeight = 20;
+    const minHeight = 22;
     const rowHeight = 21;
     const showAllSize = 27;
     const paddingSize = 20;

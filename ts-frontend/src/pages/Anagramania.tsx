@@ -1,5 +1,7 @@
 import * as React from 'react';
+import styled from 'styled-components';
 import {throttle, min, max} from 'lodash';
+import {THEME} from 'src/theme';
 
 import {
   Footer,
@@ -12,6 +14,7 @@ import {
   LoadingBar,
   AnagramVisualizer,
   SmallTitle,
+  TitleContainer,
 } from 'src/components';
 
 import * as ReactModal from 'react-modal';
@@ -33,6 +36,13 @@ const AnagramWorker = require('../anagram.worker');
 // import mockState from 'src/assets/anagramPageMock';
 // // const TESTING = true;
 
+
+const ActiveSubanagramsContainer = styled.div`
+  text-align: center;
+  margin-top: ${THEME.margins.m2};
+  margin-bottom: ${THEME.margins.m2};
+`;
+
 class ActiveSubanagrams extends React.Component<{
   currentSubanagrams: number[];
   subanagrams: anagram.IndexedWord[];
@@ -48,9 +58,9 @@ class ActiveSubanagrams extends React.Component<{
     }
 
     return (
-      <span>
+      <ActiveSubanagramsContainer>
         {`Checking: ${currentSubanagrams.map(i => subanagrams[i].word.word).join(', ')}`}
-      </span>
+      </ActiveSubanagramsContainer>
     );
   }
 }
@@ -100,14 +110,14 @@ class AnagramInfoArea extends React.Component<{
     return (
       <div className="mt-3">
         <SubTitle className="mb-2">
-          {`Found `}<strong>{`${solutions.length}`}</strong>{` solutions. `}
+          <strong>{`${solutions.length}`}</strong>{` solutions`}
         </SubTitle>
         <LoadingBar progress={progress}>
-          <ActiveSubanagrams
-            subanagrams={subanagrams}
-            currentSubanagrams={currentSubanagrams}
-          />
         </LoadingBar>
+        {/* <ActiveSubanagrams
+          subanagrams={subanagrams}
+          currentSubanagrams={currentSubanagrams}
+        /> */}
         <br />
         <AnagramResults
           share={this.props.share}
@@ -154,13 +164,15 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
     return (
       <Header>
         <InnerContainer>
-          <HeaderContainer>
+          <TitleContainer>
             <Title href="/">
               {'anagrams.io'}
             </Title>
             <SmallTitle className="mt-1 mb-3">
               {'The best anagram finder in the world.'}
             </SmallTitle>
+          </TitleContainer>
+          <HeaderContainer>
             <SearchBar
               onChange={onQueryChange}
               onSubmit={onSubmit}

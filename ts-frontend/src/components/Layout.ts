@@ -50,3 +50,7 @@ export const Footer = styled.div`
     color: ${THEME.colors.foregroundText};
   }
 `;
+
+export const TitleContainer = styled.div`
+  text-align: center;
+`;
