@@ -217,7 +217,7 @@ export function findSortedSubAnagrmns(query: string, dictionary: Word[]): Indexe
   return subanagrams;
 }
 
-export function angagramIteratorStateFactory(unsolvedGenerators = []) {
+export function anagramIteratorStateFactory(unsolvedGenerators = []) {
   const state: AnagramIteratorState = {
     breakLoop: false,
     counter: 0,
@@ -375,7 +375,7 @@ export enum AnagramResultState {
 }
 
 
-export function getAangramMapping(w1: string, w2: string): number[] {
+export function getAnagramMapping(w1: string, w2: string): number[] {
   w1 = w1.toLowerCase();
   w2 = w2.toLowerCase();
   const mapping = {};

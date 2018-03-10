@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { FRONTEND_URL } from 'src/constants';
 import {drawPath} from 'src/utility';
-import {getAangramMapping, stringToWord, sanitizeQuery} from 'src/anagram';
+import {getAnagramMapping, stringToWord, sanitizeQuery} from 'src/anagram';
 import {Card} from 'src/components/Layout';
 import {THEME} from 'src/theme';
 
@@ -24,13 +24,13 @@ const WordContainer = styled.div`
   justify-content: center;
 `;
 
-const Word = styled.strong`
+export const Word = styled.strong`
   white-space: nowrap;
   display: inline-block;
   /* color: transparent; */
   font-size: 36px;
   position: relative;
-  font-family: monospace;
+  font-family: ${THEME.font.family};
   letter-spacing: 0.5px;
   & span {
     display: inline-block;
@@ -84,12 +84,98 @@ const ExplainText = styled.p`
   text-align: center;
 `;
 
+const PADDING_TOP = 20;
+const PADDING_BOTTOM = 20;
+
+export function calculateWidths(
+  word: string, anagram: string, maxWidth: number, paddingTop = PADDING_TOP, paddingBottom = PADDING_BOTTOM,
+) {
+  const CHARACTER_WIDTH_RATIO = 1.95;
+  const CHARACTER_HEIGHT_RATIO = 1.8;
+
+  const wordLength = Math.max(word.length, anagram.length);
+  const characterWidth = Math.min(maxWidth / (wordLength * 1.5), 22);
+  const wordWidth = wordLength * characterWidth;
+
+  const strokeWidth = characterWidth / 2;
+  const characterHeight = strokeWidth * CHARACTER_HEIGHT_RATIO;
+  const height = paddingTop + word.length * characterHeight + paddingBottom;
+
+  const fontSize = characterWidth * CHARACTER_WIDTH_RATIO;
+
+
+  return {
+    height,
+    fontSize,
+    wordWidth,
+    strokeWidth,
+    characterHeight,
+    characterWidth,
+    paddingTop,
+    paddingBottom,
+  };
+}
+
 interface AnagramVisualizerProps {
   word: string;
   anagram: string;
   save?: (word: string, anagram: string) => any;
   close?: () => any;
 }
+
+export const AnagramSausages: React.StatelessComponent<{
+  anagram: string,
+  word: string,
+  height: number,
+  wordWidth: number,
+  characterWidth: number,
+  characterHeight: number,
+  paddingTop: number,
+  strokeWidth: number,
+}> = ({
+  height,
+  wordWidth,
+  characterWidth,
+  word,
+  anagram,
+  characterHeight,
+  paddingTop,
+  strokeWidth,
+}) => {
+
+  const mapping = getAnagramMapping(word, anagram);
+
+  const opacityScale = (index) => {
+    return 0.2 + (0.8 / word.length * (word.length - index));
+  };
+
+  return (
+    <svg height={height} width={wordWidth} style={{overflow: 'visible'}}>
+      {mapping.map((newIndex, index) => {
+        if (newIndex === undefined) {
+          return null;
+        }
+        const x1 = (index * characterWidth) + characterWidth / 2;
+        const y1 = 0;
+        const x2 = (newIndex * characterWidth) + characterWidth / 2;
+        const y2 = height;
+        const opacity = opacityScale(index);
+        const yOffset = paddingTop + characterHeight * index;
+        const path = drawPath(x1, y1, x2, y2, yOffset, strokeWidth);
+        return (
+          <path
+            key={index}
+            opacity={opacity}
+            stroke="black"
+            fill="transparent"
+            strokeWidth={strokeWidth}
+            d={path}
+          />
+        );
+      })}
+    </svg>
+  );
+};
 
 class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
   mode: string;
@@ -172,34 +258,22 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       anagram = currentAnagram;
     }
 
-    const MAX_WIDTH = Math.min(700, window.innerWidth - (60 + 30) );
-
-    const WORD_LENGTH = Math.max(word.length, anagram.length);
-    const CHARACTER_WIDTH = Math.min(MAX_WIDTH / (WORD_LENGTH * 1.5), 22);
-    const WORD_WIDTH = WORD_LENGTH * CHARACTER_WIDTH;
-
-    const mapping = getAangramMapping(word, anagram);
-
-    const STROKE_WIDTH = CHARACTER_WIDTH / 2;
-    const PADDING_TOP = 20;
-    const PADDING_BOTTOM = 20;
-    const HEIGHT_PER_CHARACTER = STROKE_WIDTH * 1.8
-    const HEIGHT = PADDING_TOP + word.length * HEIGHT_PER_CHARACTER + PADDING_BOTTOM;
-
-    const CHARACTER_WIDTH_RATIO = 1.63;
-    const FONT_SIZE = CHARACTER_WIDTH * CHARACTER_WIDTH_RATIO;
-
-    const opacityScale = (index) => {
-      return 0.2 + (0.8 / word.length * (word.length - index));
-    };
-
-    const minWidth = WORD_WIDTH + 30 * 2;
+    const maxWidth = Math.min(700, window.innerWidth - (60 + 30) );
+    const {
+      wordWidth,
+      fontSize,
+      height,
+      characterWidth,
+      characterHeight,
+      strokeWidth,
+    } = calculateWidths(word, anagram, maxWidth);
+    const minWidth = wordWidth + 30 * 2;
 
     const LINK = `${FRONTEND_URL}/share?anagram=${encodeURIComponent(currentAnagram)}&word=${encodeURIComponent(currentWord)}`;
 
     return (
       <Card style={{minWidth, paddingBottom: 60, ...(editable ? {border: '2px dashed grey'} : {})}}>
-          {
+          {/* {
             editable ?
             <ExplainText
               dangerouslySetInnerHTML={{
@@ -220,10 +294,10 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
                 __html: `Did you know that <br/><strong>${word}</strong><br/>is an anagram of <br/><strong>${anagram}</strong>?`
               }}
             />
-          }
+          } */}
           <WordContainer>
             <div>
-              <Word style={{minWidth: WORD_WIDTH, fontSize: FONT_SIZE}}>
+              <Word style={{minWidth: wordWidth, fontSize: fontSize}}>
                 <span
                   onInput={this.onChangeWord}
                   id="word-span"
@@ -233,32 +307,18 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
                 />
               </Word>
               <div>
-                <svg height={HEIGHT} width={WORD_WIDTH} style={{overflow: 'visible'}}>
-                  {mapping.map((newIndex, index) => {
-                    if (newIndex === undefined) {
-                      return null;
-                    }
-                    const x1 = (index * CHARACTER_WIDTH) + CHARACTER_WIDTH / 2;
-                    const y1 = 0;
-                    const x2 = (newIndex * CHARACTER_WIDTH) + CHARACTER_WIDTH / 2;
-                    const y2 = HEIGHT;
-                    const opacity = opacityScale(index);
-                    const yOffset = PADDING_TOP + HEIGHT_PER_CHARACTER * index;
-                    const path = drawPath(x1, y1, x2, y2, yOffset, STROKE_WIDTH);
-                    return (
-                      <path
-                        key={index}
-                        opacity={opacity}
-                        stroke="black"
-                        fill="transparent"
-                        strokeWidth={STROKE_WIDTH}
-                        d={path}
-                      />
-                    );
-                  })}
-                </svg>
+                <AnagramSausages
+                  anagram={anagram}
+                  word={word}
+                  height={height}
+                  wordWidth={wordWidth}
+                  characterWidth={characterWidth}
+                  characterHeight={characterHeight}
+                  paddingTop={PADDING_TOP}
+                  strokeWidth={strokeWidth}
+                />
               </div>
-              <Word style={{minWidth: WORD_WIDTH, fontSize: FONT_SIZE}}>
+              <Word style={{minWidth: wordWidth, fontSize: fontSize}}>
                 <span
                   onInput={this.onChangeAnagram}
                   id="anagram-span"

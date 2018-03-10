@@ -17,6 +17,8 @@ import {
   TitleContainer,
 } from 'src/components';
 
+import {Word, AnagramSausages, calculateWidths} from 'src/components/AnagramVisualizer';
+
 import * as ReactModal from 'react-modal';
 ReactModal.setAppElement('body');
 
@@ -161,12 +163,33 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
       onSubmit,
       onSelectChange,
     } = this.props;
+
+    // const anagram = 'a mars nag';
+    const anagram = 'anagrams';
+    const word = 'anagrams';
+
+    const maxWidth = 500;
+
+    const anagramVis = calculateWidths(word, anagram, maxWidth);
+
     return (
       <Header>
         <InnerContainer>
           <TitleContainer>
+            <div style={{position: 'relative', top: -50, height: 150}}>
+              <AnagramSausages
+                word={word}
+                anagram={anagram}
+                height={anagramVis.height}
+                wordWidth={anagramVis.wordWidth}
+                characterWidth={anagramVis.characterWidth}
+                characterHeight={anagramVis.characterHeight}
+                paddingTop={anagramVis.paddingTop}
+                strokeWidth={anagramVis.strokeWidth}
+              />
+            </div>
             <Title href="/">
-              {'anagrams.io'}
+              <Word style={{fontSize: anagramVis.fontSize}}>{anagram}</Word>
             </Title>
             <SmallTitle className="mt-1 mb-3">
               {'The best anagram finder in the world.'}
@@ -315,7 +338,7 @@ class Anagramania extends React.Component<{}, {
     const {anagrams: subanagrams} = result.data;
 
     const initialAnagramIteratorState = anagram.serializeAnagramIteratorStateFactor(
-      anagram.angagramIteratorStateFactory()
+      anagram.anagramIteratorStateFactory()
     );
 
     initialAnagramIteratorState.unsolvedSubanagrams = subanagrams.map((_, i) => i);

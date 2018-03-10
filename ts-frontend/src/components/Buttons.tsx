@@ -25,6 +25,7 @@ export const SmallButton = withProps<{active: boolean}>()(styled.button)`
   outline: none;
   text-transform: uppercase;
   border-radius: ${THEME.borderRadius};
+  font-family: ${THEME.font.family};
   &:hover {
     background: ${THEME.colors.primary};
     cursor: pointer;

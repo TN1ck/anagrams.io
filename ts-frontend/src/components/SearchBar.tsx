@@ -21,6 +21,7 @@ const SearchBarInput = styled.input`
   border-radius: 0;
   border-top-left-radius: ${THEME.borderRadius};
   border-bottom-left-radius: ${THEME.borderRadius};
+  font-family: ${THEME.font.family};
 
   &:focus {
     outline: 0;
@@ -40,6 +41,7 @@ const SearchButton = styled.button`
   border-top-right-radius: ${THEME.borderRadius};
   border-bottom-right-radius: ${THEME.borderRadius};
   margin: 0;
+  font-family: ${THEME.font.family};
   /* margin-left: 5px; */
 
   &:hover {
