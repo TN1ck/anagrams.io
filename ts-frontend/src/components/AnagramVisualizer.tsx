@@ -174,11 +174,12 @@ interface AnagramSausage {
 export class AnagramSausages extends React.Component<AnagramSausagesProps, {
   sausages: AnagramSausage[],
 }> {
-  componentWillMount() {
-    const sausages = this.calculateSausages(this.props);
-    this.setState({
+  constructor(props) {
+    super(props);
+    const sausages = this.calculateSausages(props);
+    this.state = {
       sausages,
-    });
+    };
   }
   componentWillReceiveProps(newProps: AnagramSausagesProps) {
     if (newProps.anagram !== this.props.anagram || newProps.word !== this.props.word) {
@@ -280,7 +281,11 @@ export class AnagramSausages extends React.Component<AnagramSausagesProps, {
   
     return (
       <svg height={height} width={wordWidth} style={{overflow: 'visible'}}>
-        {this.state.sausages.map(({strokeWidth, opacity, pathData}, index) => {
+        {this.state.sausages.map((d, index) => {
+          if (d === null) {
+            return;
+          }
+          const {strokeWidth, opacity, pathData} = d;
           const [x1, y1, x2, y2, yOffset] = pathData;
           const path = drawPath(x1, y1, x2, y2, yOffset, strokeWidth);
           return (
@@ -394,12 +399,14 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
           } */}
           <WordContainer>
             <div>
-              <Word
-                fontSize={fontSize}
-                characterWidth={characterWidth}
-                word={word}
-                anagram={word}
-              />
+              <div className="mb-2">
+                <Word
+                  fontSize={fontSize}
+                  characterWidth={characterWidth}
+                  word={word}
+                  anagram={word}
+                />
+              </div>
               <div>
                 <AnagramSausages
                   anagram={anagram}
