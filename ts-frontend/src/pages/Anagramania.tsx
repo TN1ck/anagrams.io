@@ -350,7 +350,15 @@ class Anagramania extends React.Component<{}, {
     this.requestAnagram();
   }
   onSelectChange(value) {
-    this.setState({selectedDictionaries: value});
+    this.setState({selectedDictionaries: value}, () => {
+      if (this.state.subanagrams.length > 0 && this.state.query.length > 0) {
+        this.setState({
+          appState: 'search',
+        });
+        this.requestAnagram();
+      }
+    });
+
   }
   pauseWorker() {
     console.log('pause');
@@ -386,6 +394,10 @@ class Anagramania extends React.Component<{}, {
   
     const cleanedQuery = anagram.sanitizeQuery(this.state.query);
     const cleanedQueryWithSpaces = anagram.sanitizeQuery(this.state.query, false);
+
+    if (cleanedQuery.length === 0) {
+      return;
+    }
 
     const result = await getSubAnagrams(cleanedQuery, this.state.selectedDictionaries);
     const {anagrams: subanagrams} = result.data;

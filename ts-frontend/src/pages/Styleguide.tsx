@@ -100,7 +100,9 @@ class Styleguide extends React.Component {
           </StyleguideSection>
 
           <StyleguideSection description={'Searchbar'}>
-            <Components.SearchBar onChange={() => 2} onSubmit={() => 2}/>
+            <StyleguideComponent description={' '}>
+              <Components.SearchBar onChange={() => 2} onSubmit={() => 2}/>
+            </StyleguideComponent>
           </StyleguideSection>
 
           <StyleguideSection description={'Loading Bar'}>
