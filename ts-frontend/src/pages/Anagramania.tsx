@@ -147,6 +147,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
 }> {
   anagrams: string[] = ['anagrams', 'a mars nag', 'mara sang'];
   word: string = 'anagrams';
+  mounted: boolean = false;
 
   constructor(props) {
     super(props);
@@ -155,12 +156,18 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
     };
   }
   componentDidMount() {
+    this.mounted = true;
     setInterval(() => {
-      const newIndex = ((this.state.anagramIndex + 1) % this.anagrams.length);
-      this.setState({
-        anagramIndex: newIndex,
-      });
+      if (this.mounted) {
+        const newIndex = ((this.state.anagramIndex + 1) % this.anagrams.length);
+        this.setState({
+          anagramIndex: newIndex,
+        });
+      }
     }, 3000);
+  }
+  componentWillUnmount() {
+    this.mounted = false;
   }
   shouldComponentUpdate(newProps: AnagramaniaHeaderProps, newState) {
     if (

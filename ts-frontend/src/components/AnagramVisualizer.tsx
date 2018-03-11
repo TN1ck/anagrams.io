@@ -83,19 +83,17 @@ export class Word extends React.Component<{
   anagram: string;
   wordWidth?: number;
 }> {
-  componentWillMount() {
-  }
-  componentWillReceiveProps() {
-  }
   render() {
     const anagram = this.props.anagram;
     const word = this.props.word;
     const mapping = getAnagramMapping(word, anagram);
-    const wordWidth = this.props.wordWidth || this.props.characterWidth * this.props.anagram.length;
+    const wordWidth = this.props.wordWidth || 0;
     return (
       <StyledWord style={{fontSize: this.props.fontSize, height: this.props.fontSize}}>
-        {word.split('').map((c, i) => {
-          const position = mapping[i] * this.props.characterWidth;
+        {word.split('').map((_, i) => {
+          const index = mapping[i]
+          const position = index * this.props.characterWidth;
+          const c2 = anagram[index];
           return (
             <span
               key={i}
@@ -108,7 +106,7 @@ export class Word extends React.Component<{
                 transform: `translate(${position}px, 0)`,
                 left: -wordWidth / 2,
               }}>
-              {c}
+              {c2}
             </span>
           );
         })}
@@ -396,7 +394,12 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
           } */}
           <WordContainer>
             <div>
-              <Word fontSize={fontSize} characterWidth={characterWidth} word={word} anagram={word}/>
+              <Word
+                fontSize={fontSize}
+                characterWidth={characterWidth}
+                word={word}
+                anagram={word}
+              />
               <div>
                 <AnagramSausages
                   anagram={anagram}
