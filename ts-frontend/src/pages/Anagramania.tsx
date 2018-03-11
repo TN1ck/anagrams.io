@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import {throttle, min, max} from 'lodash';
-import {THEME} from 'src/theme';
+import {THEME, MARGIN_RAW} from 'src/theme';
 
 import {
   Footer,
@@ -212,7 +212,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
                 characterWidth={anagramVis.characterWidth}
                 characterHeight={anagramVis.characterHeight}
                 paddingTop={anagramVis.paddingTop}
-                strokeWidth={anagramVis.strokeWidth}
+                strokeWidth={MARGIN_RAW.m1 * 2}
               />
             </div>
             <Title href="/">

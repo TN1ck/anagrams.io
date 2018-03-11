@@ -121,7 +121,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
         }}
       >
         <div style={{position: 'relative'}}>
-          <strong>
+          <strong style={{letterSpacing: '0.6px'}}>
             {word}
           </strong>
           {/* <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div> */}

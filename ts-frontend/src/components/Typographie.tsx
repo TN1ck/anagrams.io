@@ -50,5 +50,5 @@ export const SubTitle = styled.h2`
 `;
 
 export const SmallTitle = styled.div`
-  font-weight: bold;
+  font-weight: normal;
 `;

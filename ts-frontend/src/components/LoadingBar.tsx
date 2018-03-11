@@ -9,8 +9,8 @@ const LoadingBar = withProps<{
 }>()(styled.div)`
   position: relative;
   // border: 1px solid ${THEME.colors.border};
-  padding ${THEME.margins.m2};
-  box-shadow: ${THEME.dropShadow.s1};
+  padding: ${THEME.margins.m1};
+  // box-shadow: ${THEME.dropShadow.s1};
   border-radius: ${THEME.borderRadius};
   background: ${props => {
     return `linear-gradient(to right, ${THEME.colors.primary} 0%, ${THEME.colors.primary} ${props.progress}%, ${THEME.colors.backgroundBright} ${props.progress}%, ${THEME.colors.backgroundBright} 100%);`;

@@ -121,7 +121,7 @@ const PADDING_BOTTOM = 20;
 export function calculateWidths(
   word: string, anagram: string, maxWidth: number, paddingTop = PADDING_TOP, paddingBottom = PADDING_BOTTOM,
 ) {
-  const CHARACTER_WIDTH_RATIO = 1.95;
+  const CHARACTER_WIDTH_RATIO = 1.6;
   const CHARACTER_HEIGHT_RATIO = 1.8;
 
   const wordLength = Math.max(word.length, anagram.length);

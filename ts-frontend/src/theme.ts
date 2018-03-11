@@ -14,6 +14,14 @@ const COLORS = {
   WHITE: '#FFFFFF',
 };
 
+export const MARGIN_RAW = {
+  m1: 5,
+  m2: 10,
+  m3: 20,
+  m4: 40,
+  m5: 80,
+};
+
 const MARGINS = {
   m1: '5px',
   m2: '10px',
@@ -41,11 +49,12 @@ export const LIGHT_THEME = {
     highlightBackground: COLORS.GREY_200,
     highlightText: COLORS.BLACK,
   },
-  borderRadius: '2px',
+  borderRadius: '4px',
   margins: MARGINS,
   font: {
     // family: `'Bitter', Times, serif`,
-    family: `'Ubuntu Mono', monospace`,
+    family: 'Source Code Pro',
+    familyMono: `'Ubuntu Mono', monospace`,
     sizeTitle: '40px',
     sizeTitleMobile: '30px',
     sizeLarge: '18px',
