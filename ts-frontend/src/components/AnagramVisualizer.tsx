@@ -1,10 +1,11 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { FRONTEND_URL } from 'src/constants';
-import {drawPath} from 'src/utility';
+import {drawPath, pathDataToPath, createPathData} from 'src/utility';
 import {getAnagramMapping, stringToWord, sanitizeQuery} from 'src/anagram';
 import {Card} from 'src/components/Layout';
 import {THEME} from 'src/theme';
+import {interpolateArray} from 'd3-interpolate';
 
 import {
   SmallButton,
@@ -123,7 +124,7 @@ interface AnagramVisualizerProps {
   close?: () => any;
 }
 
-export const AnagramSausages: React.StatelessComponent<{
+interface AnagramSausagesProps {
   anagram: string,
   word: string,
   height: number,
@@ -132,49 +133,141 @@ export const AnagramSausages: React.StatelessComponent<{
   characterHeight: number,
   paddingTop: number,
   strokeWidth: number,
-}> = ({
-  height,
-  wordWidth,
-  characterWidth,
-  word,
-  anagram,
-  characterHeight,
-  paddingTop,
-  strokeWidth,
-}) => {
+}
 
-  const mapping = getAnagramMapping(word, anagram);
+interface AnagramSausage {
+  pathData: number[];
+  strokeWidth: number;
+  opacity: number;
+}
 
-  const opacityScale = (index) => {
-    return 0.2 + (0.8 / word.length * (word.length - index));
-  };
+export class AnagramSausages extends React.Component<AnagramSausagesProps, {
+  sausages: AnagramSausage[],
+}> {
+  componentWillMount() {
+    const sausages = this.calculateSausages(this.props);
+    this.setState({
+      sausages,
+    });
+  }
+  componentWillReceiveProps(newProps: AnagramSausagesProps) {
+    if (newProps.anagram !== this.props.anagram || newProps.word !== this.props.word) {
+      const newSausages = this.calculateSausages(newProps);
+      const oldSausages = this.state.sausages;
+      this.animateSausages(oldSausages, newSausages);
+      // this.animateToProgress(oldSausages, newSausages, 0.2);
+    }
+  }
+  animateToProgress(oldSausages, newSausages, progress) {
+    const interpolatedSausages = oldSausages.map((s, i) => {
+      const newSausage = newSausages[i];
+      const pathInterpolator = interpolateArray(s.pathData, newSausage.pathData);
+      return pathInterpolator;
+    });
+    const newInterpolatedSausages = oldSausages.map((s, i) => {
+      const interpolator = interpolatedSausages[i];
+      return {
+        ...s,
+        pathData: interpolator(progress),
+      }
+    });
+    this.setState({sausages: newInterpolatedSausages});
+  }
+  animateSausages(oldSausages: AnagramSausage[], newSausages: AnagramSausage[]) {
+    const interpolatedSausages = oldSausages.map((s, i) => {
+      const newSausage = newSausages[i];
+      const pathInterpolator = interpolateArray(s.pathData, newSausage.pathData);
+      return pathInterpolator;
+    });
+    const animationDuration = 500;
+    const startTime = +(new Date());
+    const updater = () => {
+      const now = +(new Date());
+      const diff = now - startTime;
+      const progress = diff / animationDuration;
+      if (progress < 1.0) {
+        const newInterpolatedSausages = oldSausages.map((s, i) => {
+          const interpolator = interpolatedSausages[i];
+          return {
+            ...s,
+            pathData: interpolator(progress),
+          }
+        });
+        this.setState({sausages: newInterpolatedSausages});
+        requestAnimationFrame(updater);
+      } else {
+        this.setState({sausages: newSausages});
+      }
+    };
+    updater();
+  }
+  calculateSausages(props: AnagramSausagesProps) {
+    const {
+      height,
+      characterWidth,
+      word,
+      anagram,
+      characterHeight,
+      paddingTop,
+      strokeWidth,
+    } = props;
+    const mapping = getAnagramMapping(word, anagram);
+  
+    const opacityScale = (index) => {
+      return 0.2 + (0.8 / word.length * (word.length - index));
+    };
 
-  return (
-    <svg height={height} width={wordWidth} style={{overflow: 'visible'}}>
-      {mapping.map((newIndex, index) => {
-        if (newIndex === undefined) {
-          return null;
-        }
-        const x1 = (index * characterWidth) + characterWidth / 2;
-        const y1 = 0;
-        const x2 = (newIndex * characterWidth) + characterWidth / 2;
-        const y2 = height;
-        const opacity = opacityScale(index);
-        const yOffset = paddingTop + characterHeight * index;
-        const path = drawPath(x1, y1, x2, y2, yOffset, strokeWidth);
-        return (
-          <path
-            key={index}
-            opacity={opacity}
-            stroke="black"
-            fill="transparent"
-            strokeWidth={strokeWidth}
-            d={path}
-          />
-        );
-      })}
-    </svg>
-  );
+    const values = mapping.map((newIndex, index) => {
+      if (newIndex === undefined) {
+        return null;
+      }
+      const x1 = (index * characterWidth) + characterWidth / 2;
+      const y1 = 0;
+      const x2 = (newIndex * characterWidth) + characterWidth / 2;
+      const y2 = height;
+      const opacity = opacityScale(index);
+      const yOffset = paddingTop + characterHeight * index;
+      return {
+          opacity: opacity,
+          strokeWidth: strokeWidth,
+          pathData: [
+            x1,
+            y1,
+            x2,
+            y2,
+            yOffset,
+          ],
+      };
+    });
+    return values;
+  }
+
+  render() {
+    const {
+      height,
+      wordWidth,
+    } = this.props;
+  
+    return (
+      <svg height={height} width={wordWidth} style={{overflow: 'visible'}}>
+        {this.state.sausages.map(({strokeWidth, opacity, pathData}, index) => {
+          const [x1, y1, x2, y2, yOffset] = pathData;
+          const path = drawPath(x1, y1, x2, y2, yOffset, strokeWidth);
+          return (
+            <path
+              key={index}
+              opacity={opacity}
+              stroke="black"
+              fill="transparent"
+              strokeWidth={strokeWidth}
+              d={path}
+            />
+          );
+        })}
+      </svg>
+    );
+  }
+
 };
 
 class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {

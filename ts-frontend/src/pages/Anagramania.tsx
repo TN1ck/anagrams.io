@@ -142,11 +142,31 @@ interface AnagramaniaHeaderProps {
     selectedDictionaries: string;
 };
 
-class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
-  shouldComponentUpdate(newProps: AnagramaniaHeaderProps) {
+class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
+  anagramIndex: number;
+}> {
+  anagrams: string[] = ['anagram', 'a mars nag', 'mara sang'];
+  word: string = 'anagram';
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      anagramIndex: 0,
+    };
+  }
+  componentDidMount() {
+    setInterval(() => {
+      const newIndex = ((this.state.anagramIndex + 1) % this.anagrams.length);
+      this.setState({
+        anagramIndex: newIndex,
+      });
+    }, 2000);
+  }
+  shouldComponentUpdate(newProps: AnagramaniaHeaderProps, newState) {
     if (
       this.props.selectedDictionaries !== newProps.selectedDictionaries ||
-      this.props.dictionaries !== newProps.dictionaries
+      this.props.dictionaries !== newProps.dictionaries ||
+      this.state.anagramIndex !== newState.anagramIndex
     ) {
       return true;
     }
@@ -164,9 +184,8 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps> {
       onSelectChange,
     } = this.props;
 
-    // const anagram = 'a mars nag';
-    const anagram = 'anagrams';
-    const word = 'anagrams';
+    const anagram = this.anagrams[this.state.anagramIndex];
+    const word = this.word;
 
     const maxWidth = 500;
 
