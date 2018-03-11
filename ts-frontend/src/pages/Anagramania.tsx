@@ -148,26 +148,33 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
   anagrams: string[] = ['anagrams', 'a mars nag', 'mara sang'];
   word: string = 'anagrams';
   mounted: boolean = false;
+  updateTimeout: number = 0;
 
   constructor(props) {
     super(props);
+    this.onQueryChange = this.onQueryChange.bind(this);
     this.state = {
       anagramIndex: 0,
     };
   }
   componentDidMount() {
     this.mounted = true;
-    setInterval(() => {
+    const update = () => {
       if (this.mounted) {
-        const newIndex = ((this.state.anagramIndex + 1) % this.anagrams.length);
+        const newIndex = (this.state.anagramIndex + 1);
         this.setState({
           anagramIndex: newIndex,
         });
+        if (newIndex < 3) {
+          this.updateTimeout = window.setTimeout(update, 4000);
+        }
       }
-    }, 3000);
+    };
+    this.updateTimeout = window.setTimeout(update, 4000);
   }
   componentWillUnmount() {
     this.mounted = false;
+    window.clearTimeout(this.updateTimeout);
   }
   shouldComponentUpdate(newProps: AnagramaniaHeaderProps, newState) {
     if (
@@ -179,6 +186,10 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
     }
     return false;
   }
+  onQueryChange(e) {
+    window.clearTimeout(this.updateTimeout);
+    this.props.onQueryChange(e);
+  }
   // componentDidMount() {
   //   this.input.focus();
   // }
@@ -186,12 +197,11 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
     const {
       dictionaries,
       selectedDictionaries,
-      onQueryChange,
       onSubmit,
       onSelectChange,
     } = this.props;
 
-    const anagram = this.anagrams[this.state.anagramIndex];
+    const anagram = this.anagrams[this.state.anagramIndex % this.anagrams.length];
     const word = this.word;
 
     const maxWidth = 500;
@@ -230,7 +240,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
           </TitleContainer>
           <HeaderContainer>
             <SearchBar
-              onChange={onQueryChange}
+              onChange={this.onQueryChange}
               onSubmit={onSubmit}
             />
             {dictionaries.map(d => {
