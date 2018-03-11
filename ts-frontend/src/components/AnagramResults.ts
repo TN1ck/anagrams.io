@@ -2,7 +2,7 @@ import styled, {css} from 'styled-components';
 import {AnagramResultState} from 'src/anagram';
 
 import {withProps} from 'src/utility';
-import {THEME} from 'src/theme';
+import {THEME, MARGIN_RAW} from 'src/theme';
 
 export const ResultContainer = styled.div`
   position: relative;
@@ -35,7 +35,7 @@ export const AnagramResultGroup = withProps<{
     width: 300px;
     background: ${THEME.colors.foreground};
     margin: ${THEME.margins.m2};
-    padding: ${THEME.margins.m2};
+    padding: ${THEME.margins.m2} ${MARGIN_RAW.m2 + 2}px;
     box-shadow: ${THEME.dropShadow.s1};
     border-radius: ${THEME.borderRadius};
     opacity: 0.3;

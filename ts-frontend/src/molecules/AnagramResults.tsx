@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {take} from 'lodash';
+// import {take} from 'lodash';
 
 import {
   SubTitle,
@@ -38,7 +38,7 @@ class AnagramResults extends React.Component<
     this.state = {
       columnWidth: 250,
       numberOfColumns: 1,
-      showAll: false,
+      showAll: true,
     };
     this.setRef = this.setRef.bind(this);
   }
@@ -72,11 +72,12 @@ class AnagramResults extends React.Component<
     const {solutions, currentSubanagrams, solvedSubanagrams, unsolvedSubanagrams} = anagramIteratorState;
     const isDone = unsolvedSubanagrams.length === 0;
     // only show 500 subanagrams, browser would die else
-    const MAX_NUMBER_FOR_BROWSER = 500;
+    // const MAX_NUMBER_FOR_BROWSER = 2000;
     // const someAreHidden = subanagrams.length > MAX_NUMBER_FOR_BROWSER && !this.state.showAll && !isDone;
     const groupedAnagrams = anagram.groupAnagramsByStartWord(subanagrams, solutions);
 
-    let reducedgroupedAnagrams = (this.state.showAll || isDone) ? groupedAnagrams : take(groupedAnagrams, MAX_NUMBER_FOR_BROWSER);
+    // let reducedgroupedAnagrams = (this.state.showAll || isDone) ? groupedAnagrams : take(groupedAnagrams, MAX_NUMBER_FOR_BROWSER);
+    let reducedgroupedAnagrams = groupedAnagrams;
     const anagramsWithoutSolutions = isDone ? reducedgroupedAnagrams.filter(a => {
       return a.counter === 0;
     }) : [];

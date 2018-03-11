@@ -6,12 +6,18 @@ export const ShowAllButton = styled.button`
   background: none;
   border: none;
   font-size: ${THEME.font.sizeSmall};
-  font-weight: bold;
+  font-weight: normal;
+  padding-left: 0;
+  padding-right: 0;
   padding-top: ${THEME.margins.m2};
   padding-bottom: ${THEME.margins.m2};
+  font-family: ${THEME.font.family};
   outline: none;
+  color: ${THEME.colors.foregroundText};
+  opacity: 0.5;
 
   &:hover {
+    cursor: pointer;
     text-decoration: underline;
   }
 `;

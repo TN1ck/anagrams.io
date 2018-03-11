@@ -90,7 +90,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
     } = this.props;
 
     const minHeight = 22;
-    const rowHeight = 21;
+    const rowHeight = 23;
     const showAllSize = 27;
     const paddingSize = 20;
 
@@ -141,8 +141,8 @@ class AnagramResult extends React.Component<AnagramResultProps,
               ? 
                 <ShowAllButton onClick={this.toggleShowAll}>
                   {this.state.showAll
-                    ? `... hide ${list.length - MAX_ITEMS_TO_SHOW_AT_ONCE} items`
-                    : `... show ${list.length - MAX_ITEMS_TO_SHOW_AT_ONCE} more`
+                    ? `hide ${list.length - MAX_ITEMS_TO_SHOW_AT_ONCE} items`
+                    : `show ${list.length - MAX_ITEMS_TO_SHOW_AT_ONCE} more`
                   }
                 </ShowAllButton>
 
