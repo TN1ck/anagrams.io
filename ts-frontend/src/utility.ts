@@ -41,15 +41,23 @@ export function parseSearch(search: string) {
 // * M is the start point
 // * L draws a line to x/y
 // * A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+// * Q x1 y1, x y (or q dx1 dy1, dx dy) - quadratic bezier curve where the slope is both the same
 // * Z close the path
 //
 
 export function drawPath(x1: number, y1: number, x2: number, y2: number, yOffset: number, arcRadius: number): string {
   const intermediateY = y1 + (yOffset);
+  const intermediateX = (x1 + x2) / 2;
+  const x1arc = x1 + (arcRadius * (x1 > x2 ? -1 : 1));
+  const x2arc = x2 - (arcRadius * (x1 > x2 ? -1 : 1));
+  const x1intermediate = x1 > x2 ? Math.max(x1arc, intermediateX) : Math.min(x1arc, intermediateX);
+  const x2intermediate = x1 > x2 ? Math.min(x2arc, intermediateX) : Math.max(x2arc, intermediateX);
   return `
 M ${x1}, ${y1}
 L ${x1},${intermediateY}
-C ${x1},${intermediateY + arcRadius} ${x2},${intermediateY + arcRadius} ${x2},${intermediateY + arcRadius * 2}
+Q ${x1},${intermediateY + arcRadius} ${x1intermediate},${intermediateY + arcRadius}
+L ${x2intermediate},${intermediateY + arcRadius}
+Q ${x2},${intermediateY + arcRadius} ${x2},${intermediateY + arcRadius * 2}
 L ${x2} ${y2}`;
 }
 
