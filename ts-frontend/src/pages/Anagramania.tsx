@@ -177,7 +177,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
         }
       }
     };
-    this.updateTimeout = window.setTimeout(update, 500);
+    this.updateTimeout = window.setTimeout(update, 1500);
   }
   componentWillUnmount() {
     this.mounted = false;
