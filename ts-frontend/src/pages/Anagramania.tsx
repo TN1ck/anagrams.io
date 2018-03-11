@@ -145,8 +145,8 @@ interface AnagramaniaHeaderProps {
 class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
   anagramIndex: number;
 }> {
-  anagrams: string[] = ['anagram', 'a mars nag', 'mara sang'];
-  word: string = 'anagram';
+  anagrams: string[] = ['anagrams', 'a mars nag', 'mara sang'];
+  word: string = 'anagrams';
 
   constructor(props) {
     super(props);
@@ -160,7 +160,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
       this.setState({
         anagramIndex: newIndex,
       });
-    }, 2000);
+    }, 3000);
   }
   shouldComponentUpdate(newProps: AnagramaniaHeaderProps, newState) {
     if (
@@ -190,6 +190,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
     const maxWidth = 500;
 
     const anagramVis = calculateWidths(word, anagram, maxWidth);
+    const wordWidth = calculateWidths(word, word, maxWidth).wordWidth;
 
     return (
       <Header>
@@ -200,7 +201,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
                 word={word}
                 anagram={anagram}
                 height={anagramVis.height}
-                wordWidth={anagramVis.wordWidth}
+                wordWidth={wordWidth}
                 characterWidth={anagramVis.characterWidth}
                 characterHeight={anagramVis.characterHeight}
                 paddingTop={anagramVis.paddingTop}
@@ -208,7 +209,13 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
               />
             </div>
             <Title href="/">
-              <Word style={{fontSize: anagramVis.fontSize}}>{anagram}</Word>
+              <Word
+                wordWidth={wordWidth}
+                fontSize={anagramVis.fontSize}
+                characterWidth={anagramVis.characterWidth}
+                anagram={anagram}
+                word={word}
+              />
             </Title>
             <SmallTitle className="mt-1 mb-3">
               {'The best anagram finder in the world.'}

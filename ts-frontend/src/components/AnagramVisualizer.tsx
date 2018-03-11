@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { FRONTEND_URL } from 'src/constants';
-import {drawPath, pathDataToPath, createPathData} from 'src/utility';
+import {drawPath, EasingFunctions} from 'src/utility';
 import {getAnagramMapping, stringToWord, sanitizeQuery} from 'src/anagram';
 import {Card} from 'src/components/Layout';
 import {THEME} from 'src/theme';
@@ -23,26 +23,6 @@ const WordContainer = styled.div`
   padding-top: ${THEME.margins.m2};
   display: flex;
   justify-content: center;
-`;
-
-export const Word = styled.strong`
-  white-space: nowrap;
-  display: inline-block;
-  /* color: transparent; */
-  font-size: 36px;
-  position: relative;
-  font-family: ${THEME.font.family};
-  letter-spacing: 0.5px;
-  & span {
-    display: inline-block;
-    margin-bottom: -2px;
-    height: 1.1em;
-    width: 100%;
-    &.edit {
-      outline: none;
-      border-bottom: 4px dashed ${THEME.colors.border};
-    }
-  }
 `;
 
 const ShareSection = styled.div`
@@ -84,6 +64,58 @@ const ExplainText = styled.p`
   color: ${THEME.colors.foregroundText};
   text-align: center;
 `;
+
+
+export const StyledWord = styled.strong`
+  white-space: nowrap;
+  display: block;
+  /* color: transparent; */
+  font-size: 36px;
+  position: relative;
+  font-family: ${THEME.font.family};
+  letter-spacing: 0.5px;
+`;
+
+export class Word extends React.Component<{
+  characterWidth: number;
+  fontSize: number;
+  word: string;
+  anagram: string;
+  wordWidth?: number;
+}> {
+  componentWillMount() {
+  }
+  componentWillReceiveProps() {
+  }
+  render() {
+    const anagram = this.props.anagram;
+    const word = this.props.word;
+    const mapping = getAnagramMapping(word, anagram);
+    const wordWidth = this.props.wordWidth || this.props.characterWidth * this.props.anagram.length;
+    return (
+      <StyledWord style={{fontSize: this.props.fontSize, height: this.props.fontSize}}>
+        {word.split('').map((c, i) => {
+          const position = mapping[i] * this.props.characterWidth;
+          return (
+            <span
+              key={i}
+              style={{
+                transition: 'all 500ms ease-in-out',
+                display: 'block',
+                width: this.props.characterWidth,
+                position: 'absolute',
+                top: 0,
+                transform: `translate(${position}px, 0)`,
+                left: -wordWidth / 2,
+              }}>
+              {c}
+            </span>
+          );
+        })}
+      </StyledWord>
+    );
+  }
+}
 
 const PADDING_TOP = 20;
 const PADDING_BOTTOM = 20;
@@ -190,7 +222,7 @@ export class AnagramSausages extends React.Component<AnagramSausagesProps, {
           const interpolator = interpolatedSausages[i];
           return {
             ...s,
-            pathData: interpolator(progress),
+            pathData: interpolator(EasingFunctions.easeInOutQuad(progress)),
           }
         });
         this.setState({sausages: newInterpolatedSausages});
@@ -287,8 +319,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     };
     this.edit = this.edit.bind(this);
     this.save = this.save.bind(this);
-    this.onChangeAnagram = this.onChangeAnagram.bind(this);
-    this.onChangeWord = this.onChangeWord.bind(this);
   }
   edit() {
     this.setState({
@@ -301,18 +331,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       mode: 'view',
     });
   }
-  onChangeWord(e) {
-    const currentWord = e.target.innerText;
-    this.setState({
-      currentWord,
-    })
-  }
-  onChangeAnagram(e) {
-    const currentAnagram = e.target.innerText;
-    this.setState({
-      currentAnagram,
-    })
-  }
   copyToClipboard() {
     const input: HTMLInputElement = document.getElementById('link-input') as HTMLInputElement;
     input.select();
@@ -321,18 +339,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     } catch(err) {
       console.log('Copy did not work');
     }
-  }
-  componentDidMount() {
-    this.setSpanContent(this.props);
-  }
-  componentWillReceiveProps(props) {
-    if (this.props.word !== props.word || this.props.anagram !== this.props.anagram) {
-      this.setSpanContent(props);
-    }
-  }
-  setSpanContent(props: AnagramVisualizerProps) {
-    this.anagramSpan.innerHTML = props.anagram;
-    this.wordSpan.innerHTML = props.word;
   }
   render() {
 
@@ -390,15 +396,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
           } */}
           <WordContainer>
             <div>
-              <Word style={{minWidth: wordWidth, fontSize: fontSize}}>
-                <span
-                  onInput={this.onChangeWord}
-                  id="word-span"
-                  className={editable ? 'edit' : ''}
-                  contentEditable={editable}
-                  ref={(dom) => this.wordSpan = dom}
-                />
-              </Word>
+              <Word fontSize={fontSize} characterWidth={characterWidth} word={word} anagram={word}/>
               <div>
                 <AnagramSausages
                   anagram={anagram}
@@ -411,14 +409,8 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
                   strokeWidth={strokeWidth}
                 />
               </div>
-              <Word style={{minWidth: wordWidth, fontSize: fontSize}}>
-                <span
-                  onInput={this.onChangeAnagram}
-                  id="anagram-span"
-                  className={editable ? 'edit' : ''}
-                  contentEditable={editable}
-                  ref={(dom) => this.anagramSpan = dom}
-                />
+              <Word fontSize={fontSize} characterWidth={characterWidth} word={word} anagram={anagram}>
+                {anagram}
               </Word>
             </div>
           </WordContainer>
@@ -434,13 +426,13 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         >
           {'Close'}
         </SmallButton> : null}
-        <SmallButton
+        {/* <SmallButton
           onClick={editable ? this.save : this.edit}
           active={false}
           style={{position: 'absolute', left: THEME.margins.m2, bottom: THEME.margins.m2}}
         >
           {editable ? 'Save': 'Edit'}
-        </SmallButton>
+        </SmallButton> */}
         <Copyright>
           {'anagrams.io'}
         </Copyright>
