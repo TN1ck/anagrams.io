@@ -56,11 +56,9 @@ const SearchButton = styled.button`
 class SearchBar extends React.Component<{
   onSubmit: any,
   onChange: any,
+  innerRef?: (dom: HTMLInputElement) => any;
 }> {
   input: HTMLElement;
-  setInput(dom: HTMLInputElement) {
-    this.input = dom;
-  }
   render() {
     const {
       onSubmit,
@@ -70,7 +68,7 @@ class SearchBar extends React.Component<{
       <SearchBarForm onSubmit={onSubmit}>
         <SearchBarInput
           type="text"
-          innerRef={(e) => this.setInput(e)}
+          innerRef={this.props.innerRef}
           onChange={onChange}
         />
         <SearchButton>

@@ -149,16 +149,23 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
   word: string = 'anagrams';
   mounted: boolean = false;
   updateTimeout: number = 0;
+  input: HTMLInputElement = null;
 
   constructor(props) {
     super(props);
     this.onQueryChange = this.onQueryChange.bind(this);
+    this.setInputRef = this.setInputRef.bind(this);
     this.state = {
       anagramIndex: 0,
     };
   }
+  setInputRef(dom) {
+    this.input = dom;
+    this.input.focus();
+  }
   componentDidMount() {
     this.mounted = true;
+    const duration = 3000;
     const update = () => {
       if (this.mounted) {
         const newIndex = (this.state.anagramIndex + 1);
@@ -166,11 +173,11 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
           anagramIndex: newIndex,
         });
         if (newIndex < 3) {
-          this.updateTimeout = window.setTimeout(update, 4000);
+          this.updateTimeout = window.setTimeout(update, duration);
         }
       }
     };
-    this.updateTimeout = window.setTimeout(update, 4000);
+    this.updateTimeout = window.setTimeout(update, 500);
   }
   componentWillUnmount() {
     this.mounted = false;
@@ -188,11 +195,13 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
   }
   onQueryChange(e) {
     window.clearTimeout(this.updateTimeout);
+    if (this.word !== this.anagrams[this.state.anagramIndex % this.anagrams.length]) {
+      this.setState({
+        anagramIndex: 0,
+      });
+    }
     this.props.onQueryChange(e);
   }
-  // componentDidMount() {
-  //   this.input.focus();
-  // }
   render() {
     const {
       dictionaries,
@@ -240,6 +249,7 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
           </TitleContainer>
           <HeaderContainer>
             <SearchBar
+              innerRef={this.setInputRef}
               onChange={this.onQueryChange}
               onSubmit={onSubmit}
             />
