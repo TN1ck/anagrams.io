@@ -37,7 +37,8 @@ const StyledCheckbox = styled.input`
   margin-top: ${THEME.margins.m2};
   margin-bottom: ${THEME.margins.m3};
   position: relative;
-  width: 30px;
+  width: 0;
+  margin-right: 30px;
   display: inline-block;
 
   &:hover {

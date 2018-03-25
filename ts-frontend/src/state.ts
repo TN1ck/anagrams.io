@@ -132,7 +132,7 @@ export class AnagramState {
         anagrams,
       ).filter(c => c.list.length > 0);
       return {
-        name: `Anagram with ${anagrams[0].length} words`,
+        name: `Anagrams with ${anagrams[0].length} words`,
         group: partitionArray(groupedAnagrams, numberOfColumns),
       };
     });
