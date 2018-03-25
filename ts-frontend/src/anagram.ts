@@ -1,4 +1,4 @@
-import {sortBy, drop, uniqBy, groupBy} from 'lodash';
+import {sortBy, drop, uniqBy} from 'lodash';
 
 //
 // interfaces
@@ -364,27 +364,6 @@ export function groupAnagramsByStartWord(
       groups[subangramIndex].counter += 1;
     }
   }
-
-  return groups;
-}
-
-export function groupAnagramsByWordCount(
-  subanagrams: IndexedWord[],
-  anagrams: OptimizedAnagramSolution[]
-): GroupedAnagramSolutions[] {
-
-  const groupedByLength = groupBy(anagrams, a => {
-    return a.length;
-  });
-
-  const groups = Object.values(groupedByLength).map(l => {
-    return {
-      list: l.map(list => list.map(j => subanagrams[j])) as IndexedWord[][],
-      word: l[0].length + ' words',
-      counter: l.length,
-      wordIndex: 0,
-    };
-  });
 
   return groups;
 }

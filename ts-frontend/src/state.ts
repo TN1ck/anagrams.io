@@ -1,5 +1,5 @@
 import {observable, action, flow, computed} from 'mobx';
-import {min, max} from 'lodash';
+import {min, max, groupBy} from 'lodash';
 import * as anagram from 'src/anagram';
 
 import {parseSearch} from 'src/utility';
@@ -11,7 +11,7 @@ const AnagramWorker = require('./anagram.worker');
 
 export class AnagramState {
   @observable queryStatus: RequestStatus = RequestStatus.none;
-  @observable appState: string = 'search';
+  @observable appState: string = 'none';
 
   @observable query: string = '';
   @observable cleanedQuery: string = '';
@@ -38,8 +38,8 @@ export class AnagramState {
   @observable finished: boolean = false;
 
   @observable width: number = 1;
-  @observable columnWidth: number = 1;
-  @observable numberOfColumns: number = 1;
+
+  @observable groupByNumberOfWords: boolean = false;
 
   constructor() {
     this.setQuery = this.setQuery.bind(this);
@@ -48,23 +48,34 @@ export class AnagramState {
     this.closeModal = this.closeModal.bind(this);
     this.saveAnagram = this.saveAnagram.bind(this);
     this.requestAnagram = this.requestAnagram.bind(this);
+    this.toggleGroupByNumberOfWords = this.toggleGroupByNumberOfWords.bind(this);
     this.init();
   }
 
   @action
   setWidth(width: number) {
     this.width = width;
-    const MIN_COLUMN_WIDTH = 250;
+  }
 
-    const numberOfColumns = Math.floor(width / MIN_COLUMN_WIDTH);
-    const columnWidth = width / numberOfColumns;
-    this.columnWidth = columnWidth;
-    this.numberOfColumns = numberOfColumns;
+  @computed
+  get getColumnWidth() {
+    const MIN_COLUMN_WIDTH = Math.max(250, this.query.length * 14.5);
+
+    const numberOfColumns = Math.max(Math.floor(this.width / MIN_COLUMN_WIDTH), 1);
+    const columnWidth = this.width / numberOfColumns;
+
+    return {
+      columnWidth,
+      numberOfColumns,
+    };
+
   }
 
   @computed
   get isDone() {
-    return this.anagramIteratorState.unsolvedSubanagrams.length === 0;
+    return this.anagramIteratorState.unsolvedSubanagrams.length === 0
+      && this.anagramIteratorState.solvedSubanagrams.length > 0
+      && this.anagramIteratorState.solutions.length > 0;
   }
 
   @computed
@@ -101,44 +112,85 @@ export class AnagramState {
       this.subanagrams,
       this.anagramIteratorState.solutions,
     );
-    // const groupedAnagrams = anagram.groupAnagramsByWordCount(
-    //   this.subanagrams,
-    //   this.anagramIteratorState.solutions,
-    // );
     return groupedAnagrams;
   }
 
   @computed
-  get anagramsWithoutSolution() {
-    return this.groupedAnagrams.filter(ag => ag.counter === 0);
+  get groupedSpecial() {
+
+    const groupedByLength = groupBy(this.anagramIteratorState.solutions, a => {
+      return a.length;
+    });
+    const groups = Object.values(groupedByLength)
+    const {
+      numberOfColumns,
+    } = this.getColumnWidth;
+
+    return groups.map((anagrams) => {
+      const groupedAnagrams = anagram.groupAnagramsByStartWord(
+        this.subanagrams,
+        anagrams,
+      ).filter(c => c.list.length > 0);
+      return {
+        name: `Anagram with ${anagrams[0].length} words`,
+        group: partitionArray(groupedAnagrams, numberOfColumns),
+      };
+    });
+
+  }
+
+  @action
+  toggleGroupByNumberOfWords() {
+    this.groupByNumberOfWords = !this.groupByNumberOfWords;
   }
 
   @computed
-  get anagramsWithNoOwnSolution() {
-    return this.groupedAnagrams.filter(ag => ag.counter > 0 && ag.list.length === 0);
+  get groupedNormal() {
+
+    const groupedAnagrams = this.groupedAnagrams;
+    const anagramsWithSolution = groupedAnagrams.filter(ag => ag.list.length > 0);
+
+    const {
+      numberOfColumns,
+    } = this.getColumnWidth;
+
+    const groups = [
+      {
+        name: null,
+        group: partitionArray(anagramsWithSolution, numberOfColumns),
+      }
+    ];
+
+    return groups;
   }
 
   @computed
-  get anagramsWithSolution() {
-    return this.groupedAnagrams.filter(ag => ag.list.length > 0);
-  }
+  get grouped() {
+    let groups = [];
+    if (this.groupByNumberOfWords) {
+      groups = this.groupedSpecial;
+    } else {
+      groups = this.groupedNormal;
+    }
 
-  @computed
-  get partitionedAnagramsWithSolution() {
-    const groupedAngramsContainer = partitionArray(this.anagramsWithSolution , this.numberOfColumns);
-    return groupedAngramsContainer;
-  }
+    if (this.isDone) {
+      const groupedAnagrams = this.groupedAnagrams;
+      const anagramsWithoutSolution = groupedAnagrams.filter(ag => ag.counter === 0);
+      const anagramsWithNoOwnSolution = groupedAnagrams.filter(ag => ag.counter > 0 && ag.list.length === 0);
+      const numberOfColumns = this.getColumnWidth.numberOfColumns;
+      groups.push(
+        {
+          name: 'Anagrams With No Own Solution',
+          group: partitionArray(anagramsWithNoOwnSolution,  numberOfColumns),
+        },
+        {
+          name: 'Anagrams Without Solution',
+          group: partitionArray(anagramsWithoutSolution, numberOfColumns),
+        }
+      );
+    }
 
-  @computed
-  get partitionedAnagramsWithoutSolution() {
-    const groupedAngramsContainer = partitionArray(this.anagramsWithoutSolution , this.numberOfColumns);
-    return groupedAngramsContainer;
-  }
-
-  @computed
-  get partitionedAnagramsWithNoOwnSolution() {
-    const groupedAngramsContainer = partitionArray(this.anagramsWithNoOwnSolution , this.numberOfColumns);
-    return groupedAngramsContainer;
+    return groups;
   }
 
   init = flow(function* () {
@@ -188,7 +240,7 @@ export class AnagramState {
     this.modalWord = word;
   }
 
-  requestAnagram = flow((function* () {
+  requestAnagram = flow(function* () {
 
     if (this.worker) {
       this.worker.terminate();

@@ -1,6 +1,7 @@
 import * as React from 'react';
+import styled from 'styled-components';
 import {observer, inject, Provider} from 'mobx-react';
-import {MARGIN_RAW} from 'src/theme';
+import {MARGIN_RAW, THEME} from 'src/theme';
 
 import store from 'src/state';
 
@@ -27,14 +28,51 @@ import {AnagramState} from '../state';
 
 import AnagramResults from 'src/molecules/AnagramResults';
 import {
-  // Strong,
   SmallButton,
 } from 'src/components';
 
 
-// import mockState from 'src/assets/anagramPageMock';
-// // const TESTING = true;
+const StyledCheckbox = styled.input`
+  background: red;
+  margin-top: ${THEME.margins.m2};
+  margin-bottom: ${THEME.margins.m3};
+  position: relative;
+  width: 30px;
+  display: inline-block;
 
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:checked:after {
+    position: absolute;
+    top: -5px;
+    left: 7px;
+    display: block;
+    content: 'L';
+    font-size: 17px;
+    transform: scaleY(-1) rotate(-221deg) ;
+  }
+
+  &:before {
+    border-radius: ${THEME.borderRadius};
+    position: absolute;
+    top: -5px;
+    left: 0;
+    display: block;
+    content: '';
+    width: 20px;
+    height: 20px;
+    background: ${THEME.colors.backgroundBright};
+    border: 1px solid ${THEME.colors.background};
+  }
+`;
+
+const StyledLabel = styled.label`
+  &:hover {
+    cursor: pointer;
+  }
+`;
 
 @inject('store')
 @observer
@@ -58,13 +96,18 @@ class AnagramInfoArea extends React.Component<{
         <SubTitle className="mb-2">
           <strong>{`${solutions.length}`}</strong>{` solutions`}
         </SubTitle>
-        <LoadingBar progress={store.progress}>
-        </LoadingBar>
-        {/* <ActiveSubanagrams
-          subanagrams={subanagrams}
-          currentSubanagrams={currentSubanagrams}
-        /> */}
+        <LoadingBar progress={store.progress} />
         <br />
+        <div style={{textAlign: 'center'}}>
+          <StyledCheckbox
+            type="checkbox"
+            id="group"
+            onChange={store.toggleGroupByNumberOfWords}
+          />
+          <StyledLabel htmlFor="group">
+            {'Group by number of words'}
+          </StyledLabel>
+        </div>
         <AnagramResults />
       </div>
     );
@@ -95,7 +138,9 @@ class AnagramaniaHeader extends React.Component<{
   }
   setInputRef(dom) {
     this.input = dom;
-    this.input.focus();
+    if (this.input) {
+      this.input.focus();
+    }
   }
   componentDidMount() {
     this.mounted = true;
@@ -132,6 +177,7 @@ class AnagramaniaHeader extends React.Component<{
       selectedDictionaries,
       requestAnagram,
       setDictionary,
+      query,
     } = this.props.store;
 
     const anagram = this.anagrams[this.state.anagramIndex % this.anagrams.length];
@@ -173,6 +219,7 @@ class AnagramaniaHeader extends React.Component<{
           </TitleContainer>
           <HeaderContainer>
             <SearchBar
+              value={query}
               innerRef={this.setInputRef}
               onChange={this.onQueryChange}
               onSubmit={(e) => {
@@ -212,10 +259,6 @@ class Anagramania extends React.Component<{
     this.onQueryChange = this.onQueryChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onSelectChange = this.onSelectChange.bind(this);
-
-    // if (TESTING) {
-    //   this.state = mockState as any;
-    // }
   }
 
   onQueryChange(e) {
@@ -232,7 +275,6 @@ class Anagramania extends React.Component<{
   render() {
 
     const store = this.props.store;
-    console.log(store);
     const appState = store.appState;
 
     return (

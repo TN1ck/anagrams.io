@@ -31,16 +31,20 @@ class AnagramResults extends React.Component<{
   constructor(props) {
     super(props);
     this.setRef = this.setRef.bind(this);
+    this.setWidth = this.setWidth.bind(this);
   }
   componentDidMount() {
-    window.addEventListener('resize', () => {
-      this.setWidth();
-    });
+    window.addEventListener('resize', this.setWidth);
     this.setWidth();
   }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.setWidth);
+  }
   setWidth() {
-    const width = this.dom.clientWidth;
-    this.props.store.setWidth(width);
+    if (this.dom) {
+      const width = this.dom.clientWidth;
+      this.props.store.setWidth(width);
+    }
   }
   setRef(dom) {
     this.dom = dom;
@@ -50,9 +54,11 @@ class AnagramResults extends React.Component<{
 
     const query = store.query;
     const groupedAnagrams = store.groupedAnagrams;
-    const partitionedAnagramsWithSolution = store.partitionedAnagramsWithSolution;
-    const partitionedAnagramsWithNoOwnSolution = store.partitionedAnagramsWithNoOwnSolution;
-    const partitionedAnagramsWithoutSolution = store.partitionedAnagramsWithoutSolution;
+    const grouped = store.grouped;
+
+    const {
+      columnWidth,
+    } = store.getColumnWidth;
 
     return (
       <AnagramResultsContainer innerRef={this.setRef}>
@@ -60,7 +66,7 @@ class AnagramResults extends React.Component<{
           groupedAnagrams.length === 0 ? (
             <AnagramResult
               share={store.openModal}
-              columnWidth={store.columnWidth}
+              columnWidth={columnWidth}
               result={anagram.AnagramResultState.unsolved}
               word={'No word found yet...'}
               list={[]}
@@ -70,78 +76,28 @@ class AnagramResults extends React.Component<{
             />
           ) : null
         }
-        {partitionedAnagramsWithSolution.map((group, i) => {
-          const maxLengthInGroup = Math.max(...group.map(g => g.list.length));
+        {grouped.map(({group, name}, i) => {
           return (
-            <AnagramResultRow key={i}>
-              {group.map((d) => {
-                const {word, list, counter} = d;
-                return (
-                  <AnagramResult
-                    key={word}
-                    share={store.openModal}
-                    columnWidth={store.columnWidth}
-                    result={anagram.AnagramResultState.solved}
-                    word={word}
-                    list={list}
-                    counter={counter}
-                    maxLengthInGroup={maxLengthInGroup}
-                    query={query}
-                  />
-                );
-              })}
-            </AnagramResultRow>
-          );
-        })}
-        {
-          store.isDone ? (
-            <div>
-                {partitionedAnagramsWithNoOwnSolution.length > 0 ? (
-                  <div>
-                    <SubTitleContainer>
-                      <SubTitle>{'Subanagrams that are included in the results above:'}</SubTitle>
-                    </SubTitleContainer>
-                    {partitionedAnagramsWithNoOwnSolution.map((group, i) => {
-                      return (
-                        <AnagramResultRow key={i}>
-                          {group.map((d) => {
-                            const {word, list, counter} = d;
-                            return (
-                              <AnagramResult
-                                key={word}
-                                share={store.openModal}
-                                columnWidth={store.columnWidth}
-                                result={AnagramResultState.solved}
-                                word={word}
-                                list={list}
-                                counter={counter}
-                                maxLengthInGroup={0}
-                                query={query}
-                              />
-                            );
-                          })}
-                        </AnagramResultRow>
-                      );
-                    })}
-                  </div>
-                ) : null}
-              <SubTitleContainer>
-                <SubTitle>{'Subanagrams that had no solution:'}</SubTitle>
-              </SubTitleContainer>
-              {partitionedAnagramsWithoutSolution.map((group, i) => {
+            <div key={i}>
+              {name !== null && <SubTitleContainer>
+                <SubTitle>{name}</SubTitle>
+              </SubTitleContainer>}
+              {group.map((g, i) => {
                 return (
                   <AnagramResultRow key={i}>
-                    {group.map((d) => {
+                    {g.map((d) => {
                       const {word, list, counter} = d;
+                      const maxLengthInGroup = Math.max(...g.map(a => a.list.length));
                       return (
                         <AnagramResult
                           key={word}
-                          columnWidth={store.columnWidth}
-                          result={AnagramResultState.unsolved}
+                          share={store.openModal}
+                          columnWidth={columnWidth}
+                          result={AnagramResultState.solved}
                           word={word}
                           list={list}
                           counter={counter}
-                          maxLengthInGroup={0}
+                          maxLengthInGroup={maxLengthInGroup}
                           query={query}
                         />
                       );
@@ -150,8 +106,8 @@ class AnagramResults extends React.Component<{
                 );
               })}
             </div>
-          ) : null
-        }
+          );
+        })}
       </AnagramResultsContainer>
     );
   }
