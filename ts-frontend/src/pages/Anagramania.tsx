@@ -1,7 +1,5 @@
 import * as React from 'react';
-import {Provider} from 'mobx-react';
-import {observer, inject} from 'mobx-react';
-import {min, max} from 'lodash';
+import {observer, inject, Provider} from 'mobx-react';
 import {MARGIN_RAW} from 'src/theme';
 
 import store from 'src/state';
@@ -44,62 +42,30 @@ class AnagramInfoArea extends React.Component<{
   store?: AnagramState;
 }> {
   render() {
-    const {
-      anagramIteratorState,
-      subanagrams,
-      query,
-    } = this.props.store;
-
-    console.log(anagramIteratorState, 'info bla');
+    const store = this.props.store;
+    const anagramIteratorState = store.anagramIteratorState;
 
     if (!anagramIteratorState) {
       return null;
     }
 
     const {
-      solvedSubanagrams,
-      // numberOfPossibilitiesChecked,
-      unsolvedSubanagrams,
       solutions,
     } = anagramIteratorState;
-
-    const isDone = unsolvedSubanagrams.length === 0;
-    const numberOfWordsPerSolution = solutions.map(s => s.length);
-    const numberOfWords = numberOfWordsPerSolution.reduce((a, b) => a + b, 0);
-    const averageNumberOfWords = (numberOfWords / solutions.length);
-    const minNumberOfWords = min(numberOfWordsPerSolution);
-    const maxNumberOfWords = max(numberOfWordsPerSolution);
-    const wordStats = {
-      average: averageNumberOfWords,
-      min: minNumberOfWords,
-      max: maxNumberOfWords,
-    };
-
-    const numberOfSolvedSubanagrams = solvedSubanagrams.length;
-    const numberOfAnagrams = subanagrams.length;
-
-    const progress = Math.ceil(((numberOfSolvedSubanagrams)/ numberOfAnagrams) * 100);
 
     return (
       <div className="mt-3">
         <SubTitle className="mb-2">
           <strong>{`${solutions.length}`}</strong>{` solutions`}
         </SubTitle>
-        <LoadingBar progress={progress}>
+        <LoadingBar progress={store.progress}>
         </LoadingBar>
         {/* <ActiveSubanagrams
           subanagrams={subanagrams}
           currentSubanagrams={currentSubanagrams}
         /> */}
         <br />
-        <AnagramResults
-          share={this.props.store.openModal}
-          subanagrams={subanagrams}
-          anagramIteratorState={anagramIteratorState}
-          isDone={isDone}
-          wordStats={wordStats}
-          query={query}
-        />
+        <AnagramResults />
       </div>
     );
   }

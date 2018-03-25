@@ -1,8 +1,11 @@
-import {observable, action, runInAction, flow} from 'mobx';
+import {observable, action, flow, computed} from 'mobx';
+import {min, max} from 'lodash';
 import * as anagram from 'src/anagram';
 
 import {parseSearch} from 'src/utility';
 import {RequestStatus, getSubAnagrams, getDictionaries, Dictionary} from 'src/api';
+
+import {partitionArray} from 'src/utility';
 
 const AnagramWorker = require('./anagram.worker');
 
@@ -34,6 +37,10 @@ export class AnagramState {
   @observable worker: Worker;
   @observable finished: boolean = false;
 
+  @observable width: number = 1;
+  @observable columnWidth: number = 1;
+  @observable numberOfColumns: number = 1;
+
   constructor() {
     this.setQuery = this.setQuery.bind(this);
     this.setDictionary = this.setDictionary.bind(this);
@@ -42,6 +49,96 @@ export class AnagramState {
     this.saveAnagram = this.saveAnagram.bind(this);
     this.requestAnagram = this.requestAnagram.bind(this);
     this.init();
+  }
+
+  @action
+  setWidth(width: number) {
+    this.width = width;
+    const MIN_COLUMN_WIDTH = 250;
+
+    const numberOfColumns = Math.floor(width / MIN_COLUMN_WIDTH);
+    const columnWidth = width / numberOfColumns;
+    this.columnWidth = columnWidth;
+    this.numberOfColumns = numberOfColumns;
+  }
+
+  @computed
+  get isDone() {
+    return this.anagramIteratorState.unsolvedSubanagrams.length === 0;
+  }
+
+  @computed
+  get progress(): number {
+    const {
+      solvedSubanagrams,
+    } = this.anagramIteratorState;
+    const numberOfSolvedSubanagrams = solvedSubanagrams.length;
+    const numberOfAnagrams = this.subanagrams.length;
+
+    const progress = Math.ceil(((numberOfSolvedSubanagrams)/ numberOfAnagrams) * 100);
+    return progress;
+  }
+
+  @computed
+  get stats() {
+    const {solutions} = this.anagramIteratorState;
+    const numberOfWordsPerSolution = solutions.map(s => s.length);
+    const numberOfWords = numberOfWordsPerSolution.reduce((a, b) => a + b, 0);
+    const averageNumberOfWords = (numberOfWords / solutions.length);
+    const minNumberOfWords = min(numberOfWordsPerSolution);
+    const maxNumberOfWords = max(numberOfWordsPerSolution);
+    const wordStats = {
+      average: averageNumberOfWords,
+      min: minNumberOfWords,
+      max: maxNumberOfWords,
+    };
+    return wordStats;
+  }
+
+  @computed
+  get groupedAnagrams() {
+    const groupedAnagrams = anagram.groupAnagramsByStartWord(
+      this.subanagrams,
+      this.anagramIteratorState.solutions,
+    );
+    // const groupedAnagrams = anagram.groupAnagramsByWordCount(
+    //   this.subanagrams,
+    //   this.anagramIteratorState.solutions,
+    // );
+    return groupedAnagrams;
+  }
+
+  @computed
+  get anagramsWithoutSolution() {
+    return this.groupedAnagrams.filter(ag => ag.counter === 0);
+  }
+
+  @computed
+  get anagramsWithNoOwnSolution() {
+    return this.groupedAnagrams.filter(ag => ag.counter > 0 && ag.list.length === 0);
+  }
+
+  @computed
+  get anagramsWithSolution() {
+    return this.groupedAnagrams.filter(ag => ag.list.length > 0);
+  }
+
+  @computed
+  get partitionedAnagramsWithSolution() {
+    const groupedAngramsContainer = partitionArray(this.anagramsWithSolution , this.numberOfColumns);
+    return groupedAngramsContainer;
+  }
+
+  @computed
+  get partitionedAnagramsWithoutSolution() {
+    const groupedAngramsContainer = partitionArray(this.anagramsWithoutSolution , this.numberOfColumns);
+    return groupedAngramsContainer;
+  }
+
+  @computed
+  get partitionedAnagramsWithNoOwnSolution() {
+    const groupedAngramsContainer = partitionArray(this.anagramsWithNoOwnSolution , this.numberOfColumns);
+    return groupedAngramsContainer;
   }
 
   init = flow(function* () {
@@ -92,7 +189,6 @@ export class AnagramState {
   }
 
   requestAnagram = flow((function* () {
-    console.log('reequest anagram', this.query);
 
     if (this.worker) {
       this.worker.terminate();
@@ -143,7 +239,6 @@ export class AnagramState {
       this.worker = worker;
 
       worker.addEventListener('message', message => {
-        console.log(message);
         if (message.data === 'finish') {
 
           this.anagramIteratorState.solvedSubanagrams.push(nextWorkerIndex);

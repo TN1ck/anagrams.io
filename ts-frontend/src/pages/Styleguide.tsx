@@ -2,7 +2,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 import * as Components from 'src/components';
 import AnagramResults from 'src/molecules/AnagramResults';
-import mockState from 'src/assets/anagramPageMock';
 import {THEME} from 'src/theme';
 
 const Card = styled.div`
@@ -110,17 +109,9 @@ class Styleguide extends React.Component {
           </StyleguideSection>
 
           <StyleguideSection description={'Anagram Results'}>
-            <AnagramResults
-              share={() => 2}
-              subanagrams={mockState.subanagrams}
-              anagramIteratorState={mockState.anagramIteratorState}
-              isDone={false}
-              wordStats={{average: 0, min: 0, max: 0}}
-              query={mockState.query}
-
-            />
+            <AnagramResults />
           </StyleguideSection>
-          
+
 
         </Components.InnerContainer>
       </div>

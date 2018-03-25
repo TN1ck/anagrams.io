@@ -43,11 +43,6 @@ interface AnagramResultProps {
   counter: number;
   columnWidth: number;
   maxLengthInGroup: number;
-  wordStats: {
-    average: number;
-    min: number;
-    max: number;
-  }
 };
 
 class AnagramResult extends React.Component<AnagramResultProps,
@@ -138,7 +133,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
           })}
           {
             list.length > MAX_ITEMS_TO_SHOW_AT_ONCE
-              ? 
+              ?
                 <ShowAllButton onClick={this.toggleShowAll}>
                   {this.state.showAll
                     ? `hide ${list.length - MAX_ITEMS_TO_SHOW_AT_ONCE} items`

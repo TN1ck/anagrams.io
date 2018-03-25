@@ -1,4 +1,4 @@
-import {sortBy, drop, uniqBy} from 'lodash';
+import {sortBy, drop, uniqBy, groupBy} from 'lodash';
 
 //
 // interfaces
@@ -70,7 +70,7 @@ export function sanitizeQuery(str: string, removeSpaces: boolean = true): string
   const umlauts = str.replace(/[üÜ]/g, 'ue')
     .replace(/[äÄ]/g, 'ae')
     .replace(/[öÖ]/g, 'oe');
-  
+
   if (removeSpaces) {
     return umlauts.toLowerCase().replace(/[^a-z]/g, '');
   } else {
@@ -158,7 +158,7 @@ export function joinTwoStrings(w1: string, w2: string): string {
     index2++;
   }
   return combined;
-} 
+}
 
 function isSubset(nStr1: string, nStr2: string): boolean {
   const length1 = nStr1.length;
@@ -269,7 +269,7 @@ export function findAnagramSentencesForInitialStack(
         const charsMissing = queryLength - current[1].length;
 
         // drop all subanagrams that were before index
-        const droppedSubanagrams = drop(subanagrams, current[0][0]); 
+        const droppedSubanagrams = drop(subanagrams, current[0][0]);
 
         numberOfPossibilitiesChecked += droppedSubanagrams.length;
 
@@ -364,6 +364,27 @@ export function groupAnagramsByStartWord(
       groups[subangramIndex].counter += 1;
     }
   }
+
+  return groups;
+}
+
+export function groupAnagramsByWordCount(
+  subanagrams: IndexedWord[],
+  anagrams: OptimizedAnagramSolution[]
+): GroupedAnagramSolutions[] {
+
+  const groupedByLength = groupBy(anagrams, a => {
+    return a.length;
+  });
+
+  const groups = Object.values(groupedByLength).map(l => {
+    return {
+      list: l.map(list => list.map(j => subanagrams[j])) as IndexedWord[][],
+      word: l[0].length + ' words',
+      counter: l.length,
+      wordIndex: 0,
+    };
+  });
 
   return groups;
 }
