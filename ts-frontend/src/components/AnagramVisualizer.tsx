@@ -60,12 +60,6 @@ const CopyInput = styled.input`
   min-width: 190px;
 `;
 
-const ExplainText = styled.p`
-  color: ${THEME.colors.foregroundText};
-  text-align: center;
-`;
-
-
 export const StyledWord = styled.strong`
   white-space: nowrap;
   display: block;
@@ -243,7 +237,7 @@ export class AnagramSausages extends React.Component<AnagramSausagesProps, {
       strokeWidth,
     } = props;
     const mapping = getAnagramMapping(word, anagram);
-  
+
     const opacityScale = (index) => {
       return 0.2 + (0.8 / word.length * (word.length - index));
     };
@@ -278,7 +272,7 @@ export class AnagramSausages extends React.Component<AnagramSausagesProps, {
       height,
       wordWidth,
     } = this.props;
-  
+
     return (
       <svg height={height} width={wordWidth} style={{overflow: 'visible'}}>
         {this.state.sausages.map((d, index) => {

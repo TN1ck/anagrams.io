@@ -1,7 +1,10 @@
 import * as React from 'react';
-import styled from 'styled-components';
-import {throttle, min, max} from 'lodash';
-import {THEME, MARGIN_RAW} from 'src/theme';
+import {Provider} from 'mobx-react';
+import {observer, inject} from 'mobx-react';
+import {min, max} from 'lodash';
+import {MARGIN_RAW} from 'src/theme';
+
+import store from 'src/state';
 
 import {
   Footer,
@@ -22,10 +25,7 @@ import {Word, AnagramSausages, calculateWidths} from 'src/components/AnagramVisu
 import * as ReactModal from 'react-modal';
 ReactModal.setAppElement('body');
 
-import {RequestStatus, getSubAnagrams, getDictionaries, Dictionary} from 'src/api';
-import {parseSearch} from 'src/utility';
-
-import * as anagram from 'src/anagram';
+import {AnagramState} from '../state';
 
 import AnagramResults from 'src/molecules/AnagramResults';
 import {
@@ -33,52 +33,24 @@ import {
   SmallButton,
 } from 'src/components';
 
-const AnagramWorker = require('../anagram.worker');
 
 // import mockState from 'src/assets/anagramPageMock';
 // // const TESTING = true;
 
 
-const ActiveSubanagramsContainer = styled.div`
-  text-align: center;
-  margin-top: ${THEME.margins.m2};
-  margin-bottom: ${THEME.margins.m2};
-`;
-
-class ActiveSubanagrams extends React.Component<{
-  currentSubanagrams: number[];
-  subanagrams: anagram.IndexedWord[];
-}> {
-  render() {
-    const {
-      currentSubanagrams,
-      subanagrams,
-    } = this.props;
-
-    if (currentSubanagrams.length === 0) {
-      return null;
-    }
-
-    return (
-      <ActiveSubanagramsContainer>
-        {`Checking: ${currentSubanagrams.map(i => subanagrams[i].word.word).join(', ')}`}
-      </ActiveSubanagramsContainer>
-    );
-  }
-}
-
+@inject('store')
+@observer
 class AnagramInfoArea extends React.Component<{
-  anagramIteratorState: anagram.SerializedAnagramIteratorState;
-  subanagrams: anagram.IndexedWord[];
-  query: string;
-  share: (anagram: string, word: string) => any;
+  store?: AnagramState;
 }> {
   render() {
     const {
       anagramIteratorState,
       subanagrams,
       query,
-    } = this.props;
+    } = this.props.store;
+
+    console.log(anagramIteratorState, 'info bla');
 
     if (!anagramIteratorState) {
       return null;
@@ -86,7 +58,6 @@ class AnagramInfoArea extends React.Component<{
 
     const {
       solvedSubanagrams,
-      currentSubanagrams,
       // numberOfPossibilitiesChecked,
       unsolvedSubanagrams,
       solutions,
@@ -108,7 +79,7 @@ class AnagramInfoArea extends React.Component<{
     const numberOfAnagrams = subanagrams.length;
 
     const progress = Math.ceil(((numberOfSolvedSubanagrams)/ numberOfAnagrams) * 100);
-    
+
     return (
       <div className="mt-3">
         <SubTitle className="mb-2">
@@ -122,7 +93,7 @@ class AnagramInfoArea extends React.Component<{
         /> */}
         <br />
         <AnagramResults
-          share={this.props.share}
+          share={this.props.store.openModal}
           subanagrams={subanagrams}
           anagramIteratorState={anagramIteratorState}
           isDone={isDone}
@@ -134,15 +105,12 @@ class AnagramInfoArea extends React.Component<{
   }
 }
 
-interface AnagramaniaHeaderProps {
-    onSubmit: any;
-    onQueryChange: any;
-    onSelectChange: any;
-    dictionaries: Dictionary[];
-    selectedDictionaries: string;
-};
 
-class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
+@inject('store')
+@observer
+class AnagramaniaHeader extends React.Component<{
+  store?: AnagramState;
+}, {
   anagramIndex: number;
 }> {
   anagrams: string[] = ['anagrams', 'a mars nag', 'mara sang'];
@@ -183,16 +151,6 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
     this.mounted = false;
     window.clearTimeout(this.updateTimeout);
   }
-  shouldComponentUpdate(newProps: AnagramaniaHeaderProps, newState) {
-    if (
-      this.props.selectedDictionaries !== newProps.selectedDictionaries ||
-      this.props.dictionaries !== newProps.dictionaries ||
-      this.state.anagramIndex !== newState.anagramIndex
-    ) {
-      return true;
-    }
-    return false;
-  }
   onQueryChange(e) {
     window.clearTimeout(this.updateTimeout);
     if (this.word !== this.anagrams[this.state.anagramIndex % this.anagrams.length]) {
@@ -200,15 +158,15 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
         anagramIndex: 0,
       });
     }
-    this.props.onQueryChange(e);
+    this.props.store.setQuery(e.target.value);
   }
   render() {
     const {
       dictionaries,
       selectedDictionaries,
-      onSubmit,
-      onSelectChange,
-    } = this.props;
+      requestAnagram,
+      setDictionary,
+    } = this.props.store;
 
     const anagram = this.anagrams[this.state.anagramIndex % this.anagrams.length];
     const word = this.word;
@@ -251,14 +209,17 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
             <SearchBar
               innerRef={this.setInputRef}
               onChange={this.onQueryChange}
-              onSubmit={onSubmit}
+              onSubmit={(e) => {
+                e.preventDefault();
+                requestAnagram();
+              }}
             />
             {dictionaries.map(d => {
               return (
                 <SmallButton
                   className="mr-1 mt-2"
                   key={d.id}
-                  onClick={() => onSelectChange(d.id)}
+                  onClick={() => setDictionary(d.id)}
                   active={selectedDictionaries === d.id}
                 >
                   {d.name}
@@ -272,218 +233,47 @@ class AnagramaniaHeader extends React.Component<AnagramaniaHeaderProps, {
   }
 }
 
-class Anagramania extends React.Component<{}, {
-  queryStatus: RequestStatus;
-  query: string;
-  cleanedQuery: string;
-  cleanedQueryWithSpaces: string;
-  // anagrams: AnagramResult[];
-  subanagrams: anagram.IndexedWord[];
-  anagramIteratorState: anagram.SerializedAnagramIteratorState;
-  dictionaries: Dictionary[];
-  selectedDictionaries: string;
-  showModal: boolean;
-  modalAnagram: string;
-  modalWord: string;
-  appState: string;
-}> {
+@inject('store')
+@observer
+class Anagramania extends React.Component<{
+  store?: AnagramState;
+}, {}> {
   worker: Worker;
   finished: boolean;
   constructor(props: any) {
     super(props);
-    const defaultState = {
-      queryStatus: RequestStatus.none,
-      query: '',
-      cleanedQuery: '',
-      dictionaries: [],
-      selectedDictionaries: 'en',
-      subanagrams: [],
-      anagramIteratorState: null,
-      cleanedQueryWithSpaces: '',
-      showModal: false,
-      modalAnagram: '',
-      modalWord: '',
-      appState: 'search',
-    };
 
     this.onQueryChange = this.onQueryChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onSelectChange = this.onSelectChange.bind(this);
-    this.pauseWorker = this.pauseWorker.bind(this);
-    this.continueWorker = this.continueWorker.bind(this);
-    this.openModal = this.openModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-    this.saveAnagram = this.saveAnagram.bind(this);
 
-    this.state = defaultState;
     // if (TESTING) {
     //   this.state = mockState as any;
     // }
   }
-  async componentWillMount() {
-    const location = window.location;
-    const search = location.search;
-    const parsedSearch = parseSearch(search);
-    if (parsedSearch.anagram && parsedSearch.word) {
-      this.setState ({
-        modalWord: parsedSearch.word,
-        modalAnagram: parsedSearch.anagram,
-        appState: 'anagramViewer',
-      });
-    }
 
-    const result = await getDictionaries();
-    this.setState({
-      dictionaries: result.data.dictionaries,
-    });
-  }
   onQueryChange(e) {
-    this.setState({
-      query: e.target.value,
-    });
+    this.props.store.setQuery(e.target.value);
   }
   onSubmit(e) {
     e.preventDefault();
-    this.setState({
-      appState: 'search',
-    });
-    this.requestAnagram();
+    this.props.store.requestAnagram();
   }
   onSelectChange(value) {
-    this.setState({selectedDictionaries: value}, () => {
-      if (this.state.subanagrams.length > 0 && this.state.query.length > 0) {
-        this.setState({
-          appState: 'search',
-        });
-        this.requestAnagram();
-      }
-    });
-
+    this.props.store.setDictionary(value);
   }
-  pauseWorker() {
-    console.log('pause');
-  }
-  continueWorker() {
-    console.log('continue');
-  }
-  openModal(anagram: string, word: string) {
-    this.setState({
-      showModal: true,
-      modalAnagram: anagram,
-      modalWord: word,
-    });
-  }
-  closeModal() {
-    this.setState({
-      showModal: false,
-    });
-  }
-  saveAnagram(anagram: string, word: string) {
-    this.setState({
-      modalAnagram: anagram,
-      modalWord: word,
-    });
-  }
-  async requestAnagram() {
 
-    if (this.worker) {
-      this.worker.terminate();
-    }
-
-    this.finished = false;
-  
-    const cleanedQuery = anagram.sanitizeQuery(this.state.query);
-    const cleanedQueryWithSpaces = anagram.sanitizeQuery(this.state.query, false);
-
-    if (cleanedQuery.length === 0) {
-      return;
-    }
-
-    const result = await getSubAnagrams(cleanedQuery, this.state.selectedDictionaries);
-    const {anagrams: subanagrams} = result.data;
-
-    const initialAnagramIteratorState = anagram.serializeAnagramIteratorStateFactor(
-      anagram.anagramIteratorStateFactory()
-    );
-
-    initialAnagramIteratorState.unsolvedSubanagrams = subanagrams.map((_, i) => i);
-
-    this.setState({
-      subanagrams,
-      queryStatus: RequestStatus.loading,
-      cleanedQuery,
-      cleanedQueryWithSpaces,
-      // TODO
-      anagramIteratorState: initialAnagramIteratorState,
-    });
-
-    const throttledSetState = throttle(() => {
-      this.setState({});
-    }, 100);
-    
-    const updateState = (state: anagram.AnagramGeneratorStepSerialized) => {
-      if (this.finished) {
-        return;
-      }
-      this.state.anagramIteratorState.solutions.push(...state.solutions);
-      this.state.anagramIteratorState.numberOfPossibilitiesChecked += state.numberOfPossibilitiesChecked;
-      (window as any).applicationState = this.state;
-      throttledSetState();
-    };
-
-    const startNextWorker = () => {
-      if (this.state.anagramIteratorState.unsolvedSubanagrams.length === 0) {
-        this.setState({});
-        return;
-      }
-      const nextWorkerIndex = this.state.anagramIteratorState.unsolvedSubanagrams.shift();
-      this.state.anagramIteratorState.currentSubanagrams.push(nextWorkerIndex);
-      this.setState({});
-      
-      const worker = new AnagramWorker();
-      this.worker = worker;
-
-      worker.addEventListener('message', message => {
-        if (message.data === 'finish') {
-          this.state.anagramIteratorState.solvedSubanagrams.push(nextWorkerIndex);
-          this.state.anagramIteratorState.currentSubanagrams.shift();
-          worker.terminate();
-          // stop!
-          if (this.state.anagramIteratorState.solvedSubanagrams.length === subanagrams.length) {
-            this.setState({});
-            return;
-          }
-          startNextWorker();
-          return;
-        }
-        const newState: anagram.AnagramGeneratorStepSerialized = message.data;
-        updateState(newState);
-      });
-
-      worker.postMessage({
-        type: 'start',
-        query: cleanedQuery,
-        subanagram: subanagrams[nextWorkerIndex],
-        subanagrams,
-      });
-
-    };
-
-    startNextWorker();
-
-  }
   render() {
 
-    const state = this.state.anagramIteratorState;
-
-    const query = this.state.cleanedQueryWithSpaces;
-    const appState = this.state.appState;
+    const store = this.props.store;
+    console.log(store);
+    const appState = store.appState;
 
     return (
       <div>
         <ReactModal
-          isOpen={this.state.showModal}
-          onRequestClose={this.closeModal}
+          isOpen={store.showModal}
+          onRequestClose={store.closeModal}
           shouldCloseOnEsc
           shouldCloseOnOverlayClick
           style={{
@@ -504,28 +294,18 @@ class Anagramania extends React.Component<{}, {
           }}
         >
           <AnagramVisualizer
-            anagram={this.state.modalAnagram}
-            word={this.state.modalWord}
-            close={this.closeModal}
-            save={this.saveAnagram}
+            anagram={store.modalAnagram}
+            word={store.modalWord}
+            close={store.closeModal}
+            save={store.saveAnagram}
           />
+
         </ReactModal>
 
-        <AnagramaniaHeader
-          onSubmit={this.onSubmit}
-          onQueryChange={this.onQueryChange}
-          onSelectChange={this.onSelectChange}
-          dictionaries={this.state.dictionaries}
-          selectedDictionaries={this.state.selectedDictionaries}
-        />
+        <AnagramaniaHeader />
         {appState === 'search' ?
           <InnerContainer>
-            <AnagramInfoArea
-              anagramIteratorState={state}
-              subanagrams={this.state.subanagrams}
-              query={query}
-              share={this.openModal}
-            />
+            <AnagramInfoArea />
           </InnerContainer> :
           null
         }
@@ -534,9 +314,9 @@ class Anagramania extends React.Component<{}, {
             <InnerContainer>
               <div style={{marginTop: 30}}>
                 <AnagramVisualizer
-                  anagram={this.state.modalAnagram}
-                  word={this.state.modalWord}
-                  save={this.saveAnagram}
+                  anagram={store.modalAnagram}
+                  word={store.modalWord}
+                  save={store.saveAnagram}
                 />
               </div>
             </InnerContainer>
@@ -553,4 +333,10 @@ class Anagramania extends React.Component<{}, {
   }
 };
 
-export default Anagramania;
+
+const ProvidedAnagramania = () => {
+  return <Provider store={store}><Anagramania /></Provider>;
+};
+
+export default ProvidedAnagramania;
+

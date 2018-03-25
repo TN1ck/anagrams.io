@@ -63,7 +63,7 @@ injectGlobal`
         padding-right: ${margin}
       }
     `;
-  }).join('\n')} 
+  }).join('\n')}
 
   /*
   When the modal is opened a ReactModal__Body--open class is added to the body tag.

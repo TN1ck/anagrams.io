@@ -46,6 +46,8 @@
     "history": "^4.7.2",
     "keymaster": "1.6.2",
     "lodash": "4.17.4",
+    "mobx": "^4.1.0",
+    "mobx-react": "^5.0.0",
     "react": "16.1.1",
     "react-dom": "16.1.1",
     "react-modal": "^3.1.11",
