@@ -1,13 +1,20 @@
-import {sortBy, drop, uniqBy} from 'lodash';
+import {sortBy, drop, uniqBy, groupBy} from 'lodash';
 
 //
 // interfaces
 //
 
-export interface Word {
-  set: string,
+export interface BasicWord {
+  set: string;
+}
+
+export interface SimpleWord extends BasicWord {
   word: string;
 };
+
+export interface Word extends BasicWord {
+  words: string[];
+}
 
 export interface IndexedWord {
   word: Word;
@@ -78,7 +85,7 @@ export function sanitizeQuery(str: string, removeSpaces: boolean = true): string
   }
 }
 
-export function stringToWord (str: string): Word {
+export function stringToWord (str: string): SimpleWord {
   const sorted = str.split('').sort().join('');
   return {
     set: sorted,
@@ -191,7 +198,7 @@ export function findAnagrams(query: string, dictionary: Word[]): Word[] {
   });
 }
 
-export function findSubAnagrams(query: string, dictionary: Word[]): Word[] {
+export function findSubAnagrams(query: string, dictionary: SimpleWord[]): SimpleWord[] {
   const nQuery = stringToWord(query);
   // not sure why uniqBy is needed, have to investigate
   return uniqBy(dictionary.filter(nStr => {
@@ -200,22 +207,45 @@ export function findSubAnagrams(query: string, dictionary: Word[]): Word[] {
   }), w => w.word);
 }
 
-export function sortWordList(wordList: Word[]) {
-  return sortBy(wordList, w => -w.word.length);
+export function sortWordList<T extends BasicWord>(wordList: T[]): T[] {
+  return sortBy(wordList, w => -w.set.length);
 }
 
-export function findSortedSubAnagrmns(query: string, dictionary: Word[]): IndexedWord[] {
+export function findSortedSubAnagrmns(query: string, dictionary: SimpleWord[]): IndexedWord[] {
   const _subanagrams = findSubAnagrams(query, dictionary);
   // we like long words more
   const sorted = sortWordList(_subanagrams);
   const subanagrams: IndexedWord[] = sorted.map((word, index) => {
     return {
-      word: word,
+      word: {
+        words: [word.word],
+        set: word.set,
+      },
       index,
     };
   });
   return subanagrams;
 }
+
+export function findSortedAndGroupedSubAnagrams(query: string, dictionary: SimpleWord[]): IndexedWord[] {
+  const _subanagrams = findSubAnagrams(query, dictionary);
+  const groupedSubanagrams = groupBy(_subanagrams, s => s.set);
+  const groups = Object.keys(groupedSubanagrams);
+  const sortedGroups = sortBy(groups, g => -g.length);
+  const subanagrams = sortedGroups.map((set, index) => {
+    const words = groupedSubanagrams[set].map(w => w.word);
+    return {
+      word: {
+        set,
+        words,
+      },
+      index,
+    };
+  });
+
+  return subanagrams;
+}
+
 
 export function anagramIteratorStateFactory(unsolvedGenerators = []) {
   const state: AnagramIteratorState = {
@@ -275,7 +305,7 @@ export function findAnagramSentencesForInitialStack(
 
         // first filter those out, that are too big
         const possibleSubanagrams = droppedSubanagrams.filter(s => {
-          return s.word.word.length <= charsMissing;
+          return s.word.set.length <= charsMissing;
         });
 
         const combinedWords = possibleSubanagrams.map(w => {
@@ -343,7 +373,7 @@ export function groupAnagramsByStartWord(
   const groups = subanagrams.map(a => {
     return {
       list: [] as IndexedWord[][],
-      word: a.word.word,
+      word: a.word.set,
       counter: 0,
       wordIndex: a.index,
     };
@@ -367,6 +397,31 @@ export function groupAnagramsByStartWord(
 
   return groups;
 }
+
+// export function groupStringByStartWord(
+//   subanagrams: IndexedWord[],
+//   words: string[][]
+// ) {
+//   const subanagramWords = flatten(subanagrams.map(s => {
+//     return s.word.words.map(w => ({word: w, index: s.index}))
+//   }));
+
+//   const groupedWords = groupBy(words, w => w[0]);
+
+//   const groups = subanagramWords.map(w => {
+//     const list = groupedWords[w.word] || [];
+//     return {
+//       list,
+//       word: w.word,
+//       counter: list.length,
+//       index: w.index
+//     };
+//   });
+
+//   return groups;
+
+// }
+
 
 export enum AnagramResultState {
   active = "active",
@@ -402,4 +457,38 @@ export function getAnagramMapping(w1: string, w2: string): number[] {
     // index++;
   }
   return resultMapping;
+}
+
+function _expandArray<T>(array: T[][], current: T[][]): T[][] {
+  if (array.length === 0) {
+    return current;
+  }
+  const [start, ...rest] = array;
+  const newCurrent: T[][] = [];
+  for (let t of start) {
+    for (let t2 of current) {
+      newCurrent.push([...t2, t]);
+    }
+  }
+  return _expandArray(rest, newCurrent);
+}
+
+export function expandArray<T>(array: T[][]): T[][] {
+  const [start, ...rest] = array;
+  return _expandArray(rest, start.map(s => [s]));
+}
+
+
+export function expandSolutions(solutions: OptimizedAnagramSolution[], subanagrams: IndexedWord[]): string[][] {
+  const expandedSolutions = [].concat(...solutions.map(solution => {
+    const currentSolutions = solution.map(s => {
+      const word = subanagrams[s];
+      return word.word.words;
+    });
+
+    const expanded = expandArray(currentSolutions);
+    return expanded;
+  }));
+  return expandedSolutions;
+
 }

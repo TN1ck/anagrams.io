@@ -13,7 +13,7 @@ router.get(
     const dictionaryKey = request.query.dictionary;
     const sanitizedQuery = anagram.sanitizeQuery(query);
     const dictionary = dictionaries.find(d => d.id === dictionaryKey) || dictionaries[0];
-    const sortedSubAnagrams = anagram.findSortedSubAnagrmns(sanitizedQuery, dictionary.dict)
+    const sortedSubAnagrams = anagram.findSortedAndGroupedSubAnagrams(sanitizedQuery, dictionary.dict)
     response.json({anagrams: sortedSubAnagrams, success: true});
   }
 );
