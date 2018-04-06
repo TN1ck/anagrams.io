@@ -16,8 +16,7 @@ export interface Word extends BasicWord {
   words: string[];
 }
 
-export interface IndexedWord {
-  word: Word;
+export interface IndexedWord extends Word {
   index: number;
 }
 
@@ -217,10 +216,8 @@ export function findSortedSubAnagrmns(query: string, dictionary: SimpleWord[]): 
   const sorted = sortWordList(_subanagrams);
   const subanagrams: IndexedWord[] = sorted.map((word, index) => {
     return {
-      word: {
-        words: [word.word],
-        set: word.set,
-      },
+      words: [word.word],
+      set: word.set,
       index,
     };
   });
@@ -235,10 +232,8 @@ export function findSortedAndGroupedSubAnagrams(query: string, dictionary: Simpl
   const subanagrams = sortedGroups.map((set, index) => {
     const words = groupedSubanagrams[set].map(w => w.word);
     return {
-      word: {
-        set,
-        words,
-      },
+      set,
+      words,
       index,
     };
   });
@@ -305,13 +300,13 @@ export function findAnagramSentencesForInitialStack(
 
         // first filter those out, that are too big
         const possibleSubanagrams = droppedSubanagrams.filter(s => {
-          return s.word.set.length <= charsMissing;
+          return s.set.length <= charsMissing;
         });
 
         const combinedWords = possibleSubanagrams.map(w => {
           return {
             word: w,
-            combined: joinTwoStrings(current[1], w.word.set)
+            combined: joinTwoStrings(current[1], w.set)
           };
         });
 
@@ -347,7 +342,7 @@ export function findAnagramSentencesForSubAnagram(query: string, subanagrams: In
   const initialStack: AnagramSolution[] = [
     [
       [subanagram.index],
-      subanagram.word.set,
+      subanagram.set,
     ]
   ];
   const generator = findAnagramSentencesForInitialStack(query, initialStack, subanagrams);
@@ -373,7 +368,7 @@ export function groupAnagramsByStartWord(
   const groups = subanagrams.map(a => {
     return {
       list: [] as IndexedWord[][],
-      word: a.word.set,
+      word: a.set,
       counter: 0,
       wordIndex: a.index,
     };
@@ -483,7 +478,7 @@ export function expandSolutions(solutions: OptimizedAnagramSolution[], subanagra
   const expandedSolutions = [].concat(...solutions.map(solution => {
     const currentSolutions = solution.map(s => {
       const word = subanagrams[s];
-      return word.word.words;
+      return word.words;
     });
 
     const expanded = expandArray(currentSolutions);

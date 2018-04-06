@@ -22,7 +22,8 @@ class Result extends React.Component<{
   }
   render() {
     const {result, index, query} = this.props;
-    const word = result.map(w => w.word.word).join(' ');
+    // TODO
+    const word = result.map(w => w.set).join(' ');
     return (
       <ResultContainer>
         {(index + 1) + '. ' + word}

@@ -1,4 +1,4 @@
-import {observable, action, flow, computed} from 'mobx';
+import {observable, action, flow, computed, toJS} from 'mobx';
 import {min, max, groupBy} from 'lodash';
 import * as anagram from 'src/anagram';
 
@@ -165,13 +165,17 @@ export class AnagramState {
   }
 
   @computed
-  get grouped() {
+  get grouped(): Array<{
+    name: string,
+    group: anagram.GroupedAnagramSolutions[][],
+  }> {
     let groups = [];
     if (this.groupByNumberOfWords) {
       groups = this.groupedSpecial;
     } else {
       groups = this.groupedNormal;
     }
+    console.log(toJS(groups));
 
     if (this.isDone) {
       const groupedAnagrams = this.groupedAnagrams;
