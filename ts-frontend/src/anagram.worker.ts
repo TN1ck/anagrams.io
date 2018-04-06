@@ -17,15 +17,15 @@ ctx.addEventListener('message', (message) => {
 
   const data: {
     query: string;
-    subanagrams: anagram.IndexedWord[];
-    subanagram: anagram.IndexedWord;
+    subanagrams: anagram.Word[];
+    subanagram: anagram.Word;
   } = message.data;
 
   const {query, subanagrams, subanagram} = data;
   const anagramSolver = anagram.findAnagramSentencesForSubAnagram(query, subanagrams, subanagram);
 
   const {generator} = anagramSolver;
-  
+
   let state: anagram.AnagramGeneratorStep = {
     solutions: [],
     numberOfPossibilitiesChecked: 0,
@@ -52,5 +52,5 @@ ctx.addEventListener('message', (message) => {
   ctx.postMessage(serializeAnagramStep(state));
   ctx.postMessage('finish');
   self.close();
-  
+
 });

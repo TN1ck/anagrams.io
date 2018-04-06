@@ -1,4 +1,4 @@
-import {observable, action, flow, computed, toJS} from 'mobx';
+import {observable, action, flow, computed} from 'mobx';
 import {min, max, groupBy} from 'lodash';
 import * as anagram from 'src/anagram';
 
@@ -17,18 +17,25 @@ export class AnagramState {
   @observable cleanedQuery: string = '';
   @observable cleanedQueryWithSpaces: string = '';
 
-  @observable subanagrams: anagram.IndexedWord[] = [];
+  @observable subanagrams: anagram.Word[] = [];
   @observable dictionaries: Dictionary[] = [];
   @observable selectedDictionaries: string = 'en';
 
-  @observable anagramIteratorState: anagram.SerializedAnagramIteratorState = {
-    counter: 0,
-    numberOfPossibilitiesChecked: 0,
-    unsolvedSubanagrams: [],
-    solvedSubanagrams: [],
-    currentSubanagrams: [],
-    solutions: [],
-  };
+  // anagramIteratorState: anagram.SerializedAnagramIteratorState = {
+  //   counter: 0,
+  //   numberOfPossibilitiesChecked: 0,
+  //   unsolvedSubanagrams: [],
+  //   solvedSubanagrams: [],
+  //   currentSubanagrams: [],
+  //   solutions: [],
+  // };
+
+  @observable counter: number = 0;
+  @observable numberOfPossibilitiesChecked: number = 0;
+  @observable expandedSolutions: anagram.SimpleWord[][] = [];
+  @observable solvedSubanagrams: number[] = [];
+  @observable unsolvedSubanagrams: number[] = [];
+  @observable currentSubanagrams: number[] = [];
 
   @observable modalAnagram: string = '';
   @observable modalWord: string = '';
@@ -73,16 +80,14 @@ export class AnagramState {
 
   @computed
   get isDone() {
-    return this.anagramIteratorState.unsolvedSubanagrams.length === 0
-      && this.anagramIteratorState.solvedSubanagrams.length > 0
-      && this.anagramIteratorState.solutions.length > 0;
+    return this.unsolvedSubanagrams.length === 0
+      && this.solvedSubanagrams.length > 0
+      && this.expandedSolutions.length > 0;
   }
 
   @computed
   get progress(): number {
-    const {
-      solvedSubanagrams,
-    } = this.anagramIteratorState;
+    const solvedSubanagrams = this.solvedSubanagrams;
     const numberOfSolvedSubanagrams = solvedSubanagrams.length;
     const numberOfAnagrams = this.subanagrams.length;
 
@@ -92,7 +97,7 @@ export class AnagramState {
 
   @computed
   get stats() {
-    const {solutions} = this.anagramIteratorState;
+    const solutions = this.expandedSolutions;
     const numberOfWordsPerSolution = solutions.map(s => s.length);
     const numberOfWords = numberOfWordsPerSolution.reduce((a, b) => a + b, 0);
     const averageNumberOfWords = (numberOfWords / solutions.length);
@@ -108,9 +113,9 @@ export class AnagramState {
 
   @computed
   get groupedAnagrams() {
-    const groupedAnagrams = anagram.groupAnagramsByStartWord(
+    const groupedAnagrams = anagram.groupWordsByStartWord(
       this.subanagrams,
-      this.anagramIteratorState.solutions,
+      this.expandedSolutions,
     );
     return groupedAnagrams;
   }
@@ -118,7 +123,7 @@ export class AnagramState {
   @computed
   get groupedSpecial() {
 
-    const groupedByLength = groupBy(this.anagramIteratorState.solutions, a => {
+    const groupedByLength = groupBy(this.expandedSolutions, a => {
       return a.length;
     });
     const groups = Object.values(groupedByLength)
@@ -127,7 +132,7 @@ export class AnagramState {
     } = this.getColumnWidth;
 
     return groups.map((anagrams) => {
-      const groupedAnagrams = anagram.groupAnagramsByStartWord(
+      const groupedAnagrams = anagram.groupWordsByStartWord(
         this.subanagrams,
         anagrams,
       ).filter(c => c.list.length > 0);
@@ -175,12 +180,13 @@ export class AnagramState {
     } else {
       groups = this.groupedNormal;
     }
-    console.log(toJS(groups));
 
     if (this.isDone) {
       const groupedAnagrams = this.groupedAnagrams;
       const anagramsWithoutSolution = groupedAnagrams.filter(ag => ag.counter === 0);
-      const anagramsWithNoOwnSolution = groupedAnagrams.filter(ag => ag.counter > 0 && ag.list.length === 0);
+      const anagramsWithNoOwnSolution = groupedAnagrams.filter(
+        ag => ag.counter > 0 && ag.list.length === 0
+      );
       const numberOfColumns = this.getColumnWidth.numberOfColumns;
       groups.push(
         {
@@ -251,6 +257,7 @@ export class AnagramState {
     }
 
     this.appState = 'search';
+    this.expandedSolutions = [];
     this.finished = false;
 
     const cleanedQuery = anagram.sanitizeQuery(this.query);
@@ -263,46 +270,52 @@ export class AnagramState {
     const result = yield getSubAnagrams(cleanedQuery, this.selectedDictionaries);
     const {anagrams: subanagrams} = result.data;
 
-    const initialAnagramIteratorState = anagram.serializeAnagramIteratorStateFactor(
-      anagram.anagramIteratorStateFactory()
-    );
-
-    initialAnagramIteratorState.unsolvedSubanagrams = subanagrams.map((_, i) => i);
+    this.solvedSubanagrams = [];
+    this.counter = 0;
+    this.currentSubanagrams = [];
+    this.unsolvedSubanagrams = subanagrams.map((_, i) => i);
 
     this.subanagrams = subanagrams;
+    console.log('SUBANAGRAM', subanagrams);
     this.queryStatus = RequestStatus.loading;
     this.cleanedQuery = cleanedQuery;
     this.cleanedQueryWithSpaces = cleanedQueryWithSpaces;
-    this.anagramIteratorState = initialAnagramIteratorState;
 
     const updateState = (state: anagram.AnagramGeneratorStepSerialized) => {
       if (this.finished) {
         return;
       }
-      this.anagramIteratorState.solutions.push(...state.solutions);
-      this.anagramIteratorState.numberOfPossibilitiesChecked += state.numberOfPossibilitiesChecked;
+      const {
+        solutions,
+        numberOfPossibilitiesChecked,
+      } = state;
+
+      this.numberOfPossibilitiesChecked += numberOfPossibilitiesChecked;
+      const newExpandedSolutions = anagram.expandSolutions(solutions, subanagrams);
+      this.expandedSolutions.push(...newExpandedSolutions);
+
       (window as any).applicationState = this;
     };
 
     const startNextWorker = () => {
-      if (this.anagramIteratorState.unsolvedSubanagrams.length === 0) {
+      if (this.unsolvedSubanagrams.length === 0) {
         return;
       }
 
-      const nextWorkerIndex = this.anagramIteratorState.unsolvedSubanagrams.shift();
-      this.anagramIteratorState.currentSubanagrams.push(nextWorkerIndex);
+      const nextWorkerIndex = this.unsolvedSubanagrams.shift();
+      this.currentSubanagrams.push(nextWorkerIndex);
       const worker = new AnagramWorker();
       this.worker = worker;
 
       worker.addEventListener('message', message => {
         if (message.data === 'finish') {
 
-          this.anagramIteratorState.solvedSubanagrams.push(nextWorkerIndex);
-          this.anagramIteratorState.currentSubanagrams.shift();
+          this.solvedSubanagrams.push(nextWorkerIndex);
+          this.currentSubanagrams.shift();
 
           worker.terminate();
           // stop!
-          if (this.anagramIteratorState.solvedSubanagrams.length === subanagrams.length) {
+          if (this.solvedSubanagrams.length === subanagrams.length) {
             return;
           }
           startNextWorker();

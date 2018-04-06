@@ -1,4 +1,4 @@
-import {Word, stringToWord, sanitizeQuery, SimpleWord} from './anagram';
+import {stringToWord, sanitizeQuery, SimpleWord} from './anagram';
 
 export function parseDictionary(rawDictionary: string): SimpleWord[] {
   const rows = rawDictionary.split('\n');

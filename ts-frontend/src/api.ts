@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {IndexedWord} from './anagram';
+import {Word} from './anagram';
 import {Performance} from './performance/performance';
 
 import {BACKEND_URL} from './constants';
@@ -14,7 +14,7 @@ export enum RequestStatus {
 export function getSubAnagrams(query: string, dictionaries: string)  {
   return axios.get<{
     success: boolean;
-    anagrams: IndexedWord[];
+    anagrams: Word[];
   }>(BACKEND_URL + '/anagram/' + query + '?dictionary=' + dictionaries);
 }
 

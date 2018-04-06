@@ -12,7 +12,7 @@ import {
 const MAX_ITEMS_TO_SHOW_AT_ONCE = 3;
 
 class Result extends React.Component<{
-  result: anagram.IndexedWord[];
+  result: anagram.SimpleWord[];
   index: number;
   query: string;
   share?: (anagram: string, word: string) => any;
@@ -23,7 +23,7 @@ class Result extends React.Component<{
   render() {
     const {result, index, query} = this.props;
     // TODO
-    const word = result.map(w => w.set).join(' ');
+    const word = result.map(w => w.word).join(' ');
     return (
       <ResultContainer>
         {(index + 1) + '. ' + word}
@@ -40,7 +40,7 @@ interface AnagramResultProps {
   query: string;
   result: anagram.AnagramResultState;
   word: string;
-  list: anagram.IndexedWord[][];
+  list: anagram.SimpleWord[][];
   counter: number;
   columnWidth: number;
   maxLengthInGroup: number;

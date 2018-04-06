@@ -82,15 +82,11 @@ class AnagramInfoArea extends React.Component<{
 }> {
   render() {
     const store = this.props.store;
-    const anagramIteratorState = store.anagramIteratorState;
+    const solutions = store.expandedSolutions;
 
-    if (!anagramIteratorState) {
+    if (solutions.length === 0) {
       return null;
     }
-
-    const {
-      solutions,
-    } = anagramIteratorState;
 
     return (
       <div className="mt-3">
