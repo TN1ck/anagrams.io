@@ -99,6 +99,7 @@ class AnagramInfoArea extends React.Component<{
           <StyledCheckbox
             type="checkbox"
             id="group"
+            checked={store.groupByNumberOfWords}
             onChange={store.toggleGroupByNumberOfWords}
           />
           <StyledLabel htmlFor="group">
@@ -119,8 +120,8 @@ class AnagramaniaHeader extends React.Component<{
 }, {
   anagramIndex: number;
 }> {
-  anagrams: string[] = ['anagrams', 'a mars nag', 'mara sang'];
-  word: string = 'anagrams';
+  anagrams: string[] = ['anagrams.io', 'so i anagram.', 'roams again.', 'mango arias.', 'anagrams.io'];
+  word: string = 'anagrams.io';
   mounted: boolean = false;
   updateTimeout: number = 0;
   input: HTMLInputElement = null;
@@ -148,7 +149,7 @@ class AnagramaniaHeader extends React.Component<{
         this.setState({
           anagramIndex: newIndex,
         });
-        if (newIndex < 3) {
+        if (newIndex < this.anagrams.length) {
           this.updateTimeout = window.setTimeout(update, duration);
         }
       }
@@ -189,7 +190,7 @@ class AnagramaniaHeader extends React.Component<{
       <Header>
         <InnerContainer>
           <TitleContainer>
-            <div style={{position: 'relative', top: -50, height: 150}}>
+            <div style={{position: 'relative', top: -110, height: 150}}>
               <AnagramSausages
                 word={word}
                 anagram={anagram}

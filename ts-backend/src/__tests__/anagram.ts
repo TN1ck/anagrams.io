@@ -22,7 +22,7 @@ const NUMBER_OF_SUBANAGRAMS = 113;
 describe('Anagram / findanagrams', () => {
   test('Should find the the anagrams', () => {
     const dictionary = dictionaries.find(d => d.id === 'eng-us-3k');
-    const subanagrams = anagram.findSortedSubAnagrmns(TEST_WORD, dictionary.dict);
+    const subanagrams = anagram.findSortedAndGroupedSubAnagrams(TEST_WORD, dictionary.dict);
     expect(subanagrams.length).toBe(NUMBER_OF_SUBANAGRAMS);
     const generators = anagram.findAnagramSentences(TEST_WORD, subanagrams);
     const subanagramSolutions = generators.map(({generator}) => {
@@ -31,6 +31,7 @@ describe('Anagram / findanagrams', () => {
       return values;
     });
     const values = flatten(subanagramSolutions);
+    console.log(values, 'values');
     expect(values.length).toBe(TEST_WORD_SOLUTIONS.length);
   });
 });
@@ -67,7 +68,7 @@ describe('joinTwoStrings', () => {
   //    const resultExpected = anagram.joinTwoStringsNaive(currentMerge, c.set);
   //    const result = anagram.joinTwoStrings(currentMerge, c.set);
   //    expect(result).toEqual(resultExpected);
-  //    currentMerge = resultExpected; 
+  //    currentMerge = resultExpected;
   //   }
   // });
 

@@ -21,15 +21,6 @@ export class AnagramState {
   @observable dictionaries: Dictionary[] = [];
   @observable selectedDictionaries: string = 'en';
 
-  // anagramIteratorState: anagram.SerializedAnagramIteratorState = {
-  //   counter: 0,
-  //   numberOfPossibilitiesChecked: 0,
-  //   unsolvedSubanagrams: [],
-  //   solvedSubanagrams: [],
-  //   currentSubanagrams: [],
-  //   solutions: [],
-  // };
-
   @observable counter: number = 0;
   @observable numberOfPossibilitiesChecked: number = 0;
   @observable expandedSolutions: anagram.SimpleWord[][] = [];
@@ -131,7 +122,7 @@ export class AnagramState {
       numberOfColumns,
     } = this.getColumnWidth;
 
-    return groups.map((anagrams) => {
+    const result = groups.map((anagrams) => {
       const groupedAnagrams = anagram.groupWordsByStartWord(
         this.subanagrams,
         anagrams,
@@ -141,6 +132,10 @@ export class AnagramState {
         group: partitionArray(groupedAnagrams, numberOfColumns),
       };
     });
+
+    console.log(result);
+
+    return result;
 
   }
 
@@ -276,7 +271,6 @@ export class AnagramState {
     this.unsolvedSubanagrams = subanagrams.map((_, i) => i);
 
     this.subanagrams = subanagrams;
-    console.log('SUBANAGRAM', subanagrams);
     this.queryStatus = RequestStatus.loading;
     this.cleanedQuery = cleanedQuery;
     this.cleanedQueryWithSpaces = cleanedQueryWithSpaces;
@@ -303,12 +297,15 @@ export class AnagramState {
       }
 
       const nextWorkerIndex = this.unsolvedSubanagrams.shift();
+      console.log('Start next worker', nextWorkerIndex, cleanedQuery, subanagrams[nextWorkerIndex]);
       this.currentSubanagrams.push(nextWorkerIndex);
       const worker = new AnagramWorker();
       this.worker = worker;
 
       worker.addEventListener('message', message => {
         if (message.data === 'finish') {
+
+          console.log(message, 'message');
 
           this.solvedSubanagrams.push(nextWorkerIndex);
           this.currentSubanagrams.shift();
