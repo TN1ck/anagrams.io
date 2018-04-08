@@ -110,16 +110,8 @@ class AnagramResultGroup extends React.Component<{
                 active={false}
                 onClick={this.toggleExpand}
               >
-                {`Show ${howManyHidden} more`}
+                {expanded ? `Hide ${howManyHidden} again` :`Show ${howManyHidden} more`}
               </SmallButton>
-              {expanded ? (
-                <SmallButton
-                  active={false}
-                  onClick={this.toggleExpand}
-                >
-                  {`Hide ${howManyHidden} again`}
-                </SmallButton>
-              ) : null}
             </ShowMoreButtonContainer>
           ) : null
         }
