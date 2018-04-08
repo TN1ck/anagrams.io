@@ -91,6 +91,10 @@ export class AnagramState {
     const numberOfSolvedSubanagrams = solvedSubanagrams.length;
     const numberOfAnagrams = this.subanagrams.length;
 
+    if (numberOfAnagrams === 0) {
+      return 100;
+    }
+
     const progress = Math.ceil(((numberOfSolvedSubanagrams)/ numberOfAnagrams) * 100);
     return progress;
   }
@@ -291,6 +295,13 @@ export class AnagramState {
       this.cleanedQuery = cleanedQuery;
       this.cleanedQueryWithSpaces = cleanedQueryWithSpaces;
     });
+
+    if (subanagrams.length === 0) {
+      runInAction(() => {
+        this.appState = AppState.done;
+      });
+      return;
+    }
 
     const updateState = (state: anagram.AnagramGeneratorStepSerialized) => {
       if (this.finished) {
