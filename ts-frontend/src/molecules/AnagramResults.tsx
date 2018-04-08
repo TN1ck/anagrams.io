@@ -7,6 +7,7 @@ import {
   SubTitle,
   AnagramResultsContainer,
   AnagramResultRow,
+  SmallButton,
 } from 'src/components';
 
 import {AnagramState, AppState} from '../state';
@@ -22,10 +23,117 @@ const SubTitleContainer = styled.div`
   margin-left: ${THEME.margins.m2};
 `;
 
+const ShowMoreButtonContainer = styled.div`
+  margin-top: ${THEME.margins.m2};
+  margin-bottom: ${THEME.margins.m2};
+  text-align: center;
+  clear: both;
+`;
+
+
+@inject('store')
+@observer
+class AnagramResultGroup extends React.Component<{
+  group: anagram.GroupedAnagramSolutions[][];
+  name: string;
+  store?: AnagramState;
+  index: number;
+}, {
+  expanded: boolean
+}> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      expanded: false,
+    };
+    this.toggleExpand = this.toggleExpand.bind(this);
+  }
+  toggleExpand() {
+    this.setState({
+      expanded: !this.state.expanded,
+    });
+  }
+  render() {
+    const {
+      group,
+      name,
+      store,
+      index,
+    } = this.props;
+
+    const {
+      columnWidth,
+    } = store.getColumnWidth;
+    const query = store.query;
+
+    const expanded = this.state.expanded;
+
+    const maxRows = index === 0 ? 1000 : Math.max((100 - 10 * index), 5);
+    const expandedGroup = expanded ? group : group.slice(0, maxRows);
+    const howManyHidden = group.length - maxRows;
+    const canExpand = howManyHidden > 0;
+
+    return (
+      <div>
+        {name !== null && (
+          <SubTitleContainer>
+            <SubTitle>{name}</SubTitle>
+          </SubTitleContainer>
+        )}
+        {expandedGroup.map((g, i) => {
+          return (
+            <AnagramResultRow key={i}>
+              {g.map((d) => {
+                const {word, list, counter} = d;
+                const maxLengthInGroup = Math.max(...g.map(a => a.list.length));
+                return (
+                  <AnagramResult
+                    key={word}
+                    share={store.openModal}
+                    columnWidth={columnWidth}
+                    result={AnagramResultState.solved}
+                    word={word}
+                    list={list}
+                    counter={counter}
+                    maxLengthInGroup={maxLengthInGroup}
+                    query={query}
+                  />
+                );
+              })}
+            </AnagramResultRow>
+          );
+        })}
+        {
+          canExpand ? (
+            <ShowMoreButtonContainer>
+              <SmallButton
+                active={false}
+                onClick={this.toggleExpand}
+              >
+                {`Show ${howManyHidden} more`}
+              </SmallButton>
+              {expanded ? (
+                <SmallButton
+                  active={false}
+                  onClick={this.toggleExpand}
+                >
+                  {`Hide ${howManyHidden} again`}
+                </SmallButton>
+              ) : null}
+            </ShowMoreButtonContainer>
+          ) : null
+        }
+      </div>
+    );
+  }
+}
+
 @inject('store')
 @observer
 class AnagramResults extends React.Component<{
   store?: AnagramState;
+}, {
+  expanded: boolean;
 }> {
   dom: HTMLElement;
   constructor(props) {
@@ -80,36 +188,12 @@ class AnagramResults extends React.Component<{
         }
         {grouped.map(({group, name}, i) => {
           return (
-            <div key={i}>
-              {name !== null && (
-                <SubTitleContainer>
-                  <SubTitle>{name}</SubTitle>
-                </SubTitleContainer>
-              )}
-              {group.map((g, i) => {
-                return (
-                  <AnagramResultRow key={i}>
-                    {g.map((d) => {
-                      const {word, list, counter} = d;
-                      const maxLengthInGroup = Math.max(...g.map(a => a.list.length));
-                      return (
-                        <AnagramResult
-                          key={word}
-                          share={store.openModal}
-                          columnWidth={columnWidth}
-                          result={AnagramResultState.solved}
-                          word={word}
-                          list={list}
-                          counter={counter}
-                          maxLengthInGroup={maxLengthInGroup}
-                          query={query}
-                        />
-                      );
-                    })}
-                  </AnagramResultRow>
-                );
-              })}
-            </div>
+            <AnagramResultGroup
+              key={i}
+              group={group}
+              name={name}
+              index={i}
+            />
           );
         })}
       </AnagramResultsContainer>

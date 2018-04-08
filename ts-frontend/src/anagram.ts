@@ -358,17 +358,17 @@ export function findAnagramSentences(query: string, subanagrams: Word[]): Subana
   return subanagramsGenerators;
 }
 
-export function groupWordsByStartWord(
-  subanagrams: Word[],
-  words: SimpleWord[][]
-) {
-  const groups: {[key: string]: {
-    list: SimpleWord[][],
-    counter: number,
-    word: string,
-    wordIndex: number,
-  }} = {};
+export interface GroupedWords {
+  list: SimpleWord[][],
+  counter: number,
+  word: string,
+  wordIndex: number,
+}
 
+export type GroupedWordsDict = {[key: string]: GroupedWords};
+
+function createGroups(subanagrams: Word[]): GroupedWordsDict {
+  const groups = {};
   subanagrams.forEach(a => {
     a.words.forEach(w => {
       const group = {
@@ -380,12 +380,27 @@ export function groupWordsByStartWord(
       groups[w] = group;
     });
   });
+  return groups;
+}
+
+export function groupWordsByStartWord(
+  subanagrams: Word[],
+  words: SimpleWord[][],
+  cache: {[key: string]: GroupedWords} = {},
+  cacheLength: number = 0,
+): GroupedWordsDict {
+  const values = Object.values(cache || {});
+  const groups: {[key: string]: GroupedWords} = values.length === 0 ? createGroups(subanagrams) : cache;
+  // TODO
+  cacheLength = values.reduce((a, c) => c.list.length + a, 0)
 
   // let current = null;
   let currentWordIndex = 0;
 
-  for (let i = 0; i < words.length; i++) {
-    const aList = words[i];
+  const newWords = words.slice(cacheLength);
+
+  for (let i = 0; i < newWords.length; i++) {
+    const aList = newWords[i];
     const newIndexdWord = aList[0];
     const newIndexdWordIndex = newIndexdWord.index;
     if (currentWordIndex !== newIndexdWordIndex) {
@@ -398,7 +413,7 @@ export function groupWordsByStartWord(
     }
   }
 
-  return Object.values(groups);
+  return groups;
 
 }
 

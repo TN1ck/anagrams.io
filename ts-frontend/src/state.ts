@@ -24,16 +24,16 @@ export class AnagramState {
   @observable cleanedQuery: string = '';
   @observable cleanedQueryWithSpaces: string = '';
 
-  @observable subanagrams: anagram.Word[] = [];
-  @observable dictionaries: Dictionary[] = [];
+  @observable.shallow subanagrams: anagram.Word[] = [];
+  @observable.shallow dictionaries: Dictionary[] = [];
   @observable selectedDictionaries: string = 'en';
 
   @observable counter: number = 0;
   @observable numberOfPossibilitiesChecked: number = 0;
-  @observable expandedSolutions: anagram.SimpleWord[][] = [];
-  @observable solvedSubanagrams: number[] = [];
-  @observable unsolvedSubanagrams: number[] = [];
-  @observable currentSubanagrams: number[] = [];
+  @observable.shallow expandedSolutions: anagram.SimpleWord[][] = [];
+  @observable.shallow solvedSubanagrams: number[] = [];
+  @observable.shallow unsolvedSubanagrams: number[] = [];
+  @observable.shallow currentSubanagrams: number[] = [];
 
   @observable modalAnagram: string = '';
   @observable modalWord: string = '';
@@ -45,6 +45,10 @@ export class AnagramState {
   @observable width: number = 1;
 
   @observable groupByNumberOfWords: boolean = true;
+
+  // caches
+  groupedSpecialCache: {[key: string]: anagram.GroupedWordsDict} = {};
+  groupedAnagramsCache: anagram.GroupedWordsDict = {};
 
   constructor() {
     this.setQuery = this.setQuery.bind(this);
@@ -64,7 +68,7 @@ export class AnagramState {
 
   @computed
   get getColumnWidth() {
-    const MIN_COLUMN_WIDTH = Math.max(250, this.query.length * 14.5);
+    const MIN_COLUMN_WIDTH = Math.max(250, this.cleanedQuery.length * 14.5);
 
     const numberOfColumns = Math.max(Math.floor(this.width / MIN_COLUMN_WIDTH), 1);
     const columnWidth = this.width / numberOfColumns;
@@ -95,7 +99,7 @@ export class AnagramState {
       return 100;
     }
 
-    const progress = Math.ceil(((numberOfSolvedSubanagrams)/ numberOfAnagrams) * 100);
+    const progress = Math.ceil((numberOfSolvedSubanagrams / numberOfAnagrams) * 100);
     return progress;
   }
 
@@ -115,36 +119,47 @@ export class AnagramState {
     return wordStats;
   }
 
-  @computed
   get groupedAnagrams() {
+    const oldCache = this.groupedAnagramsCache;
     const groupedAnagrams = anagram.groupWordsByStartWord(
       this.subanagrams,
       this.expandedSolutions,
+      oldCache,
     );
-    return groupedAnagrams;
+    this.groupedAnagramsCache = groupedAnagrams;
+    return Object.values(groupedAnagrams);
   }
 
-  @computed
   get groupedSpecial() {
 
     const groupedByLength = groupBy(this.expandedSolutions, a => {
       return a.length;
     });
-    const groups = Object.values(groupedByLength)
+    const groupKeys = Object.keys(groupedByLength)
     const {
       numberOfColumns,
     } = this.getColumnWidth;
 
-    const result = groups.map((anagrams) => {
-      const groupedAnagrams = anagram.groupWordsByStartWord(
+    const oldCache = this.groupedSpecialCache;
+    const newCache: {[key: string]: anagram.GroupedWordsDict} = {};
+
+    const result = groupKeys.map((key) => {
+      const anagrams = groupedByLength[key];
+      const groupedAnagramsDict = anagram.groupWordsByStartWord(
         this.subanagrams,
         anagrams,
-      ).filter(c => c.list.length > 0);
+        oldCache[key],
+        0,
+      );
+      newCache[key] = groupedAnagramsDict;
+      const groupedAnagrams = Object.values(groupedAnagramsDict).filter(c => c.list.length > 0)
       return {
         name: `Anagrams with ${anagrams[0].length} words`,
         group: partitionArray(groupedAnagrams, numberOfColumns),
       };
     });
+
+    this.groupedSpecialCache = newCache;
 
     return result;
 
@@ -155,7 +170,6 @@ export class AnagramState {
     this.groupByNumberOfWords = !this.groupByNumberOfWords;
   }
 
-  @computed
   get groupedNormal() {
 
     const groupedAnagrams = this.groupedAnagrams;
@@ -268,7 +282,7 @@ export class AnagramState {
       this.worker.terminate();
     }
 
-    runInAction(() => {
+    const clear = () => {
       this.appState = AppState.search;
       this.expandedSolutions = [];
       this.finished = false;
@@ -276,7 +290,13 @@ export class AnagramState {
       this.counter = 0;
       this.currentSubanagrams = [];
       this.unsolvedSubanagrams = [];
-    });
+      this.groupedAnagramsCache = {};
+      this.groupedSpecialCache = {};
+      this.subanagrams = [];
+    };
+
+    clear();
+    runInAction(clear);
 
     const cleanedQuery = anagram.sanitizeQuery(this.query);
     const cleanedQueryWithSpaces = anagram.sanitizeQuery(this.query, false);
