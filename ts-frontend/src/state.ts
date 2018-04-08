@@ -1,4 +1,4 @@
-import {observable, action, flow, computed} from 'mobx';
+import {observable, action, runInAction, computed} from 'mobx';
 import {min, max, groupBy} from 'lodash';
 import * as anagram from 'src/anagram';
 
@@ -9,9 +9,16 @@ import {partitionArray} from 'src/utility';
 
 const AnagramWorker = require('./anagram.worker');
 
+export enum AppState {
+  none = 'none',
+  search = 'search',
+  done = 'done',
+  anagramViewer = 'anagramViewer',
+}
+
 export class AnagramState {
   @observable queryStatus: RequestStatus = RequestStatus.none;
-  @observable appState: string = 'none';
+  @observable appState: string = AppState.none;
 
   @observable query: string = '';
   @observable cleanedQuery: string = '';
@@ -37,7 +44,7 @@ export class AnagramState {
 
   @observable width: number = 1;
 
-  @observable groupByNumberOfWords: boolean = false;
+  @observable groupByNumberOfWords: boolean = true;
 
   constructor() {
     this.setQuery = this.setQuery.bind(this);
@@ -70,10 +77,12 @@ export class AnagramState {
   }
 
   @computed
+  get showInfoArea() {
+    return this.appState === AppState.search || this.appState === AppState.done;
+  }
+
   get isDone() {
-    return this.unsolvedSubanagrams.length === 0
-      && this.solvedSubanagrams.length > 0
-      && this.expandedSolutions.length > 0;
+    return this.appState === AppState.done;
   }
 
   @computed
@@ -133,8 +142,6 @@ export class AnagramState {
       };
     });
 
-    console.log(result);
-
     return result;
 
   }
@@ -183,35 +190,41 @@ export class AnagramState {
         ag => ag.counter > 0 && ag.list.length === 0
       );
       const numberOfColumns = this.getColumnWidth.numberOfColumns;
-      groups.push(
+      const otherGroups = [,
         {
           name: 'Anagrams With No Own Solution',
           group: partitionArray(anagramsWithNoOwnSolution,  numberOfColumns),
         },
         {
-          name: 'Anagrams Without Solution',
+          name: 'Subanagrams Without Solution',
           group: partitionArray(anagramsWithoutSolution, numberOfColumns),
         }
-      );
+      ].filter(d => d.group.length > 0);
+
+      groups = [...groups, ...otherGroups];
     }
 
     return groups;
   }
 
-  init = flow(function* () {
+  async init() {
     const location = window.location;
     const search = location.search;
     const parsedSearch = parseSearch(search);
 
     if (parsedSearch.anagram && parsedSearch.word) {
-      this.modalWord = parsedSearch.word;
-      this.modalAnagram = parsedSearch.anagram;
-      this.appState = 'anagramViewer';
+      runInAction(() => {
+        this.modalWord = parsedSearch.word;
+        this.modalAnagram = parsedSearch.anagram;
+        this.appState = AppState.anagramViewer;
+      });
     }
 
-    const result = yield getDictionaries();
-    this.dictionaries = result.data.dictionaries;
-  })
+    const result = await getDictionaries();
+    runInAction(() => {
+      this.dictionaries = result.data.dictionaries;
+    });
+  }
 
   @action
   setQuery(query) {
@@ -222,7 +235,7 @@ export class AnagramState {
   setDictionary(value) {
     this.selectedDictionaries = value;
     if (this.subanagrams.length > 0 && this.query.length > 0) {
-      this.appState = 'search';
+      this.appState = AppState.search;
       this.requestAnagram();
     }
   }
@@ -245,15 +258,21 @@ export class AnagramState {
     this.modalWord = word;
   }
 
-  requestAnagram = flow(function* () {
+  async requestAnagram() {
 
     if (this.worker) {
       this.worker.terminate();
     }
 
-    this.appState = 'search';
-    this.expandedSolutions = [];
-    this.finished = false;
+    runInAction(() => {
+      this.appState = AppState.search;
+      this.expandedSolutions = [];
+      this.finished = false;
+      this.solvedSubanagrams = [];
+      this.counter = 0;
+      this.currentSubanagrams = [];
+      this.unsolvedSubanagrams = [];
+    });
 
     const cleanedQuery = anagram.sanitizeQuery(this.query);
     const cleanedQueryWithSpaces = anagram.sanitizeQuery(this.query, false);
@@ -262,33 +281,29 @@ export class AnagramState {
       return;
     }
 
-    const result = yield getSubAnagrams(cleanedQuery, this.selectedDictionaries);
+    const result = await getSubAnagrams(cleanedQuery, this.selectedDictionaries);
     const {anagrams: subanagrams} = result.data;
 
-    this.solvedSubanagrams = [];
-    this.counter = 0;
-    this.currentSubanagrams = [];
-    this.unsolvedSubanagrams = subanagrams.map((_, i) => i);
-
-    this.subanagrams = subanagrams;
-    this.queryStatus = RequestStatus.loading;
-    this.cleanedQuery = cleanedQuery;
-    this.cleanedQueryWithSpaces = cleanedQueryWithSpaces;
+    runInAction(() => {
+      this.unsolvedSubanagrams = subanagrams.map((_, i) => i);
+      this.subanagrams = subanagrams;
+      this.queryStatus = RequestStatus.loading;
+      this.cleanedQuery = cleanedQuery;
+      this.cleanedQueryWithSpaces = cleanedQueryWithSpaces;
+    });
 
     const updateState = (state: anagram.AnagramGeneratorStepSerialized) => {
       if (this.finished) {
         return;
       }
-      const {
-        solutions,
-        numberOfPossibilitiesChecked,
-      } = state;
 
-      this.numberOfPossibilitiesChecked += numberOfPossibilitiesChecked;
-      const newExpandedSolutions = anagram.expandSolutions(solutions, subanagrams);
-      this.expandedSolutions.push(...newExpandedSolutions);
+      runInAction(() => {
+        this.numberOfPossibilitiesChecked += state.numberOfPossibilitiesChecked;
+        const newExpandedSolutions = anagram.expandSolutions(state.solutions, subanagrams);
+        this.expandedSolutions.push(...newExpandedSolutions);
+      });
 
-      (window as any).applicationState = this;
+      // (window as any).applicationState = this;
     };
 
     const startNextWorker = () => {
@@ -297,22 +312,28 @@ export class AnagramState {
       }
 
       const nextWorkerIndex = this.unsolvedSubanagrams.shift();
-      console.log('Start next worker', nextWorkerIndex, cleanedQuery, subanagrams[nextWorkerIndex]);
-      this.currentSubanagrams.push(nextWorkerIndex);
+
+      runInAction(() => {
+        this.currentSubanagrams.push(nextWorkerIndex);
+      })
+
       const worker = new AnagramWorker();
       this.worker = worker;
 
       worker.addEventListener('message', message => {
         if (message.data === 'finish') {
 
-          console.log(message, 'message');
-
-          this.solvedSubanagrams.push(nextWorkerIndex);
-          this.currentSubanagrams.shift();
+          runInAction(() => {
+            this.solvedSubanagrams.push(nextWorkerIndex);
+            this.currentSubanagrams.shift();
+          });
 
           worker.terminate();
           // stop!
           if (this.solvedSubanagrams.length === subanagrams.length) {
+            runInAction(() => {
+              this.appState = AppState.done;
+            });
             return;
           }
           startNextWorker();
@@ -333,7 +354,7 @@ export class AnagramState {
 
     startNextWorker();
 
-  })
+  }
 
 }
 

@@ -9,7 +9,7 @@ import {
   AnagramResultRow,
 } from 'src/components';
 
-import {AnagramState} from '../state';
+import {AnagramState, AppState} from '../state';
 
 import * as anagram from 'src/anagram';
 
@@ -60,10 +60,12 @@ class AnagramResults extends React.Component<{
       columnWidth,
     } = store.getColumnWidth;
 
+    const noResultsYet = groupedAnagrams.length === 0 && store.appState === AppState.search;
+
     return (
       <AnagramResultsContainer innerRef={this.setRef}>
         {
-          groupedAnagrams.length === 0 ? (
+          noResultsYet ? (
             <AnagramResult
               share={store.openModal}
               columnWidth={columnWidth}
@@ -79,9 +81,11 @@ class AnagramResults extends React.Component<{
         {grouped.map(({group, name}, i) => {
           return (
             <div key={i}>
-              {name !== null && <SubTitleContainer>
-                <SubTitle>{name}</SubTitle>
-              </SubTitleContainer>}
+              {name !== null && (
+                <SubTitleContainer>
+                  <SubTitle>{name}</SubTitle>
+                </SubTitleContainer>
+              )}
               {group.map((g, i) => {
                 return (
                   <AnagramResultRow key={i}>

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {observer, inject, Provider} from 'mobx-react';
 import {MARGIN_RAW, THEME} from 'src/theme';
 
-import store from 'src/state';
+import store, {AppState} from 'src/state';
 
 import {
   Footer,
@@ -84,7 +84,7 @@ class AnagramInfoArea extends React.Component<{
     const store = this.props.store;
     const solutions = store.expandedSolutions;
 
-    if (solutions.length === 0) {
+    if (!store.showInfoArea) {
       return null;
     }
 
@@ -309,14 +309,13 @@ class Anagramania extends React.Component<{
         </ReactModal>
 
         <AnagramaniaHeader />
-        {appState === 'search' ?
-          <InnerContainer>
-            <AnagramInfoArea />
-          </InnerContainer> :
-          null
-        }
+
+        <InnerContainer>
+          <AnagramInfoArea />
+        </InnerContainer>
+
         {
-          appState === 'anagramViewer' ?
+          appState === AppState.anagramViewer ?
             <InnerContainer>
               <div style={{marginTop: 30}}>
                 <AnagramVisualizer

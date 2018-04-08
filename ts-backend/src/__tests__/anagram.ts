@@ -31,7 +31,6 @@ describe('Anagram / findanagrams', () => {
       return values;
     });
     const values = flatten(subanagramSolutions);
-    console.log(values, 'values');
     expect(values.length).toBe(TEST_WORD_SOLUTIONS.length);
   });
 });
