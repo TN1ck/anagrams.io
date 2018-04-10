@@ -1,6 +1,7 @@
 import styled, {css} from 'styled-components';
 import {AnagramResultState} from 'src/anagram';
 
+import {MutedButton} from './Buttons';
 import {withProps} from 'src/utility';
 import {THEME, MARGIN_RAW} from 'src/theme';
 
@@ -9,6 +10,15 @@ export const ResultContainer = styled.div`
   color: ${THEME.colors.foregroundText};
   white-space: nowrap;
   margin-top: ${THEME.margins.m1};
+
+  &:hover {
+    cursor: pointer;
+    font-weight: bold;
+    & ${MutedButton} {
+      opacity: 1;
+      font-weight: bold;
+    }
+  }
 `;
 
 export const AnagramResultsContainer = styled.div`

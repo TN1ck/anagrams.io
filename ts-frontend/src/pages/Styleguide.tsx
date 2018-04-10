@@ -90,7 +90,7 @@ class Styleguide extends React.Component {
             </StyleguideComponent>
 
             <StyleguideComponent description={'Share Button'}>
-              <Components.ShareButton>{'Share'}</Components.ShareButton>
+              <Components.MutedButton>{'Share'}</Components.MutedButton>
             </StyleguideComponent>
           </StyleguideSection>
 

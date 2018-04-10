@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 import {withProps} from 'src/utility';
 import {THEME} from 'src/theme';
 
@@ -38,13 +38,22 @@ export const SmallButton = withProps<{active: boolean}>()(styled.button)`
   }
 `;
 
-export const ShareButton = styled.a`
+export const MutedButton = withProps<{
+  hovered?: boolean;
+}>()(styled.a)`
   position: absolute;
   top: 0;
   right: 0;
   opacity: 0.2;
   text-decoration: none;
   color: ${THEME.colors.foregroundText};
+
+  ${props => props.hovered && css`
+    opacity: 1.0;
+    cursor: pointer;
+    color: ${THEME.colors.foregroundText};
+  `}
+
   &:hover {
     opacity: 1.0;
     cursor: pointer;

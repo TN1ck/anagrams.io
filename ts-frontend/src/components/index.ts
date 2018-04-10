@@ -3,5 +3,5 @@ export {Card, Header, HeaderContainer, InnerContainer, Footer, TitleContainer} f
 export {default as LoadingBar} from './LoadingBar';
 export {Title, SubTitle, SmallTitle} from './Typographie';
 export {default as SearchBar} from './SearchBar';
-export {SmallButton, ShowAllButton, ShareButton} from './Buttons';
+export {SmallButton, ShowAllButton, MutedButton} from './Buttons';
 export {AnagramResultGroup, AnagramResultRow, AnagramResultsContainer, ResultContainer} from './AnagramResults';
