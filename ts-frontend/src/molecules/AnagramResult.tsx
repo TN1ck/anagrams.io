@@ -107,7 +107,7 @@ class Result extends React.Component<{
             <span style={{
               fontWeight: expanded ? 'bold' : 'normal',
             }}>{query}</span>
-            <div>
+            <div style={{textAlign: 'right'}}>
               <span style={{opacity: 0}}>{(index + 1) + '. '}</span>
               <SmallButton
                 onClick={(e) => {
@@ -115,7 +115,7 @@ class Result extends React.Component<{
                   e.preventDefault();
                   e.stopPropagation();
                 }}
-                active={true}>{'CHANGE & SHARE'}</SmallButton>
+                active={false}>{'CHANGE & SHARE'}</SmallButton>
             </div>
           </div>
         )}
