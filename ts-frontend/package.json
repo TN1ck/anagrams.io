@@ -22,6 +22,8 @@
     "@types/node": "^8.0.47",
     "@types/react": "16.0.24",
     "@types/react-dom": "16.0.3",
+    "@types/react-router": "^4.0.23",
+    "@types/react-router-dom": "^4.2.6",
     "@types/recharts": "^1.0.5",
     "@types/webpack-env": "^1.13.2",
     "assemblyscript": "^0.3.0",
@@ -52,6 +54,8 @@
     "react": "16.1.1",
     "react-dom": "16.1.1",
     "react-modal": "^3.1.11",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
     "recharts": "^1.0.0-beta.1",
     "styled-components": "2.2.3",
     "styled-theming": "^2.2.0"

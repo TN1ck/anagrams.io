@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import {observer, inject, Provider} from 'mobx-react';
+import {observer, inject} from 'mobx-react';
 import {MARGIN_RAW, THEME} from 'src/theme';
 
 import store, {AppState} from 'src/state';
@@ -340,7 +340,7 @@ class Anagramania extends React.Component<{
 
 
 const ProvidedAnagramania = () => {
-  return <Provider store={store}><Anagramania /></Provider>;
+  return <Anagramania />;
 };
 
 export default ProvidedAnagramania;

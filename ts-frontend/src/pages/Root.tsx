@@ -1,10 +1,12 @@
 import * as React from 'react';
-import {ThemeProvider, injectGlobal} from 'styled-components';
-import {THEME} from 'src/theme';
+import {Provider} from 'mobx-react';
+import { BrowserRouter } from 'react-router-dom'
 
-import Anagramania from './Anagramania';
-import Performance from './Performance';
-import Styleguide from './Styleguide';
+import {injectGlobal} from 'styled-components';
+import {THEME} from 'src/theme';
+import store from 'src/state';
+
+import App from './App';
 
 injectGlobal`
   * {
@@ -31,36 +33,11 @@ injectGlobal`
   ${Object.values(THEME.margins).map((margin, i) => {
     const index = i + 1;
     return `
-      .m-${index} {
-        margin: ${margin};
-      }
       .mt-${index} {
         margin-top: ${margin}
       }
       .mb-${index} {
         margin-bottom: ${margin}
-      }
-      .ml-${index} {
-        margin-left: ${margin}
-      }
-      .mr-${index} {
-        margin-right: ${margin}
-      }
-
-      .p-${index} {
-        padding: ${margin};
-      }
-      .pt-${index} {
-        padding-top: ${margin}
-      }
-      .pb-${index} {
-        padding-bottom: ${margin}
-      }
-      .pl-${index} {
-        padding-left: ${margin}
-      }
-      .pr-${index} {
-        padding-right: ${margin}
       }
     `;
   }).join('\n')}
@@ -75,28 +52,14 @@ injectGlobal`
 `;
 
 const Root: React.StatelessComponent<{}> = () => {
-  const location = window.location;
-  const path = location.pathname;
-  const pathArray = path.split('/');
-  const page = pathArray[1];
-
-  let component = null;
-
-  switch (page) {
-    case 'performance':
-      component = <Performance />;
-      break;
-    case 'styleguide':
-      component = <Styleguide />;
-      break;
-    default:
-      component = <Anagramania />;
-  }
-
   return (
-    <ThemeProvider theme={THEME}>
-      {component}
-    </ThemeProvider>
+    <div>
+      <BrowserRouter>
+        <Provider store={store}>
+          <App />
+        </Provider>
+      </BrowserRouter>
+    </div>
   )
 };
 
