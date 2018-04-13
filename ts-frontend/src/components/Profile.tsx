@@ -5,16 +5,18 @@ import {THEME} from 'src/theme';
 export const ProfilesContainer = styled.div`
   display: flex;
   width: 100%;
+  flex-wrap: wrap;
   justify-content: center;
 `;
 
 const ProfileContainer = styled.div`
-  width: 300px;
+  max-width: 300px;
+  width: 100%;
   margin: ${THEME.margins.m2};
 `;
 
 const ProfileImage = styled.img`
-  width: 300px;
+  width: 100%;
 `;
 
 export class Profile extends React.Component<{
