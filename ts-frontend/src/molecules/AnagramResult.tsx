@@ -41,7 +41,7 @@ class ResultVisualisation extends React.Component<{
     const marginLeft = (('' + (index + 1)).length + 2) * LETTER_WIDTH;
 
     return (
-      <div style={{marginLeft: marginLeft}}>
+      <div style={{marginLeft: marginLeft, marginTop: 2, marginBottom: -3}}>
         <AnagramSausages
           word={word}
           anagram={query}
