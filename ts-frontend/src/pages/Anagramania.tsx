@@ -136,9 +136,10 @@ class AnagramaniaHeader extends React.Component<{
   }
   setInputRef(dom) {
     this.input = dom;
-    if (this.input) {
-      this.input.focus();
-    }
+    // is kind of annoying on mobile
+    // if (this.input) {
+    //   this.input.focus();
+    // }
   }
   componentDidMount() {
     this.mounted = true;
