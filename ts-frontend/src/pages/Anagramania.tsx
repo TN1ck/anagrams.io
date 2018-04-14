@@ -17,7 +17,6 @@ import {
   AnagramVisualizer,
   SmallTitle,
   TitleContainer,
-  MutedButton,
 } from 'src/components';
 
 import {withProps} from 'src/utility';
@@ -36,40 +35,46 @@ import {
 
 
 const StyledCheckbox = styled.input`
-  background: red;
   margin-top: ${THEME.margins.m2};
-  margin-bottom: ${THEME.margins.m3};
   position: relative;
   width: 0;
-  margin-right: 30px;
+  height: 0;
+  opacity: 0;
+  margin-right: ${MARGIN_RAW.m3 + MARGIN_RAW.m1}px;
   display: inline-block;
 
   &:hover {
     cursor: pointer;
   }
 
-  &:checked:after {
-    position: absolute;
-    top: -5px;
-    left: 7px;
+`;
+
+const StyledCheckboxSquare = withProps<{
+  checked: boolean;
+}>()(styled.div)`
+  border-radius: ${THEME.borderRadius};
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background: ${THEME.colors.backgroundBright};
+  border: 1px solid ${THEME.colors.background};
+
+  &:after {
     display: block;
-    content: 'L';
+    content: ${props => props.checked ? "'L'" : "''"};
+    position: absolute;
+    top: -4px;
+    left: 5px;
     font-size: 17px;
-    transform: scaleY(-1) rotate(-221deg) ;
+    transform: scaleY(-1) rotate(-221deg);
   }
 
-  &:before {
-    border-radius: ${THEME.borderRadius};
-    position: absolute;
-    top: -5px;
-    left: 0;
-    display: block;
-    content: '';
-    width: 20px;
-    height: 20px;
-    background: ${THEME.colors.backgroundBright};
-    border: 1px solid ${THEME.colors.background};
+  &:hover {
+    cursor: pointer;
   }
+
 `;
 
 const StyledLabel = styled.label`
@@ -80,7 +85,32 @@ const StyledLabel = styled.label`
 
 const StyledCheckboxContainer = styled.div`
   margin: ${THEME.margins.m2};
+  position: relative;
 `;
+
+const Checkbox: React.StatelessComponent<{
+  id: string;
+  checked: boolean;
+  onChange: () => any;
+}> = ({id, onChange, checked, children}) => {
+  return (
+    <StyledCheckboxContainer>
+      <StyledCheckbox
+        type="checkbox"
+        id={id}
+        checked={checked}
+        onChange={onChange}
+      />
+      <StyledCheckboxSquare
+        checked={checked}
+        onClick={onChange}
+      />
+      <StyledLabel htmlFor={id}>
+        {children}
+      </StyledLabel>
+    </StyledCheckboxContainer>
+  );
+};
 
 @inject('store')
 @observer
@@ -140,28 +170,20 @@ class AnagramaniaOptions extends React.Component<{
           </SmallButton>
         </div>
         <OptionsCollapse show={store.showOptions}>
-          <StyledCheckboxContainer>
-            <StyledCheckbox
-              type="checkbox"
-              id="group"
-              checked={store.groupByNumberOfWords}
-              onChange={store.toggleGroupByNumberOfWords}
-            />
-            <StyledLabel htmlFor="group">
-              {'Group by number of words'}
-            </StyledLabel>
-          </StyledCheckboxContainer>
-          <StyledCheckboxContainer>
-            <StyledCheckbox
-              type="checkbox"
-              id="small-word"
-              checked={store.allowOnlyOneSmallWord}
-              onChange={store.toggleAllowOnlyOneSmallWord}
-            />
-            <StyledLabel htmlFor="small-word">
-              {'Allow only one small word'}
-            </StyledLabel>
-          </StyledCheckboxContainer>
+          <Checkbox
+            id='group'
+            checked={store.groupByNumberOfWords}
+            onChange={store.toggleGroupByNumberOfWords}
+          >
+            {'Group by number of words'}
+          </Checkbox>
+          <Checkbox
+            id='one-word'
+            checked={store.allowOnlyOneSmallWord}
+            onChange={store.toggleAllowOnlyOneSmallWord}
+          >
+            {'Allow only one small word'}
+          </Checkbox>
         </OptionsCollapse>
       </OptionsContainer>
     );

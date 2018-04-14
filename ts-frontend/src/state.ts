@@ -192,7 +192,7 @@ export class AnagramState {
 
     const groups = [
       {
-        name: null,
+        name: 'Anagrams',
         group: partitionArray(anagramsWithSolution, numberOfColumns),
       }
     ];
