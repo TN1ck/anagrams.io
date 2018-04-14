@@ -17,7 +17,10 @@ import {
   AnagramVisualizer,
   SmallTitle,
   TitleContainer,
+  MutedButton,
 } from 'src/components';
+
+import {withProps} from 'src/utility';
 
 import {Word, AnagramSausages, calculateWidths} from 'src/components/AnagramVisualizer';
 
@@ -75,6 +78,10 @@ const StyledLabel = styled.label`
   }
 `;
 
+const StyledCheckboxContainer = styled.div`
+  margin: ${THEME.margins.m2};
+`;
+
 @inject('store')
 @observer
 class AnagramInfoArea extends React.Component<{
@@ -90,24 +97,73 @@ class AnagramInfoArea extends React.Component<{
 
     return (
       <div className="mt-3">
+        <AnagramaniaOptions />
         <SubTitle className="mb-2">
           <strong>{`${solutions.length}`}</strong>{` solutions`}
         </SubTitle>
         <LoadingBar progress={store.progress} />
-        <br />
-        <div style={{textAlign: 'center'}}>
-          <StyledCheckbox
-            type="checkbox"
-            id="group"
-            checked={store.groupByNumberOfWords}
-            onChange={store.toggleGroupByNumberOfWords}
-          />
-          <StyledLabel htmlFor="group">
-            {'Group by number of words'}
-          </StyledLabel>
-        </div>
         <AnagramResults />
       </div>
+    );
+  }
+}
+
+const OptionsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  flex-direction: column;
+`;
+
+const OptionsCollapse = withProps<{
+  show: boolean;
+}>()(styled.div)`
+  width: 100%;
+  display: ${props => props.show ? 'flex' : 'none'};
+  justify-content: center;
+`;
+
+@inject('store')
+@observer
+class AnagramaniaOptions extends React.Component<{
+  store?: AnagramState;
+}> {
+  render() {
+    return (
+      <OptionsContainer>
+        <div style={{textAlign: 'center'}}>
+          <SmallButton
+            active={false}
+            onClick={store.toggleShowOptions}
+          >
+            {store.showOptions ? 'Options -' : 'Options +'}
+          </SmallButton>
+        </div>
+        <OptionsCollapse show={store.showOptions}>
+          <StyledCheckboxContainer>
+            <StyledCheckbox
+              type="checkbox"
+              id="group"
+              checked={store.groupByNumberOfWords}
+              onChange={store.toggleGroupByNumberOfWords}
+            />
+            <StyledLabel htmlFor="group">
+              {'Group by number of words'}
+            </StyledLabel>
+          </StyledCheckboxContainer>
+          <StyledCheckboxContainer>
+            <StyledCheckbox
+              type="checkbox"
+              id="small-word"
+              checked={store.allowOnlyOneSmallWord}
+              onChange={store.toggleAllowOnlyOneSmallWord}
+            />
+            <StyledLabel htmlFor="small-word">
+              {'Allow only one small word'}
+            </StyledLabel>
+          </StyledCheckboxContainer>
+        </OptionsCollapse>
+      </OptionsContainer>
     );
   }
 }

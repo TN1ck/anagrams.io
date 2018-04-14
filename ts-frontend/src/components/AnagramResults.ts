@@ -11,6 +11,12 @@ export const ResultContainer = styled.div`
   white-space: nowrap;
   margin-top: ${THEME.margins.m1};
 
+  & ${MutedButton} {
+      position: absolute;
+      top: 0;
+      right: 0;
+  }
+
   &:hover {
     cursor: pointer;
     font-weight: bold;

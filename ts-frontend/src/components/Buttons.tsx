@@ -41,9 +41,6 @@ export const SmallButton = withProps<{active: boolean}>()(styled.button)`
 export const MutedButton = withProps<{
   hovered?: boolean;
 }>()(styled.a)`
-  position: absolute;
-  top: 0;
-  right: 0;
   opacity: 0.2;
   text-decoration: none;
   color: ${THEME.colors.foregroundText};

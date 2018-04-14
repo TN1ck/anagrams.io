@@ -44,7 +44,10 @@ export class AnagramState {
 
   @observable width: number = 1;
 
+  // options
   @observable groupByNumberOfWords: boolean = true;
+  @observable showOptions: boolean = false;
+  @observable allowOnlyOneSmallWord: boolean = false;
 
   // caches
   groupedSpecialCache: {[key: string]: anagram.GroupedWordsDict} = {};
@@ -57,7 +60,11 @@ export class AnagramState {
     this.closeModal = this.closeModal.bind(this);
     this.saveAnagram = this.saveAnagram.bind(this);
     this.requestAnagram = this.requestAnagram.bind(this);
+    // options
     this.toggleGroupByNumberOfWords = this.toggleGroupByNumberOfWords.bind(this);
+    this.toggleShowOptions = this.toggleShowOptions.bind(this);
+    this.toggleAllowOnlyOneSmallWord = this.toggleAllowOnlyOneSmallWord.bind(this);
+
     this.init();
   }
 
@@ -165,11 +172,6 @@ export class AnagramState {
 
   }
 
-  @action
-  toggleGroupByNumberOfWords() {
-    this.groupByNumberOfWords = !this.groupByNumberOfWords;
-  }
-
   get groupedNormal() {
 
     const groupedAnagrams = this.groupedAnagrams;
@@ -194,11 +196,40 @@ export class AnagramState {
     name: string,
     group: anagram.GroupedAnagramSolutions[][],
   }> {
-    let groups = [];
+    let groups: {
+      name: string;
+      group: anagram.GroupedWords[][];
+    }[] = [];
     if (this.groupByNumberOfWords) {
       groups = this.groupedSpecial;
     } else {
       groups = this.groupedNormal;
+    }
+
+    if (this.allowOnlyOneSmallWord) {
+      groups = groups.map(({group, name}) => {
+        groups[0].group;
+        const newGroup = group.map(g => {
+          return g.map(d => {
+            d.list = d.list.filter(words => {
+              // a small word less than 4
+              const smallWordsLength = words.filter(w => w.set.length < 4).length;
+              // only one small word
+              return smallWordsLength <= 1;
+            });
+            return d;
+          }).filter(d => {
+            return d.list.length > 0;
+          });
+        })
+        const filteredNewGroup = newGroup.filter(g => {
+          return g.length > 0;
+        });
+        return {
+          group: filteredNewGroup,
+          name,
+        };
+      });
     }
 
     if (this.isDone) {
@@ -386,6 +417,23 @@ export class AnagramState {
     startNextWorker();
 
   }
+
+    // options stuff
+    @action
+    toggleGroupByNumberOfWords() {
+      this.groupByNumberOfWords = !this.groupByNumberOfWords;
+    }
+
+    @action
+    toggleShowOptions() {
+      this.showOptions = !this.showOptions;
+    }
+
+    @action
+    toggleAllowOnlyOneSmallWord() {
+      this.allowOnlyOneSmallWord = !this.allowOnlyOneSmallWord;
+    }
+
 
 }
 
