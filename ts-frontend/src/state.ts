@@ -30,7 +30,7 @@ export class AnagramState {
 
   @observable counter: number = 0;
   @observable numberOfPossibilitiesChecked: number = 0;
-  @observable.shallow expandedSolutions: anagram.SimpleWord[][] = [];
+  @observable.shallow _expandedSolutions: anagram.SimpleWord[][] = [];
   @observable.shallow solvedSubanagrams: number[] = [];
   @observable.shallow unsolvedSubanagrams: number[] = [];
   @observable.shallow currentSubanagrams: number[] = [];
@@ -66,6 +66,15 @@ export class AnagramState {
     this.toggleAllowOnlyOneSmallWord = this.toggleAllowOnlyOneSmallWord.bind(this);
 
     this.init();
+  }
+
+  get expandedSolutions() {
+    if (this.allowOnlyOneSmallWord) {
+      return this._expandedSolutions.filter(w => {
+        return w.filter(word => word.set.length < 4).length <= 1;
+      });
+    }
+    return this._expandedSolutions;
   }
 
   @action
@@ -206,31 +215,31 @@ export class AnagramState {
       groups = this.groupedNormal;
     }
 
-    if (this.allowOnlyOneSmallWord) {
-      groups = groups.map(({group, name}) => {
-        groups[0].group;
-        const newGroup = group.map(g => {
-          return g.map(d => {
-            d.list = d.list.filter(words => {
-              // a small word less than 4
-              const smallWordsLength = words.filter(w => w.set.length < 4).length;
-              // only one small word
-              return smallWordsLength <= 1;
-            });
-            return d;
-          }).filter(d => {
-            return d.list.length > 0;
-          });
-        })
-        const filteredNewGroup = newGroup.filter(g => {
-          return g.length > 0;
-        });
-        return {
-          group: filteredNewGroup,
-          name,
-        };
-      });
-    }
+    // if (this.allowOnlyOneSmallWord) {
+    //   groups = groups.map(({group, name}) => {
+    //     groups[0].group;
+    //     const newGroup = group.map(g => {
+    //       return g.map(d => {
+    //         d.list = d.list.filter(words => {
+    //           // a small word less than 4
+    //           const smallWordsLength = words.filter(w => w.set.length < 4).length;
+    //           // only one small word
+    //           return smallWordsLength <= 1;
+    //         });
+    //         return d;
+    //       }).filter(d => {
+    //         return d.list.length > 0;
+    //       });
+    //     })
+    //     const filteredNewGroup = newGroup.filter(g => {
+    //       return g.length > 0;
+    //     });
+    //     return {
+    //       group: filteredNewGroup,
+    //       name,
+    //     };
+    //   });
+    // }
 
     if (this.isDone) {
       const groupedAnagrams = this.groupedAnagrams;
@@ -315,7 +324,7 @@ export class AnagramState {
 
     const clear = () => {
       this.appState = AppState.search;
-      this.expandedSolutions = [];
+      this._expandedSolutions = [];
       this.finished = false;
       this.solvedSubanagrams = [];
       this.counter = 0;
@@ -362,7 +371,7 @@ export class AnagramState {
       runInAction(() => {
         this.numberOfPossibilitiesChecked += state.numberOfPossibilitiesChecked;
         const newExpandedSolutions = anagram.expandSolutions(state.solutions, subanagrams);
-        this.expandedSolutions.push(...newExpandedSolutions);
+        this._expandedSolutions.push(...newExpandedSolutions);
       });
 
       // (window as any).applicationState = this;
@@ -432,6 +441,9 @@ export class AnagramState {
     @action
     toggleAllowOnlyOneSmallWord() {
       this.allowOnlyOneSmallWord = !this.allowOnlyOneSmallWord;
+      // we need to reset the cache
+      this.groupedAnagramsCache = {};
+      this.groupedSpecialCache = {};
     }
 
 
