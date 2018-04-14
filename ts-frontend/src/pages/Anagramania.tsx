@@ -151,6 +151,7 @@ const OptionsCollapse = withProps<{
   width: 100%;
   display: ${props => props.show ? 'flex' : 'none'};
   justify-content: center;
+  flex-wrap: wrap;
 `;
 
 @inject('store')

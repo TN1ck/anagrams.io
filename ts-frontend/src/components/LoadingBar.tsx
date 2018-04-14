@@ -15,6 +15,7 @@ const LoadingBar = withProps<{
   background: ${props => {
     return `linear-gradient(to right, ${THEME.colors.primary} 0%, ${THEME.colors.primary} ${props.progress}%, ${THEME.colors.backgroundBright} ${props.progress}%, ${THEME.colors.backgroundBright} 100%);`;
   }}
+  margin-bottom: ${THEME.margins.m2};
   width: 100%;
 `;
 
