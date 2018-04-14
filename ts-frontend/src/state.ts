@@ -215,32 +215,6 @@ export class AnagramState {
       groups = this.groupedNormal;
     }
 
-    // if (this.allowOnlyOneSmallWord) {
-    //   groups = groups.map(({group, name}) => {
-    //     groups[0].group;
-    //     const newGroup = group.map(g => {
-    //       return g.map(d => {
-    //         d.list = d.list.filter(words => {
-    //           // a small word less than 4
-    //           const smallWordsLength = words.filter(w => w.set.length < 4).length;
-    //           // only one small word
-    //           return smallWordsLength <= 1;
-    //         });
-    //         return d;
-    //       }).filter(d => {
-    //         return d.list.length > 0;
-    //       });
-    //     })
-    //     const filteredNewGroup = newGroup.filter(g => {
-    //       return g.length > 0;
-    //     });
-    //     return {
-    //       group: filteredNewGroup,
-    //       name,
-    //     };
-    //   });
-    // }
-
     if (this.isDone) {
       const groupedAnagrams = this.groupedAnagrams;
       const anagramsWithoutSolution = groupedAnagrams.filter(ag => ag.counter === 0);
