@@ -435,22 +435,24 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     const pageX = e.pageX;
     const pageY = e.pageY;
 
+    const wordPosition = this.state.wordPositions[wordIndex];
+
     this.setState({
       wordDragState: {
         ...this.state.wordDragState,
         activeIndex: wordIndex,
         mouseDown: true,
-        initialX: pageX,
-        initialY: pageY,
+        initialX: pageX - wordPosition.offsetX,
+        initialY: pageY - wordPosition.offsetY,
       }
     });
   }
-  onMouseUp(wordIndex) {
+  onMouseUp() {
     this.setState({
       wordDragState: {
         ...this.state.wordDragState,
-        activeIndex: wordIndex,
         mouseDown: false,
+        isDragging: false,
       }
     });
   }
@@ -459,6 +461,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     const pageX = e.pageX;
     const pageY = e.pageY;
     if (dragState.mouseDown) {
+
       if (!dragState.isDragging) {
         dragState.isDragging = true;
       }
