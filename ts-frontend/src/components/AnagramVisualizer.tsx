@@ -512,7 +512,26 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
 
     const LINK = `${FRONTEND_URL}/share?anagram=${encodeURIComponent(currentAnagram)}&word=${encodeURIComponent(currentWord)}`;
 
-    const anagramSplitted = anagram.split(' ');
+    const anagramIndexed: Array<[string, number]> = [...anagram]
+      .map((w, i) => {
+        return [w, i];
+      }) as any;
+
+    const anagramSplitted: Array<Array<[string, number]>> = [];
+    let currentIndexedWord: Array<[string, number]> = [];
+    for (const [w, i] of anagramIndexed) {
+      if (w === ' ' && currentIndexedWord.length > 0) {
+        anagramSplitted.push(currentIndexedWord);
+        currentIndexedWord = [];
+        continue;
+      }
+      currentIndexedWord.push([w, i]);
+    }
+    if (currentIndexedWord.length > 0) {
+      anagramSplitted.push(currentIndexedWord);
+    }
+
+    // const anagramSplitted = anagram.split(' ');
 
     const wordComponents = [];
     let index = 0;
@@ -527,6 +546,12 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       const wordPosition = this.state.wordPositions[wordIndex];
       const top = wordPosition ? wordPosition.offsetY : 0;
       const left = wordPosition ? wordPosition.offsetX : 0;
+
+      for (const [, i] of word) {
+        // reverse mapping
+        const mappingIndex =  mapping.indexOf(i);
+        letterOffsets[mappingIndex] = {x: left, y: top};
+      }
 
       const onMouseDown = ((wordIndex) => {
         return (e) => this.onMouseDown(e, wordIndex)
@@ -555,13 +580,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
           }}
         >
           {
-            [...word].map((w, j) => {
-
-              const mappingIndex =  mapping[index];
-              letterOffsets[mappingIndex] = {
-                x: left,
-                y: top,
-              };
+            [...word].map(([w], j) => {
 
               const letter = (
                 <WordLetter
