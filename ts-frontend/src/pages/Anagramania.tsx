@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {observer, inject} from 'mobx-react';
 import {MARGIN_RAW, THEME} from 'src/theme';
 
-import store, {AppState} from 'src/state';
+import store from 'src/state';
 
 import {
   Footer,
@@ -14,9 +14,9 @@ import {
   Title,
   HeaderContainer,
   LoadingBar,
-  AnagramVisualizer,
   SmallTitle,
   TitleContainer,
+  AnagramVisualizer,
 } from 'src/components';
 
 import {withProps} from 'src/utility';
@@ -261,32 +261,33 @@ class AnagramaniaHeader extends React.Component<{
     const anagram = this.anagrams[this.state.anagramIndex % this.anagrams.length];
     const word = this.word;
 
-    const maxWidth = 500;
+    const fontSize = 30;
 
-    const anagramVis = calculateWidths(word, anagram, maxWidth);
-    const wordWidth = calculateWidths(word, word, maxWidth).wordWidth;
+    const paddingTop = 0;
+    const anagramVis = calculateWidths(word, anagram, fontSize);
+    const wordWidth = word.length * anagramVis.letterWidth;
 
     return (
       <Header>
         <InnerContainer>
           <TitleContainer>
-            <div style={{position: 'relative', top: -110, height: 150}}>
+            <div style={{position: 'relative', top: -220, height: 150}}>
               <AnagramSausages
                 word={word}
                 anagram={anagram}
-                height={anagramVis.height}
+                height={word.length * anagramVis.letterHeight}
                 wordWidth={wordWidth}
-                characterWidth={anagramVis.characterWidth}
-                characterHeight={anagramVis.characterHeight}
-                paddingTop={anagramVis.paddingTop}
-                strokeWidth={MARGIN_RAW.m1 * 2}
+                characterWidth={anagramVis.letterWidth}
+                characterHeight={anagramVis.letterHeight}
+                paddingTop={paddingTop}
+                strokeWidth={anagramVis.strokeWidth}
               />
             </div>
             <Title href="/">
               <Word
                 wordWidth={wordWidth}
-                fontSize={anagramVis.fontSize}
-                characterWidth={anagramVis.characterWidth}
+                fontSize={fontSize}
+                characterWidth={anagramVis.letterWidth}
                 anagram={anagram}
                 word={word}
               />
@@ -359,7 +360,6 @@ class Anagramania extends React.Component<{
   render() {
 
     const store = this.props.store;
-    const appState = store.appState;
 
     return (
       <div>
@@ -399,20 +399,6 @@ class Anagramania extends React.Component<{
         <InnerContainer>
           <AnagramInfoArea />
         </InnerContainer>
-
-        {
-          appState === AppState.anagramViewer ?
-            <InnerContainer>
-              <div style={{marginTop: 30}}>
-                <AnagramVisualizer
-                  anagram={store.modalAnagram}
-                  word={store.modalWord}
-                  save={store.saveAnagram}
-                />
-              </div>
-            </InnerContainer>
-          : null
-        }
 
         <Footer>
           <span>{'Made by '}</span>

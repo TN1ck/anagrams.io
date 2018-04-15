@@ -8,6 +8,7 @@ import Anagramania from './Anagramania';
 import Performance from './Performance';
 import Styleguide from './Styleguide';
 import About from './About';
+import Share from './Share';
 
 class App extends React.Component {
   render() {
@@ -25,7 +26,6 @@ class App extends React.Component {
             exact
             activeStyle={{
               fontWeight: 'bold',
-              color: 'red',
             }}
           >
             <SmallButton
@@ -39,7 +39,6 @@ class App extends React.Component {
             exact
             activeStyle={{
               fontWeight: 'bold',
-              color: 'red',
             }}
           >
             <SmallButton
@@ -47,6 +46,19 @@ class App extends React.Component {
               useFontWeightHover
               style={{fontWeight: 'inherit'}}
             >{'About'}</SmallButton>
+          </NavLink>
+          <NavLink
+            to='/share'
+            exact
+            activeStyle={{
+              fontWeight: 'bold',
+            }}
+          >
+            <SmallButton
+              active={false}
+              useFontWeightHover
+              style={{fontWeight: 'inherit'}}
+            >{'Share'}</SmallButton>
           </NavLink>
         </div>
         <div>
@@ -69,6 +81,11 @@ class App extends React.Component {
             path="/styleguide"
             exact
             component={Styleguide}
+          />
+          <Route
+            path="/share"
+            exact
+            component={Share}
           />
         </div>
         <Footer>

@@ -4,7 +4,7 @@ import { FRONTEND_URL } from 'src/constants';
 import {drawPath, EasingFunctions} from 'src/utility';
 import {getAnagramMapping, stringToWord, sanitizeQuery} from 'src/anagram';
 import {Card} from 'src/components/Layout';
-import {THEME} from 'src/theme';
+import {THEME, MARGIN_RAW} from 'src/theme';
 import {interpolateArray} from 'd3-interpolate';
 
 import {
@@ -109,35 +109,29 @@ export class Word extends React.Component<{
   }
 }
 
-const PADDING_TOP = 20;
-const PADDING_BOTTOM = 20;
-
 export function calculateWidths(
-  word: string, anagram: string, maxWidth: number, paddingTop = PADDING_TOP, paddingBottom = PADDING_BOTTOM,
+  word: string, anagram: string, fontSize: number
 ) {
-  const CHARACTER_WIDTH_RATIO = 1.6;
-  const CHARACTER_HEIGHT_RATIO = 1.8;
 
-  const wordLength = Math.max(word.length, anagram.length);
-  const characterWidth = Math.min(maxWidth / (wordLength * 1.5), 22);
-  const wordWidth = wordLength * characterWidth;
+  const WIDTH_PER_PIXEL = 0.5992857143;
+  const HEIGHT_PER_PIXEL = 1.13;
 
-  const strokeWidth = characterWidth / 2;
-  const characterHeight = strokeWidth * CHARACTER_HEIGHT_RATIO;
-  const height = paddingTop + word.length * characterHeight + paddingBottom;
+  const letterWidth = WIDTH_PER_PIXEL * fontSize; // at 14px
+  const letterHeight = HEIGHT_PER_PIXEL * fontSize;
 
-  const fontSize = characterWidth * CHARACTER_WIDTH_RATIO;
+  const strokeWidth = letterWidth / 2;
 
+  const maxLength = Math.max(word.length, anagram.length);
+  const width = maxLength * letterWidth;
+
+  const height = maxLength * letterHeight;
 
   return {
     height,
-    fontSize,
-    wordWidth,
+    width,
     strokeWidth,
-    characterHeight,
-    characterWidth,
-    paddingTop,
-    paddingBottom,
+    letterWidth,
+    letterHeight,
   };
 }
 
@@ -253,15 +247,15 @@ export class AnagramSausages extends React.Component<AnagramSausagesProps, {
       const opacity = opacityScale(index);
       const yOffset = paddingTop + characterHeight * index;
       return {
-          opacity: opacity,
-          strokeWidth: strokeWidth,
-          pathData: [
-            x1,
-            y1,
-            x2,
-            y2,
-            yOffset,
-          ],
+        opacity,
+        strokeWidth,
+        pathData: [
+          x1,
+          y1,
+          x2,
+          y2,
+          yOffset,
+        ],
       };
     });
     return values;
@@ -354,70 +348,51 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       anagram = currentAnagram;
     }
 
-    const maxWidth = Math.min(700, window.innerWidth - (60 + 30) );
+    const fontSize = Math.min(22, window.innerWidth / 20);
+
     const {
-      wordWidth,
-      fontSize,
+      width,
       height,
-      characterWidth,
-      characterHeight,
       strokeWidth,
-    } = calculateWidths(word, anagram, maxWidth);
-    const minWidth = wordWidth + 30 * 2;
+      letterHeight,
+      letterWidth,
+    } = calculateWidths(word, anagram, fontSize);
 
     const LINK = `${FRONTEND_URL}/share?anagram=${encodeURIComponent(currentAnagram)}&word=${encodeURIComponent(currentWord)}`;
 
     return (
-      <Card style={{minWidth, paddingBottom: 60, ...(editable ? {border: '2px dashed grey'} : {})}}>
-          {/* {
-            editable ?
-            <ExplainText
-              dangerouslySetInnerHTML={{
-                __html: `
-                  You are in edit mode.
-                  <br/>
-                  Here you can change both anagrams and save it.
-                  <br/>
-                  Change the <strong>order</strong>, <strong>capitalisation</strong> or add some <strong>spaces</strong>.
-                  <br/>
-                  You're current edit is
-                  ${isCorrectAnagram ? "<strong style='color: green'>valid</strong>" : "<strong style='color: red'>invalid</strong>"}.
-                  `
-              }}
-            />
-            : <ExplainText
-              dangerouslySetInnerHTML={{
-                __html: `Did you know that <br/><strong>${word}</strong><br/>is an anagram of <br/><strong>${anagram}</strong>?`
-              }}
-            />
-          } */}
-          <WordContainer>
-            <div>
-              <div className="mb-2">
-                <Word
-                  fontSize={fontSize}
-                  characterWidth={characterWidth}
-                  word={word}
-                  anagram={word}
-                />
-              </div>
-              <div>
-                <AnagramSausages
-                  anagram={anagram}
-                  word={word}
-                  height={height}
-                  wordWidth={wordWidth}
-                  characterWidth={characterWidth}
-                  characterHeight={characterHeight}
-                  paddingTop={PADDING_TOP}
-                  strokeWidth={strokeWidth}
-                />
-              </div>
-              <Word fontSize={fontSize} characterWidth={characterWidth} word={word} anagram={anagram}>
-                {anagram}
-              </Word>
+      <Card style={{paddingBottom: 60, ...(editable ? {border: '2px dashed grey'} : {})}}>
+        <WordContainer>
+          <div>
+            <div style={{marginBottom: MARGIN_RAW.m2}}>
+              <Word
+                fontSize={fontSize}
+                characterWidth={letterWidth}
+                word={word}
+                anagram={word}
+              />
             </div>
-          </WordContainer>
+            <div>
+              <AnagramSausages
+                anagram={anagram}
+                word={word}
+                height={height}
+                wordWidth={width}
+                characterWidth={letterWidth}
+                characterHeight={letterHeight}
+                paddingTop={20}
+                strokeWidth={strokeWidth}
+              />
+            </div>
+            <Word
+              fontSize={fontSize}
+              characterWidth={letterWidth}
+              word={word}
+              anagram={anagram}>
+              {anagram}
+            </Word>
+          </div>
+        </WordContainer>
         <ShareSection>
           {`Share it using this Link: `}
           <CopyInput readOnly id="link-input" type="text" value={LINK} />

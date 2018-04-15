@@ -10,7 +10,7 @@ import {
   SmallButton,
 } from 'src/components';
 
-import {Word, AnagramSausages, calculateWidths} from 'src/components/AnagramVisualizer';
+import {AnagramSausages, calculateWidths} from 'src/components/AnagramVisualizer';
 
 const MAX_ITEMS_TO_SHOW_AT_ONCE = 3;
 
@@ -26,30 +26,29 @@ class ResultVisualisation extends React.Component<{
       index,
     } = this.props;
 
-    const WIDTH_PER_PIXEL = 0.5992857143;
-    const HEIGHT_PER_PIXEL = 1.2857142857;
-    const LETTER_WIDTH = WIDTH_PER_PIXEL * 14; // at 14px
-    const LETTER_HEIGHT = HEIGHT_PER_PIXEL * 14;
+    const {
+      height,
+      width,
+      letterHeight,
+      letterWidth,
+      strokeWidth,
+    } = calculateWidths(word, query, 14);
 
-    const strokeWidth = LETTER_WIDTH / 2;
+    const paddingTop = 10;
+    const paddingBottom = 10;
 
-    const maxLength = Math.max(word.length, query.length);
-    const maxWidth = maxLength * LETTER_WIDTH;
-
-    const height = 10 + maxLength * LETTER_WIDTH * 1.8 + 10;
-
-    const marginLeft = (('' + (index + 1)).length + 2) * LETTER_WIDTH;
+    const marginLeft = (('' + (index + 1)).length + 2) * letterWidth;
 
     return (
       <div style={{marginLeft: marginLeft, marginTop: 2, marginBottom: -3}}>
         <AnagramSausages
           word={word}
           anagram={query}
-          height={height}
-          wordWidth={maxWidth}
-          characterWidth={LETTER_WIDTH}
-          characterHeight={14}
-          paddingTop={10}
+          height={height + paddingBottom}
+          wordWidth={width}
+          characterWidth={letterWidth}
+          characterHeight={letterHeight}
+          paddingTop={paddingTop}
           strokeWidth={strokeWidth}
         />
       </div>
