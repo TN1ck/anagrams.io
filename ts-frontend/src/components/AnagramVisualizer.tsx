@@ -10,6 +10,7 @@ import {interpolateArray} from 'd3-interpolate';
 import {
   SmallButton,
 } from './Buttons';
+import { getHeapStatistics } from 'v8';
 
 const Copyright = styled.div`
   font-size: ${THEME.font.sizeSmall};
@@ -68,6 +69,7 @@ export const StyledWord = styled.strong`
   position: relative;
   font-family: ${THEME.font.family};
   letter-spacing: 0.5px;
+  user-select: none;
 `;
 
 class WordLetter extends React.Component<{
@@ -120,6 +122,7 @@ export class Word extends React.Component<{
           const c2 = anagram[index];
           return (
             <WordLetter
+              key={index}
               letter={c2}
               position={position}
               characterWidth={this.props.characterWidth}
@@ -174,6 +177,8 @@ interface AnagramSausagesProps {
   characterHeight: number,
   paddingTop: number,
   strokeWidth: number,
+  animationDuration?: number;
+  letterOffsets?: Array<{x: number, y: number}>;
 }
 
 interface AnagramSausage {
@@ -221,7 +226,7 @@ export class AnagramSausages extends React.Component<AnagramSausagesProps, {
       const pathInterpolator = interpolateArray(s.pathData, newSausage.pathData);
       return pathInterpolator;
     });
-    const animationDuration = 500;
+    const animationDuration = this.props.animationDuration || 500;
     const startTime = +(new Date());
     const updater = () => {
       const now = +(new Date());
@@ -298,7 +303,15 @@ export class AnagramSausages extends React.Component<AnagramSausagesProps, {
           }
           const {strokeWidth, opacity, pathData} = d;
           const [x1, y1, x2, y2, yOffset] = pathData;
-          const path = drawPath(x1, y1, x2, y2, yOffset, strokeWidth);
+          let letterOffset = {x: 0, y: 0};
+          if (this.props.letterOffsets) {
+            const letterOffsetFromProp = this.props.letterOffsets[index];
+            if (letterOffsetFromProp) {
+              letterOffset.x = letterOffsetFromProp.x;
+              letterOffset.y = letterOffsetFromProp.y;
+            }
+          }
+          const path = drawPath(x1, y1, x2 + letterOffset.x, y2 + letterOffset.y, yOffset, strokeWidth);
           return (
             <path
               key={index}
@@ -320,6 +333,21 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
   mode: string;
   currentWord: string;
   currentAnagram: string;
+  wordDragState: {
+    activeIndex: number;
+    mouseDown: boolean;
+    isDragging: boolean;
+    initialX: number;
+    initialY: number;
+  };
+  wordPositions: {
+    offsetX: number;
+    offsetY: number;
+    startX: number;
+    startY: number;
+    width: number;
+    height: number;
+  }[]
 }> {
   wordSpan: HTMLSpanElement;
   anagramSpan: HTMLSpanElement;
@@ -330,9 +358,28 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       mode: 'view',
       currentWord: this.props.word,
       currentAnagram: this.props.anagram,
+      wordDragState: {
+        mouseDown: false,
+        isDragging: false,
+        activeIndex: 0,
+        initialX: 0,
+        initialY: 0,
+      },
+      wordPositions: [],
     };
     this.edit = this.edit.bind(this);
     this.save = this.save.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.setWordPosition = this.setWordPosition.bind(this);
+  }
+  componentDidMount() {
+    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseup', this.onMouseUp);
+  }
+  componentWillUnmount() {
+    document.removeEventListener('mousemove', this.onMouseMove);
   }
   edit() {
     this.setState({
@@ -352,6 +399,86 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       document.execCommand('copy');
     } catch(err) {
       console.log('Copy did not work');
+    }
+  }
+  getWordPosition(index: number) {
+    return this.state.wordPositions[index] || {
+      offsetX: 0,
+      offsetY: 0,
+      width: 0,
+      height: 0,
+      startX: 0,
+      startY: 0,
+    }
+  }
+  setWordPosition(ref: HTMLElement, index: number) {
+    if (!ref || this.state.wordPositions[index]) {
+      return;
+    }
+    console.log(ref);
+    const targetPosition = ref.getBoundingClientRect() as DOMRect;
+    const position = {
+      width: targetPosition.width,
+      height: targetPosition.height,
+      startX: targetPosition.x,
+      startY: targetPosition.y,
+      offsetX: 0,
+      offsetY: 0,
+    };
+    this.state.wordPositions[index] = position;
+    this.setState({
+      wordPositions: this.state.wordPositions,
+    });
+  }
+  onMouseDown(e: React.MouseEvent<HTMLElement>, wordIndex: number) {
+    console.log('on mouse down', wordIndex);
+    const pageX = e.pageX;
+    const pageY = e.pageY;
+
+    this.setState({
+      wordDragState: {
+        ...this.state.wordDragState,
+        activeIndex: wordIndex,
+        mouseDown: true,
+        initialX: pageX,
+        initialY: pageY,
+      }
+    });
+  }
+  onMouseUp(wordIndex) {
+    this.setState({
+      wordDragState: {
+        ...this.state.wordDragState,
+        activeIndex: wordIndex,
+        mouseDown: false,
+      }
+    });
+  }
+  onMouseMove(e) {
+    const dragState = this.state.wordDragState;
+    const pageX = e.pageX;
+    const pageY = e.pageY;
+    if (dragState.mouseDown) {
+      if (!dragState.isDragging) {
+        dragState.isDragging = true;
+      }
+
+      const wordPosition = this.state.wordPositions[dragState.activeIndex];
+
+      // console.log(e);
+      const offsetX = pageX - dragState.initialX;
+      const offsetY = pageY - dragState.initialY;
+
+      wordPosition.offsetX = offsetX,
+      wordPosition.offsetY = offsetY,
+
+      this.setState({
+        wordDragState: {
+          ...dragState,
+          isDragging: true,
+        },
+        wordPositions: this.state.wordPositions,
+      })
     }
   }
   render() {
@@ -381,15 +508,40 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       letterWidth,
     } = calculateWidths(word, anagram, fontSize);
 
+    const mapping = getAnagramMapping(word, anagram);
+
     const LINK = `${FRONTEND_URL}/share?anagram=${encodeURIComponent(currentAnagram)}&word=${encodeURIComponent(currentWord)}`;
 
     const anagramSplitted = anagram.split(' ');
+
     const wordComponents = [];
     let index = 0;
     let wordIndex = 0;
+    const dragState = this.state.wordDragState;
+
+
+    const letterOffsets = [];
+
     for (const word of anagramSplitted) {
+
+      const wordPosition = this.state.wordPositions[wordIndex];
+      const top = wordPosition ? wordPosition.offsetY : 0;
+      const left = wordPosition ? wordPosition.offsetX : 0;
+
+      const onMouseDown = ((wordIndex) => {
+        return (e) => this.onMouseDown(e, wordIndex)
+      })(wordIndex);
+
+      const setRef = ((wordIndex) => {
+        return (ref) => this.setWordPosition(ref, wordIndex);
+      })(wordIndex);
+
       wordComponents.push(
         <StyledWord
+          innerRef={setRef}
+          onMouseDown={onMouseDown}
+          onMouseEnter={() => console.log('enter')}
+          onMouseLeave={() => console.log('leave')}
           key={wordIndex}
           style={{
             fontSize: fontSize,
@@ -397,20 +549,27 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
             background: 'red',
             width: word.length * letterWidth,
             position: 'absolute',
-            top: 0,
-            left: 0,
+            top,
+            left,
             transform: `translate(${index * letterWidth}px, 0)`
           }}
         >
           {
             [...word].map((w, j) => {
+
+              const mappingIndex =  mapping[index];
+              letterOffsets[mappingIndex] = {
+                x: left,
+                y: top,
+              };
+
               const letter = (
                 <WordLetter
-                key={j}
-                characterWidth={letterWidth}
-                position={j * letterWidth}
-                letter={w}
-                left={0}
+                  key={j}
+                  characterWidth={letterWidth}
+                  position={j * letterWidth}
+                  letter={w}
+                  left={0}
                 />
               );
               index += 1;
@@ -444,19 +603,20 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
                 characterWidth={letterWidth}
                 characterHeight={letterHeight}
                 paddingTop={20}
+                letterOffsets={letterOffsets}
                 strokeWidth={strokeWidth}
               />
             </div>
-            <div style={{position: 'relative'}}>
+            <div style={{position: 'relative', height: 20}}>
               {wordComponents}
             </div>
-            <Word
+            {/* <Word
               fontSize={fontSize}
               characterWidth={letterWidth}
               word={word}
               anagram={anagram}>
               {anagram}
-            </Word>
+            </Word> */}
           </div>
         </WordContainer>
         <ShareSection>
