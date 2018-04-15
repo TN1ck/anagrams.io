@@ -126,9 +126,9 @@ class AnagramInfoArea extends React.Component<{
     }
 
     return (
-      <div className="mt-3">
+      <div style={{marginTop: THEME.margins.m3}}>
         <AnagramaniaOptions />
-        <SubTitle className="mb-2">
+        <SubTitle style={{marginBottom: THEME.margins.m2}}>
           <strong>{`${solutions.length}`}</strong>{` solutions`}
         </SubTitle>
         <LoadingBar progress={store.progress} />
@@ -291,7 +291,10 @@ class AnagramaniaHeader extends React.Component<{
                 word={word}
               />
             </Title>
-            <SmallTitle className="mt-1 mb-3">
+            <SmallTitle style={{
+              marginTop: THEME.margins.m2,
+              marginBottom: THEME.margins.m3,
+            }}>
               {'The best anagram finder in the world.'}
             </SmallTitle>
           </TitleContainer>
@@ -308,7 +311,10 @@ class AnagramaniaHeader extends React.Component<{
             {dictionaries.map(d => {
               return (
                 <SmallButton
-                  className="mr-1 mt-2"
+                  style={{
+                    marginRight: THEME.margins.m1,
+                    marginTop: THEME.margins.m2,
+                  }}
                   key={d.id}
                   onClick={() => setDictionary(d.id)}
                   active={selectedDictionaries === d.id}

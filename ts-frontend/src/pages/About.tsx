@@ -1,18 +1,23 @@
 import * as React from 'react';
 import * as Components from '../components';
+import {MARGIN_RAW} from 'src/theme';
 import {ProfilesContainer, Profile} from '../components/Profile';
 
 class About extends React.Component {
   render() {
     return (
       <div>
-        <div style={{paddingTop: 20}}>
-        </div>
+        <Components.Header style={{paddingBottom: MARGIN_RAW.m2}}>
+          <Components.InnerContainer>
+            <Components.Title>
+              {'About'}
+            </Components.Title>
+          </Components.InnerContainer>
+        </Components.Header>
         <Components.InnerContainer>
           <div
             dangerouslySetInnerHTML={{
               __html: `
-                <h1>About</h1>
                 <p>
                   We created <a href="https://anagrams.io">anagrams.io</a> with the intention to provide the best anagram finder in the world to the world.
                   We hope you'll have as much fun as we did exploring the anagrams.

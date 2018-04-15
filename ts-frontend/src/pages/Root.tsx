@@ -28,20 +28,6 @@ injectGlobal`
     position: relative;
   }
 
-  /* Margin classes */
-
-  ${Object.values(THEME.margins).map((margin, i) => {
-    const index = i + 1;
-    return `
-      .mt-${index} {
-        margin-top: ${margin}
-      }
-      .mb-${index} {
-        margin-bottom: ${margin}
-      }
-    `;
-  }).join('\n')}
-
   /*
   When the modal is opened a ReactModal__Body--open class is added to the body tag.
   You can use this to remove scrolling on the body while the modal is open.

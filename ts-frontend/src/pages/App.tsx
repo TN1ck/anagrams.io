@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Route, NavLink} from 'react-router-dom';
 
-import {MARGIN_RAW} from '../theme';
+import {MARGIN_RAW, THEME} from '../theme';
 import {Footer} from '../components';
 import {SmallButton} from '../components';
 import Anagramania from './Anagramania';
@@ -17,6 +17,7 @@ class App extends React.Component {
           position: 'absolute',
           top: MARGIN_RAW.m2,
           right: MARGIN_RAW.m2,
+          background: THEME.colors.backgroundBright,
           zIndex: 99,
         }}>
           <NavLink
@@ -29,6 +30,7 @@ class App extends React.Component {
           >
             <SmallButton
               active={false}
+              useFontWeightHover
               style={{fontWeight: 'inherit'}}
             >{'Search'}</SmallButton>
           </NavLink>
@@ -42,6 +44,7 @@ class App extends React.Component {
           >
             <SmallButton
               active={false}
+              useFontWeightHover
               style={{fontWeight: 'inherit'}}
             >{'About'}</SmallButton>
           </NavLink>

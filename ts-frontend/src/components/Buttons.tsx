@@ -22,7 +22,10 @@ export const ShowAllButton = styled.button`
   }
 `;
 
-export const SmallButton = withProps<{active: boolean}>()(styled.button)`
+export const SmallButton = withProps<{
+  active: boolean,
+  useFontWeightHover?: boolean,
+}>()(styled.button)`
   background: ${props => props.active ? THEME.colors.primary : 'none'};
   border: none;
   color: ${props => props.active ? THEME.colors.primaryText : THEME.colors.foregroundText};
@@ -33,7 +36,8 @@ export const SmallButton = withProps<{active: boolean}>()(styled.button)`
   border-radius: ${THEME.borderRadius};
   font-family: ${THEME.font.family};
   &:hover {
-    background: ${THEME.colors.primary};
+    background: ${props => props.useFontWeightHover ? 'none' : THEME.colors.primary};
+    font-weight: ${props => props.useFontWeightHover ? 'bold' : 'inherit'} !important;
     cursor: pointer;
   }
 `;
