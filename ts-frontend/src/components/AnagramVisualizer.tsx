@@ -383,6 +383,46 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
 
     const LINK = `${FRONTEND_URL}/share?anagram=${encodeURIComponent(currentAnagram)}&word=${encodeURIComponent(currentWord)}`;
 
+    const anagramSplitted = anagram.split(' ');
+    const wordComponents = [];
+    let index = 0;
+    let wordIndex = 0;
+    for (const word of anagramSplitted) {
+      wordComponents.push(
+        <StyledWord
+          key={wordIndex}
+          style={{
+            fontSize: fontSize,
+            height: fontSize,
+            background: 'red',
+            width: word.length * letterWidth,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            transform: `translate(${index * letterWidth}px, 0)`
+          }}
+        >
+          {
+            [...word].map((w, j) => {
+              const letter = (
+                <WordLetter
+                key={j}
+                characterWidth={letterWidth}
+                position={j * letterWidth}
+                letter={w}
+                left={0}
+                />
+              );
+              index += 1;
+              return letter;
+            })
+          }
+        </StyledWord>
+      );
+      index += 1;
+      wordIndex += 1;
+    }
+
     return (
       <Card style={{paddingBottom: 60, ...(editable ? {border: '2px dashed grey'} : {})}}>
         <WordContainer>
@@ -406,6 +446,9 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
                 paddingTop={20}
                 strokeWidth={strokeWidth}
               />
+            </div>
+            <div style={{position: 'relative'}}>
+              {wordComponents}
             </div>
             <Word
               fontSize={fontSize}
