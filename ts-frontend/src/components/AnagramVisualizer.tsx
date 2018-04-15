@@ -70,6 +70,36 @@ export const StyledWord = styled.strong`
   letter-spacing: 0.5px;
 `;
 
+class WordLetter extends React.Component<{
+  characterWidth: number;
+  position: number;
+  left: number;
+  letter: string;
+}> {
+  render() {
+    const {
+      characterWidth,
+      position,
+      left,
+      letter,
+    } = this.props;
+    return (
+      <span
+        style={{
+          transition: 'all 500ms ease-in-out',
+          display: 'block',
+          width: characterWidth,
+          position: 'absolute',
+          top: 0,
+          transform: `translate(${position}px, 0)`,
+          left: left,
+        }}>
+        {letter}
+      </span>
+    );
+  }
+}
+
 export class Word extends React.Component<{
   characterWidth: number;
   fontSize: number;
@@ -89,19 +119,12 @@ export class Word extends React.Component<{
           const position = index * this.props.characterWidth;
           const c2 = anagram[index];
           return (
-            <span
-              key={i}
-              style={{
-                transition: 'all 500ms ease-in-out',
-                display: 'block',
-                width: this.props.characterWidth,
-                position: 'absolute',
-                top: 0,
-                transform: `translate(${position}px, 0)`,
-                left: -wordWidth / 2,
-              }}>
-              {c2}
-            </span>
+            <WordLetter
+              letter={c2}
+              position={position}
+              characterWidth={this.props.characterWidth}
+              left={-wordWidth / 2}
+            />
           );
         })}
       </StyledWord>
