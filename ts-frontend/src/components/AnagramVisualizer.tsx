@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {sortBy} from 'lodash';
 import styled from 'styled-components';
 import { FRONTEND_URL } from 'src/constants';
 import {getAnagramMapping, stringToWord, sanitizeQuery} from 'src/anagram';
@@ -251,7 +252,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       wordDragState: {
         mouseDown: false,
         isDragging: false,
-        activeIndex: 0,
+        activeIndex: -1,
         initialX: 0,
         initialY: 0,
       },
@@ -276,6 +277,9 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
   }
   setContainerRef(container) {
     this.container = container;
+    if (!container) {
+      return;
+    }
     const position = this.container.getBoundingClientRect();
     this.setState({
       containerPosition: {
@@ -300,7 +304,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     }
   }
   onMouseDown(e: React.MouseEvent<HTMLElement>, wordIndex: number) {
-    console.log('on mouse down', wordIndex);
     const pageX = e.pageX;
     const pageY = e.pageY;
 
@@ -317,13 +320,16 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     });
   }
   onMouseUp() {
+    this.state.wordDragState.activeIndex = -1;
     this.setState({
       wordDragState: {
         ...this.state.wordDragState,
         mouseDown: false,
         isDragging: false,
+        activeIndex: -1,
       }
     });
+    this.rearrangeAnagram();
   }
   onMouseMove(e) {
     const dragState = this.state.wordDragState;
@@ -351,7 +357,52 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         },
         wordOffsets: this.state.wordOffsets,
       })
+      this.rearrangeAnagram()
     }
+  }
+
+  rearrangeAnagram() {
+    const wordsWithOffset = this.state.wordPositions.map((p, i) => {
+      const offset = this.state.wordOffsets[i];
+      return {
+        x: p.x + offset.x,
+        y: p.y + offset.y,
+        index: i,
+      };
+    });
+
+    const sortedWords = sortBy(wordsWithOffset, w => w.x);
+
+    let x = 0;
+    const {
+      letterWidth,
+    } = calculateWidths(this.props.word, this.props.anagram, this.fontSize);
+
+    const newPositions = [];
+    for (const word of sortedWords) {
+      const newPosition = {
+        x,
+        y: 0,
+        index: word.index,
+      };
+      const anagram = this.state.anagramSplitted[word.index];
+      x += (anagram.length + 1) * letterWidth;
+      newPositions.push(newPosition);
+    }
+
+    // overwrite positions
+    newPositions.map((p) => {
+      if (p.index !== this.state.wordDragState.activeIndex) {
+        const oldPosition = this.state.wordPositions[p.index];
+        const oldOffset = this.state.wordOffsets[p.index];
+        oldOffset.x =  p.x - oldPosition.x;
+        oldOffset.y =  p.y - oldPosition.y;
+      }
+    });
+    this.setState({
+      wordOffsets: this.state.wordOffsets,
+    });
+
   }
 
   get fontSize() {
@@ -407,8 +458,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       wordComponents.push(
         <StyledWord
           onMouseDown={onMouseDown}
-          onMouseEnter={() => console.log('enter')}
-          onMouseLeave={() => console.log('leave')}
           key={wordIndex}
           style={{
             fontSize: fontSize,
