@@ -33,32 +33,8 @@ const ShareSection = styled.div`
   margin-right: -${THEME.margins.m4};
 `;
 
-const CopyButton = styled.button`
-  margin: 0;
-  color: ${THEME.searchBar.buttonTextColor};
-  font-size: ${THEME.font.sizeSmall};
-  background-color: ${THEME.searchBar.buttonColor};
-  outline: none;
-  border: none;
-  padding: ${THEME.margins.m1} ${THEME.margins.m2};
-  border: 1px solid ${THEME.colors.border};
-  &:hover {
-    background-color: ${THEME.searchBar.buttonColorHover};
-    cursor: pointer;
-  }
-`;
-
 const CopyInput = styled.input`
-  margin: 0;
-  display: inline-block;
-  outline: none;
-  border: 1px solid ${THEME.colors.border};
-  border-right: none;
-  font-size: ${THEME.font.sizeSmall};
-  padding: ${THEME.margins.m1};
-  border-radius: ${THEME.borderRadius};
-  margin: 0;
-  min-width: 190px;
+  display: none;
 `;
 
 export const StyledWord = styled.strong`
@@ -460,10 +436,14 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
           onMouseDown={onMouseDown}
           key={wordIndex}
           style={{
+            display: 'block',
             fontSize: fontSize,
             height: fontSize,
-            background: 'red',
             width: word.length * letterWidth,
+            border: '1px black dotted',
+            paddingBottom: 30,
+            paddingLeft: letterWidth / 2,
+            paddingRight: letterWidth / 2,
             position: 'absolute',
             top,
             left,
@@ -527,8 +507,13 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         </WordContainer>
         <ShareSection>
           {`Share it using this Link: `}
+          <br/>
+          <br/>
+          <a target="_blank" href={LINK}>{LINK}</a>
+          <br />
           <CopyInput readOnly id="link-input" type="text" value={LINK} />
-          <CopyButton onClick={this.copyToClipboard}>{'Copy'}</CopyButton>
+          <br />
+          <SmallButton active={false} onClick={this.copyToClipboard}>{'Copy'}</SmallButton>
         </ShareSection>
         {this.props.close ? <SmallButton
           onClick={this.props.close}
