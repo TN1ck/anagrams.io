@@ -10,7 +10,9 @@ import {
   SmallButton,
 } from 'src/components';
 
-import {AnagramSausages, calculateWidths} from 'src/components/AnagramVisualizer';
+
+import {calculateWidths} from 'src/components/AnagramVisualizer';
+import AnagramSausages from 'src/components/AnagramSausages';
 
 const MAX_ITEMS_TO_SHOW_AT_ONCE = 3;
 

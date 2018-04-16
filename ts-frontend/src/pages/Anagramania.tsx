@@ -21,7 +21,8 @@ import {
 
 import {withProps} from 'src/utility';
 
-import {Word, AnagramSausages, calculateWidths} from 'src/components/AnagramVisualizer';
+import {Word, calculateWidths} from 'src/components/AnagramVisualizer';
+import AnagramSausages from 'src/components/AnagramSausages';
 
 import * as ReactModal from 'react-modal';
 ReactModal.setAppElement('body');
