@@ -98,7 +98,7 @@ export class Word extends React.Component<{
           const c2 = anagram[index];
           return (
             <WordLetter
-              key={index}
+              key={i}
               letter={c2}
               position={position}
               characterWidth={this.props.characterWidth}
