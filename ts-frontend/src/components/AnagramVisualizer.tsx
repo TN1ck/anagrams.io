@@ -488,7 +488,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
               <AnagramSausages
                 anagram={anagram}
                 word={word}
-                height={height}
+                height={height + 30}
                 wordWidth={width}
                 characterWidth={letterWidth}
                 characterHeight={letterHeight}
