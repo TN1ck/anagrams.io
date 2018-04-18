@@ -37,6 +37,20 @@ const CopyInput = styled.input`
   display: none;
 `;
 
+const ShareLink = styled.a`
+  color: black;
+  padding: 2px;
+  /* background: ${THEME.colors.primary}; */
+
+  &:visited {
+    color: black;
+  }
+
+  &:hover {
+    background: ${THEME.colors.background};
+  }
+`;
+
 export const StyledWord = styled.strong`
   white-space: nowrap;
   display: block;
@@ -546,7 +560,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         <ShareSection>
           {`Share it using this Link: `}
           <br/>
-          <a target="_blank" href={LINK}>{LINK}</a>
+          <ShareLink target="_blank" href={LINK}>{LINK}</ShareLink>
           <br />
           <CopyInput readOnly id="link-input" type="text" value={LINK} />
           <br />
