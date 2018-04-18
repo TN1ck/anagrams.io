@@ -391,6 +391,7 @@ class Anagramania extends React.Component<{
             word={store.modalWord}
             close={store.closeModal}
             save={store.saveAnagram}
+            viewState={'edit'}
           />
 
         </ReactModal>

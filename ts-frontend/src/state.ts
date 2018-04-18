@@ -35,8 +35,8 @@ export class AnagramState {
   @observable.shallow unsolvedSubanagrams: number[] = [];
   @observable.shallow currentSubanagrams: number[] = [];
 
-  @observable modalAnagram: string = 'roams again.';
-  @observable modalWord: string = 'anagrams.io';
+  @observable modalAnagram: string = 'roams again';
+  @observable modalWord: string = 'anagrams io';
   @observable showModal: boolean = false;
 
   @observable worker: Worker;

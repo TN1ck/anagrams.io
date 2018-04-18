@@ -140,6 +140,7 @@ export function calculateWidths(
 interface AnagramVisualizerProps {
   word: string;
   anagram: string;
+  viewState?: string;
   save?: (word: string, anagram: string) => any;
   close?: () => any;
 }
@@ -215,7 +216,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         x: 0,
         y: 0,
       },
-      viewState: 'edit',
+      viewState: this.props.viewState || 'normal',
     };
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -286,10 +287,8 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       }
     });
     const newAnagram = this.rearrangeAnagram();
-    const state = this.setAnagram(newAnagram, this.state.word);
     this.setState({
       anagram: newAnagram,
-      ...state,
     });
   }
   setAnagram(anagram: string, word: string) {
@@ -421,7 +420,8 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
 
   render() {
 
-    let {word, anagram} = this.state;
+    let {word, anagram} = this.props;
+    let {word: currentWord, anagram: currentAnagram} = this.state;
 
     const fontSize = this.fontSize;
 
@@ -435,7 +435,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
 
     const mapping = getAnagramMapping(word, anagram);
 
-    const LINK = `${FRONTEND_URL}/share?anagram=${encodeURIComponent(anagram)}&word=${encodeURIComponent(word)}`;
+    const LINK = `${FRONTEND_URL}/share?anagram=${encodeURIComponent(currentAnagram)}&word=${encodeURIComponent(currentWord)}`;
 
     const wordComponents = [];
     let wordIndex = 0;
