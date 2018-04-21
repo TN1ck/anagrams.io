@@ -247,16 +247,27 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
+
+    this.onTouchMove = this.onTouchMove.bind(this);
+    this.onTouchStart = this.onTouchStart.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
+
     this.setContainerRef = this.setContainerRef.bind(this);
     this.setEditMode = this.setEditMode.bind(this);
     this.setNormalMode = this.setNormalMode.bind(this);
   }
   componentDidMount() {
-    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mousemove',this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
+    document.addEventListener('touchend', this.onTouchEnd);
+    document.addEventListener('touchmove', this.onTouchMove);
+
   }
   componentWillUnmount() {
     document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.onMouseMove);
+    document.removeEventListener('touchmove', this.onTouchMove);
+    document.removeEventListener('touchend', this.onTouchEnd);
   }
   setContainerRef(container) {
     this.container = container;
@@ -286,9 +297,20 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       offsetY: 0,
     }
   }
+  onTouchStart(e: React.TouchEvent<HTMLElement>, wordIndex: number) {
+    const touches = e.touches;
+    const touch = touches[0];
+    if (!touch) {
+      return;
+    }
+    this.onDown(touch.pageX, touch.pageY, wordIndex);
+  }
   onMouseDown(e: React.MouseEvent<HTMLElement>, wordIndex: number) {
     const pageX = e.pageX;
     const pageY = e.pageY;
+    this.onDown(pageX, pageY, wordIndex);
+  }
+  onDown(pageX: number, pageY: number, wordIndex: number) {
 
     const wordOffset = this.state.wordOffsets[wordIndex];
 
@@ -301,6 +323,9 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         initialY: pageY - wordOffset.y,
       }
     });
+  }
+  onTouchEnd() {
+    this.onMouseUp();
   }
   onMouseUp() {
     this.state.wordDragState.activeIndex = -1;
@@ -347,10 +372,20 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       wordPositions,
     }
   }
+
   onMouseMove(e) {
+    this.onMove(e.pageX, e.pageY);
+  }
+
+  onTouchMove(e) {
+    const touches = e.touches;
+    const touch = touches[0];
+    this.onMove(touch.pageX, touch.pageY);
+    // console.log(e, 'move');
+  }
+
+  onMove(pageX, pageY) {
     const dragState = this.state.wordDragState;
-    const pageX = e.pageX;
-    const pageY = e.pageY;
     if (dragState.mouseDown) {
 
       if (!dragState.isDragging) {
@@ -488,9 +523,14 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         return (e) => this.onMouseDown(e, wordIndex)
       })(wordIndex);
 
+      const onTouchStart = ((wordIndex) => {
+        return (e) => this.onTouchStart(e, wordIndex)
+      })(wordIndex);
+
       wordComponents.push(
         <MovableStyledWord
           onMouseDown={onMouseDown}
+          onTouchStart={onTouchStart}
           key={wordIndex}
           style={{
             display: 'block',
