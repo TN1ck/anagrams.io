@@ -64,7 +64,7 @@ class AnagramResultGroup extends React.Component<{
     const {
       columnWidth,
     } = store.getColumnWidth;
-    const query = store.query;
+    const query = store.cleanedQueryWithSpaces;
 
     const expanded = this.state.expanded;
 
