@@ -1,8 +1,9 @@
 import * as React from 'react';
+import {Link} from 'react-router-dom';
 import {sortBy} from 'lodash';
 import styled from 'styled-components';
 import { FRONTEND_URL } from 'src/constants';
-import {getAnagramMapping, stringToWord, sanitizeQuery} from 'src/anagram';
+import {getAnagramMapping} from 'src/anagram';
 import {Card} from 'src/components/Layout';
 import {THEME, MARGIN_RAW} from 'src/theme';
 
@@ -18,6 +19,7 @@ const Copyright = styled.div`
   top: ${THEME.margins.m2};
   left: ${THEME.margins.m2};
   opacity: 0.3;
+  text-decoration: none;
 `;
 
 const WordContainer = styled.div`
@@ -28,9 +30,9 @@ const WordContainer = styled.div`
 
 const ShareSection = styled.div`
   margin-top: ${THEME.margins.m3};
-  text-align: center;
-  margin-left: -${THEME.margins.m4};
-  margin-right: -${THEME.margins.m4};
+  /* text-align: center; */
+  /* margin-left: -${THEME.margins.m4};
+  margin-right: -${THEME.margins.m4}; */
 `;
 
 const CopyInput = styled.input`
@@ -38,8 +40,10 @@ const CopyInput = styled.input`
 `;
 
 const ShareLink = styled.a`
+  font-weight: bold;
   color: black;
   padding: 2px;
+  text-decoration: none;
   /* background: ${THEME.colors.primary}; */
 
   &:visited {
@@ -47,6 +51,7 @@ const ShareLink = styled.a`
   }
 
   &:hover {
+    /* border-bottom: 1px ${THEME.colors.primary} solid; */
     background: ${THEME.colors.background};
   }
 `;
@@ -60,6 +65,13 @@ export const StyledWord = styled.strong`
   font-family: ${THEME.font.family};
   letter-spacing: 0.5px;
   user-select: none;
+`;
+
+export const MovableStyledWord = StyledWord.extend`
+  &:hover {
+    cursor: move;
+    background: ${THEME.colors.background};
+  }
 `;
 
 class WordLetter extends React.Component<{
@@ -140,7 +152,7 @@ export function calculateWidths(
   const maxLength = Math.max(word.length, anagram.length);
   const width = maxLength * letterWidth;
 
-  const height = maxLength * letterHeight;
+  const height = maxLength * letterHeight / 2;
 
   return {
     height,
@@ -167,7 +179,7 @@ function splitWord(word: string) {
 
   const wordSplitted: Array<Array<[string, number]>> = [];
   let currentIndexedWord: Array<[string, number]> = [];
-  const noLetterRegex = /a-z/;
+
   for (const [w, i] of wordIndexed) {
     if (w === ' ' && currentIndexedWord.length > 0) {
       wordSplitted.push(currentIndexedWord);
@@ -477,7 +489,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       })(wordIndex);
 
       wordComponents.push(
-        <StyledWord
+        <MovableStyledWord
           onMouseDown={onMouseDown}
           key={wordIndex}
           style={{
@@ -485,7 +497,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
             fontSize: fontSize,
             height: fontSize,
             width: word.length * letterWidth,
-            border: this.state.viewState === 'edit' ? '1px black dotted' : 'none',
             paddingBottom: 30,
             paddingLeft: letterWidth / 2,
             paddingRight: letterWidth / 2,
@@ -510,75 +521,82 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
               return letter;
             })
           }
-        </StyledWord>
+        </MovableStyledWord>
       );
       wordIndex += 1;
     }
 
     return (
-      <Card style={{paddingBottom: 60}}>
-        {this.state.viewState === 'edit' ?
-          <div style={{textAlign: 'center'}}
-            dangerouslySetInnerHTML={{__html: `
-              You can <strong>drag and drop</strong> the words on the bottom to rearrange the sentence.
-              <br/>
-              Click <strong>save</strong> to stop editing.
-            `}}>
-          </div> : null
-        }
-        <WordContainer>
-          <div>
-            <div style={{marginBottom: MARGIN_RAW.m2}}>
-              <Word
-                fontSize={fontSize}
-                characterWidth={letterWidth}
-                word={word}
-                anagram={word}
-              />
-            </div>
+      <div style={{display: 'flex', justifyContent: 'center'}}>
+        <Card style={{display: 'inline-block'}}>
+          <WordContainer>
             <div>
-              <AnagramSausages
-                anagram={anagram}
-                word={word}
-                height={height + 30}
-                wordWidth={width}
-                characterWidth={letterWidth}
-                characterHeight={letterHeight}
-                paddingTop={20}
-                letterOffsets={letterOffsets}
-                strokeWidth={strokeWidth}
-              />
+              <div style={{marginBottom: MARGIN_RAW.m2}}>
+                <Word
+                  fontSize={fontSize}
+                  characterWidth={letterWidth}
+                  word={word}
+                  anagram={word}
+                />
+              </div>
+              <div>
+                <AnagramSausages
+                  anagram={anagram}
+                  word={word}
+                  height={height + 40}
+                  wordWidth={width}
+                  characterWidth={letterWidth}
+                  characterHeight={letterHeight}
+                  paddingTop={20}
+                  letterOffsets={letterOffsets}
+                  strokeWidth={strokeWidth}
+                />
+              </div>
+              <div
+                style={{position: 'relative', height: letterHeight * 1.3}}
+                ref={this.setContainerRef}
+              >
+                {wordComponents}
+              </div>
             </div>
-            <div
-              style={{position: 'relative', height: letterHeight * 1.3}}
-              ref={this.setContainerRef}
-            >
-              {wordComponents}
+          </WordContainer>
+          <ShareSection>
+            <div style={{marginTop: MARGIN_RAW.m3, marginBottom: MARGIN_RAW.m1}}>
+              {`Share it using this Link: `}
             </div>
+            <ShareLink target="_blank" href={LINK}>{LINK}</ShareLink>
+            <br />
+            <CopyInput readOnly id="link-input" type="text" value={LINK} />
+          </ShareSection>
+          <div style={{marginTop: MARGIN_RAW.m3}}>
+            {/* {this.state.viewState === 'edit' ? (
+              <div style={{display: 'flex', alignItems: 'flex-end'}}>
+                <NormalButton active={true} onClick={this.setNormalMode}>{'Save'}</NormalButton>
+                <span style={{paddingLeft: MARGIN_RAW.m2}}>{'Save when you are done rearranging words'}</span>
+              </div>
+            ) : null}
+            {this.state.viewState === 'normal' ? (
+              <div style={{display: 'flex', alignItems: 'flex-end'}}>
+                <NormalButton active={true} onClick={this.setEditMode}>{'Edit'}</NormalButton>
+                <span style={{paddingLeft: MARGIN_RAW.m2}}>{'When editing you can rearrange the words'}</span>
+              </div>
+            ) : null} */}
+            <span>{'You can '}<strong>{'rearrange'}</strong>{' the words by dragging the words.'}</span>
           </div>
-        </WordContainer>
-        <ShareSection>
-          {`Share it using this Link: `}
-          <br/>
-          <ShareLink target="_blank" href={LINK}>{LINK}</ShareLink>
-          <br />
-          <CopyInput readOnly id="link-input" type="text" value={LINK} />
-          <br />
-          {/* <SmallButton active={false} onClick={this.copyToClipboard}>{'Copy Link'}</SmallButton> */}
-          {this.state.viewState === 'edit' && <SmallButton active={true} onClick={this.setNormalMode}>{'Save'}</SmallButton>}
-          {this.state.viewState === 'normal' && <SmallButton active={true} onClick={this.setEditMode}>{'Edit'}</SmallButton>}
-        </ShareSection>
-        {this.props.close ? <SmallButton
-          onClick={this.props.close}
-          active={false}
-          style={{position: 'absolute', right: THEME.margins.m2, top: THEME.margins.m2}}
-        >
-          {'Close'}
-        </SmallButton> : null}
-        <Copyright>
-          {'anagrams.io'}
-        </Copyright>
-      </Card>
+          {this.props.close ? <SmallButton
+            onClick={this.props.close}
+            active={false}
+            style={{position: 'absolute', right: THEME.margins.m2, top: THEME.margins.m2}}
+          >
+            {'Close'}
+          </SmallButton> : null}
+          <Link to="/">
+            <Copyright >
+              {'anagrams.io'}
+            </Copyright>
+          </Link>
+        </Card>
+      </div>
     );
   }
 };

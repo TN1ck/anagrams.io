@@ -1,5 +1,8 @@
 const COLORS = {
   YELLOW: '#FFFF55',
+  YELLOW4: '#FFF400',
+  YELLOW3: '#FFF166',
+  YELLOW2: '#F8E71C',
   ORANGE: '#FFAA55',
   GREY_100: '#f8f9fa',
   GREY_200: '#DDDDDD',

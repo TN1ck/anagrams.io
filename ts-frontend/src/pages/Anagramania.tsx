@@ -272,11 +272,11 @@ class AnagramaniaHeader extends React.Component<{
       <Header>
         <InnerContainer>
           <TitleContainer>
-            <div style={{position: 'relative', top: -220, height: 150}}>
+            <div style={{position: 'relative', top: -45, height: 150}}>
               <AnagramSausages
                 word={word}
                 anagram={anagram}
-                height={word.length * anagramVis.letterHeight}
+                height={word.length * anagramVis.letterHeight / 2 + 10}
                 wordWidth={wordWidth}
                 characterWidth={anagramVis.letterWidth}
                 characterHeight={anagramVis.letterHeight}

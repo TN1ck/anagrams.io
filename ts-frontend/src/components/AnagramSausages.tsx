@@ -108,7 +108,7 @@ export default class AnagramSausages extends React.Component<AnagramSausagesProp
       const x2 = (newIndex * characterWidth) + characterWidth / 2;
       const y2 = height;
       const opacity = opacityScale(index);
-      const yOffset = paddingTop + characterHeight * index;
+      const yOffset = paddingTop + characterHeight / 2 * index;
       return {
         opacity,
         strokeWidth,

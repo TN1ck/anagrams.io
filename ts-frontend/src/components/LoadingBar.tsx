@@ -8,7 +8,7 @@ const LoadingBar = withProps<{
     progress: number;
 }>()(styled.div)`
   position: relative;
-  // border: 1px solid ${THEME.colors.border};
+  border: 1px solid rgba(0, 0, 0, 0.08);
   padding: ${THEME.margins.m1};
   // box-shadow: ${THEME.dropShadow.s1};
   border-radius: ${THEME.borderRadius};

@@ -46,7 +46,7 @@ class ResultVisualisation extends React.Component<{
         <AnagramSausages
           word={word}
           anagram={query}
-          height={height + paddingBottom}
+          height={height + paddingBottom * 2}
           wordWidth={width}
           characterWidth={letterWidth}
           characterHeight={letterHeight}

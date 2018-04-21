@@ -31,6 +31,7 @@ export const SmallButton = withProps<{
   color: ${props => props.active ? THEME.colors.primaryText : THEME.colors.foregroundText};
   margin: 0;
   padding: 2px 5px;
+  border: ${props => props.active ? '1px rgba(0, 0, 0, 0.08) solid' : '1px rgba(0, 0, 0, 0) solid'};
   outline: none;
   text-transform: uppercase;
   border-radius: ${THEME.borderRadius};
@@ -38,6 +39,28 @@ export const SmallButton = withProps<{
   &:hover {
     background: ${props => props.useFontWeightHover ? 'none' : THEME.colors.primary};
     font-weight: ${props => props.useFontWeightHover ? 'bold' : 'inherit'} !important;
+    cursor: pointer;
+  }
+`;
+
+export const NormalButton = withProps<{
+  active: boolean,
+  useFontWeightHover?: boolean,
+}>()(styled.button)`
+  background: ${THEME.colors.background};
+  border: none;
+  color: ${props => props.active ? THEME.colors.primaryText : THEME.colors.foregroundText};
+  margin: 0;
+  padding: 5px 10px;
+  font-size: 14px;
+  border: ${props => props.active ? '1px rgba(0, 0, 0, 0.08) solid' : '1px rgba(0, 0, 0, 0) solid'};
+  outline: none;
+  font-weight: bold;
+  // text-transform: uppercase;
+  border-radius: ${THEME.borderRadius};
+  font-family: ${THEME.font.family};
+  &:hover {
+    background: ${THEME.colors.primary};
     cursor: pointer;
   }
 `;
