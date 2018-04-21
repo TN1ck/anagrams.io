@@ -35,6 +35,12 @@ injectGlobal`
   .ReactModal__Body--open {
     overflow: hidden;
   }
+
+  .ReactModal__Content {
+    max-height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
 `;
 
 const Root: React.StatelessComponent<{}> = () => {
