@@ -40,6 +40,7 @@ const CopyInput = styled.input`
 `;
 
 const ShareLink = styled.a`
+  word-wrap: break-word;
   font-weight: bold;
   color: black;
   padding: 2px;
@@ -568,7 +569,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
 
     return (
       <div style={{display: 'flex', justifyContent: 'center'}}>
-        <Card style={{display: 'inline-block'}}>
+        <Card style={{display: 'inline-block', maxWidth: '100%'}}>
           <WordContainer>
             <div>
               <div style={{marginBottom: MARGIN_RAW.m2}}>
