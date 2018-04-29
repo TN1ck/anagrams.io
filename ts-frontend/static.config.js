@@ -114,7 +114,16 @@ export default {
             use: [
               {
                 loader: 'worker-loader',
-              }
+              },
+              {
+                loader: "babel-loader",
+              },
+              {
+                loader: require.resolve("ts-loader"),
+                options: {
+                  transpileOnly: true,
+                },
+              },
             ]
           },
           {

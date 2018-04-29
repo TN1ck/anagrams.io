@@ -2,7 +2,7 @@ import 'babel-polyfill';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
-import Root from './pages/Root';
+import App from './App';
 
 //
 // https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
@@ -31,7 +31,7 @@ if (typeof document !== 'undefined') {
 //
 
 // Export your top level component as JSX (for static rendering)
-export default Root;
+export default App;
 
 // Render your app
 if (typeof document !== "undefined") {
@@ -41,5 +41,5 @@ if (typeof document !== "undefined") {
   };
 
   // Render!
-  render(Root);
+  render(App);
 }
