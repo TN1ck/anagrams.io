@@ -103,12 +103,12 @@ const App: React.StatelessComponent<{}> = () => {
           </div>
 
           <Routes />
+          <Footer>
+            <span>{'Made by '}</span>
+            <a href="http://tomnick.org">{' Tom Nick '}</a>
+            <span>{' & Taisia Tikhnovetskaya'}</span>
+          </Footer>
         </div>
-        <Footer>
-          <span>{'Made by '}</span>
-          <a href="http://tomnick.org">{' Tom Nick '}</a>
-          <span>{' & Taisia Tikhnovetskaya'}</span>
-        </Footer>
       </Router>
     </Provider>
   )
