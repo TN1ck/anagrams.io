@@ -1,4 +1,5 @@
 import React from "react";
+import { ServerStyleSheet } from 'styled-components'
 import path from "path";
 import fs from "fs";
 import ExtractTextPlugin from "extract-text-webpack-plugin";
@@ -16,10 +17,6 @@ export default {
     return [
       {
         path: "/",
-        component: "src/pages/Anagramania",
-      },
-      {
-        path: "/anagrams",
         component: "src/pages/Anagramania",
       },
       {
@@ -44,24 +41,31 @@ export default {
       },
     ];
   },
+  renderToHtml: (render, Comp, meta) => {
+    const sheet = new ServerStyleSheet();
+    const html = render(sheet.collectStyles(<Comp />));
+    meta.styleTags = sheet.getStyleElement();
+    return html;
+  },
   Document: ({ Html, Head, Body, children, siteData, renderMeta }) => (
     <Html lang="en-US">
       <Head>
         <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="description" content="Tom Nick. Developer by heart. Trying to build great products." />
-
-        <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-180x180.png" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/images/android-icon-192x192.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" rel="stylesheet" />
-
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="msapplication-TileColor" content="#9B9B9B" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, shrink-to-fit=no, user-scalable=no" />
+        <meta httpEquiv="x-ua-compatible" content="ie=edge" />
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+        <link rel="icon" href="favicon.ico" type="image/x-icon" />
+        <title>anagrams.io</title>
+        <meta name="description" content="Find anagrams with the best anagram finder in the world!"/>
+        <meta name="keywords" content="Anagrams,Anagram,Subanagram,Anagram Sentences,Wordplays"/>
+        <meta property="og:title" content="anagrams.io"/>
+        <meta property="og:site_name" content="anagrams.io"/>
+        <meta property="og:type" content="website"/>
+        <meta name="msapplication-TileColor" content="#e4e4e4" />
         <meta name="msapplication-TileImage" content="/images/mstile-150x150.png" />
-        <meta name="theme-color" content="#9B9B9B" />
-
+        <meta name="theme-color" content="#e4e4e4" />
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" rel="stylesheet" />
+        {renderMeta.styleTags}
       </Head>
       <Body>{children}</Body>
       <script async src="https://www.googletagmanager.com/gtag/js?id=UA-58665819-4" />
@@ -75,6 +79,8 @@ export default {
           gtag('config', 'UA-58665819-4');
         ` }}
       />
+      <script src="https://cdn.ravenjs.com/3.22.2/raven.min.js" crossOrigin="anonymous"></script>
+      <script dangerouslySetInnerHTML={{__html: `Raven.config('https://ca404d6267644f978c26ee64994a5066@sentry.io/286292').install();`}} />
     </Html>
   ),
   webpack: (config, { defaultLoaders, stage }) => {
@@ -90,28 +96,6 @@ export default {
     config.module.rules = [
       {
         oneOf: [
-          {
-            test: /\.s(a|c)ss$/,
-            use:
-              stage === "dev"
-                ? [{ loader: "style-loader" }, { loader: "css-loader" }, { loader: "sass-loader" }]
-                : ExtractTextPlugin.extract({
-                  use: [
-                    {
-                      loader: "css-loader",
-                      options: {
-                        importLoaders: 1,
-                        minimize: true,
-                        sourceMap: false,
-                      },
-                    },
-                    {
-                      loader: "sass-loader",
-                      options: { includePaths: ["src/"] },
-                    },
-                  ],
-                }),
-          },
           defaultLoaders.cssLoader,
           {
             test: /\.worker\.ts$/,
@@ -150,13 +134,6 @@ export default {
       },
     ];
 
-    // small react-static bug, make sure to use their extract text plugin config
-    config.plugins.push(
-      new ExtractTextPlugin({
-        filename: "styles.[hash:8].css",
-        disable: stage === "dev",
-      }),
-    );
     return config;
   },
 };

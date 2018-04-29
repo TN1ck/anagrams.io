@@ -55,9 +55,7 @@ export const LIGHT_THEME = {
   borderRadius: '4px',
   margins: MARGINS,
   font: {
-    // family: `'Bitter', Times, serif`,
-    family: 'Source Code Pro',
-    familyMono: `'Ubuntu Mono', monospace`,
+    family: 'Source Code Pro, monospace',
     sizeTitle: '40px',
     sizeTitleMobile: '30px',
     sizeLarge: '18px',

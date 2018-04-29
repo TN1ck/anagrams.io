@@ -21,6 +21,8 @@ injectGlobal`
     height: 100%;
   }
 
+  font-family: ${THEME.font.family};
+
   body {
     font-family: ${THEME.font.family};
     margin: 0;

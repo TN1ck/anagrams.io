@@ -4,8 +4,7 @@
   "compilerOptions": {
     "lib": [
       "dom",
-      "es2015",
-      "es2016"
+      "es2017"
     ],
     "typeRoots": [
       "./node_modules/@types"
@@ -27,7 +26,7 @@
         "./src/*"
       ]
     },
-    "target": "esnext",
+    "target": "es6",
     "module": "esnext",
     "jsx": "preserve",
     "emitDecoratorMetadata": true,
