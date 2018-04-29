@@ -134,11 +134,15 @@ class AnagramResults extends React.Component<{
     this.setWidth = this.setWidth.bind(this);
   }
   componentDidMount() {
-    window.addEventListener('resize', this.setWidth);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', this.setWidth);
+    }
     this.setWidth();
   }
   componentWillUnmount() {
-    window.removeEventListener('resize', this.setWidth);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.setWidth);
+    }
   }
   setWidth() {
     if (this.dom) {

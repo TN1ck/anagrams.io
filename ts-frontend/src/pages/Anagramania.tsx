@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import {observer, inject} from 'mobx-react';
 import {MARGIN_RAW, THEME} from 'src/theme';
@@ -24,7 +24,7 @@ import {withProps} from 'src/utility';
 import {Word, calculateWidths} from 'src/components/AnagramVisualizer';
 import AnagramSausages from 'src/components/AnagramSausages';
 
-import * as ReactModal from 'react-modal';
+import ReactModal from 'react-modal';
 ReactModal.setAppElement('body');
 
 import {AnagramState} from '../state';
@@ -239,10 +239,14 @@ class AnagramaniaHeader extends React.Component<{
   }
   componentWillUnmount() {
     this.mounted = false;
-    window.clearTimeout(this.updateTimeout);
+    if (typeof window !== 'undefined') {
+      window.clearTimeout(this.updateTimeout);
+    }
   }
   onQueryChange(e) {
-    window.clearTimeout(this.updateTimeout);
+    if (typeof window !== 'undefined') {
+      window.clearTimeout(this.updateTimeout);
+    }
     if (this.word !== this.anagrams[this.state.anagramIndex % this.anagrams.length]) {
       this.setState({
         anagramIndex: 0,

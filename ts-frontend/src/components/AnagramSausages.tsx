@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import {drawPath, EasingFunctions} from 'src/utility';
 import {getAnagramMapping} from 'src/anagram';
 import {interpolateArray} from 'd3-interpolate';

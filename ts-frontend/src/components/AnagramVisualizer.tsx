@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import {Link} from 'react-router-dom';
 import {sortBy} from 'lodash';
 import styled from 'styled-components';
@@ -258,17 +258,21 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     this.setNormalMode = this.setNormalMode.bind(this);
   }
   componentDidMount() {
-    document.addEventListener('mousemove',this.onMouseMove);
-    document.addEventListener('mouseup', this.onMouseUp);
-    document.addEventListener('touchend', this.onTouchEnd);
-    document.addEventListener('touchmove', this.onTouchMove);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('mousemove',this.onMouseMove);
+      document.addEventListener('mouseup', this.onMouseUp);
+      document.addEventListener('touchend', this.onTouchEnd);
+      document.addEventListener('touchmove', this.onTouchMove);
+    }
 
   }
   componentWillUnmount() {
-    document.removeEventListener('mousemove', this.onMouseMove);
-    document.removeEventListener('mouseup', this.onMouseMove);
-    document.removeEventListener('touchmove', this.onTouchMove);
-    document.removeEventListener('touchend', this.onTouchEnd);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('mousemove', this.onMouseMove);
+      document.removeEventListener('mouseup', this.onMouseMove);
+      document.removeEventListener('touchmove', this.onTouchMove);
+      document.removeEventListener('touchend', this.onTouchEnd);
+    }
   }
   setContainerRef(container) {
     this.container = container;
@@ -477,7 +481,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
   }
 
   get fontSize() {
-    return Math.min(22, window.innerWidth / 20);
+    return Math.min(22, typeof window !== 'undefined' ? window.innerWidth / 20 : 14);
   }
 
   render() {

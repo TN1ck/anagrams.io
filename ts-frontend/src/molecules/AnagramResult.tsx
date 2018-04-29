@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import {take} from 'lodash';
 
 import * as anagram from 'src/anagram';

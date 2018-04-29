@@ -1,12 +1,15 @@
-import * as React from 'react';
+import React from 'react';
 import {Provider} from 'mobx-react';
-import { BrowserRouter } from 'react-router-dom'
+import { Router, Link } from "react-static";
 
 import {injectGlobal} from 'styled-components';
-import {THEME} from 'src/theme';
 import store from 'src/state';
 
-import App from './App';
+import {MARGIN_RAW, THEME} from '../theme';
+import {Footer} from '../components';
+import {SmallButton} from '../components';
+
+import Routes from "react-static-routes";
 
 injectGlobal`
   * {
@@ -45,13 +48,67 @@ injectGlobal`
 
 const Root: React.StatelessComponent<{}> = () => {
   return (
-    <div>
-      <BrowserRouter>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </BrowserRouter>
-    </div>
+    <Router>
+      <div style={{
+        position: 'absolute',
+        top: MARGIN_RAW.m2,
+        right: MARGIN_RAW.m2,
+        background: THEME.colors.backgroundBright,
+        zIndex: 99,
+      }}>
+        <Link
+          to='/'
+          exact
+          activeStyle={{
+            fontWeight: 'bold',
+          }}
+        >
+          <SmallButton
+            active={false}
+            useFontWeightHover
+            style={{fontWeight: 'inherit'}}
+          >{'Search'}</SmallButton>
+        </Link>
+        <Link
+          to='/about'
+          exact
+          activeStyle={{
+            fontWeight: 'bold',
+          }}
+        >
+          <SmallButton
+            active={false}
+            useFontWeightHover
+            style={{fontWeight: 'inherit'}}
+          >{'About'}</SmallButton>
+        </Link>
+        <Link
+          to='/share'
+          exact
+          activeStyle={{
+            fontWeight: 'bold',
+          }}
+        >
+          <SmallButton
+            active={false}
+            useFontWeightHover
+            style={{fontWeight: 'inherit'}}
+          >{'Share'}</SmallButton>
+        </Link>
+      </div>
+
+      <Provider store={store}>
+
+        <Routes />
+
+      </Provider>
+
+      <Footer>
+        <span>{'Made by '}</span>
+        <a href="http://tomnick.org">{' Tom Nick '}</a>
+        <span>{' & Taisia Tikhnovetskaya'}</span>
+      </Footer>
+    </Router>
   )
 };
 

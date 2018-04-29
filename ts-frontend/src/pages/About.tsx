@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import * as Components from '../components';
 import {MARGIN_RAW} from 'src/theme';
 import {ProfilesContainer, Profile} from '../components/Profile';

@@ -240,16 +240,18 @@ export class AnagramState {
   }
 
   async init() {
-    const location = window.location;
-    const search = location.search;
-    const parsedSearch = parseSearch(search);
+    if (typeof window !== 'undefined') {
+      const location = window.location;
+      const search = location.search;
+      const parsedSearch = parseSearch(search);
 
-    if (parsedSearch.anagram && parsedSearch.word) {
-      runInAction(() => {
-        this.modalWord = parsedSearch.word;
-        this.modalAnagram = parsedSearch.anagram;
-        this.appState = AppState.anagramViewer;
-      });
+      if (parsedSearch.anagram && parsedSearch.word) {
+        runInAction(() => {
+          this.modalWord = parsedSearch.word;
+          this.modalAnagram = parsedSearch.anagram;
+          this.appState = AppState.anagramViewer;
+        });
+      }
     }
 
     const result = await getDictionaries();

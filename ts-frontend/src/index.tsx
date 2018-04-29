@@ -4,44 +4,42 @@ import * as ReactDom from 'react-dom';
 
 import Root from './pages/Root';
 
-import 'src/assets/styles.css';
-
 //
 // https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari
 // disable zooming on ios 10.3+
 //
 
-document.addEventListener('touchmove', function(event: any) {
-  if (event.scale !== 1) {
-     event.preventDefault();
-  }
-}, false);
+if (typeof document !== 'undefined') {
+  document.addEventListener('touchmove', function(event: any) {
+    if (event.scale !== 1) {
+       event.preventDefault();
+    }
+  }, false);
 
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function (event) {
-  var now = (new Date()).getTime();
-  if (now - lastTouchEnd <= 300) {
-    event.preventDefault();
-  }
-  lastTouchEnd = now;
-}, false);
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function (event) {
+    var now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, false);
+}
 
 //
 // render the app
 //
 
-function renderApp(Component) {
-  ReactDom.render(
-    <Component />,
-    document.getElementById('root'),
-  );
-}
+// Export your top level component as JSX (for static rendering)
+export default Root;
 
-renderApp(Root);
+// Render your app
+if (typeof document !== "undefined") {
+  const renderMethod = module.hot ? ReactDom.render : ReactDom.hydrate || ReactDom.render;
+  const render = (Comp: any) => {
+    renderMethod(<Comp />, document.getElementById("root"));
+  };
 
-if (module.hot) {
-  module.hot.accept();
-  module.hot.accept(['./pages/Root.tsx'], () => {
-    renderApp(require('./pages/Root.tsx').default);
-  });
+  // Render!
+  render(Root);
 }
