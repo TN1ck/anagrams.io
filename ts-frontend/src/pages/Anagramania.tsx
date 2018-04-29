@@ -25,7 +25,6 @@ import {Word, calculateWidths} from 'src/components/AnagramVisualizer';
 import AnagramSausages from 'src/components/AnagramSausages';
 
 import ReactModal from 'react-modal';
-ReactModal.setAppElement('body');
 
 import {AnagramState} from '../state';
 
@@ -349,6 +348,9 @@ class Anagramania extends React.Component<{
     this.onQueryChange = this.onQueryChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onSelectChange = this.onSelectChange.bind(this);
+    if (typeof document !== 'undefined') {
+      ReactModal.setAppElement('body');
+    }
   }
 
   onQueryChange(e) {
@@ -405,21 +407,9 @@ class Anagramania extends React.Component<{
         <InnerContainer>
           <AnagramInfoArea />
         </InnerContainer>
-
-        <Footer>
-          <span>{'Made by '}</span>
-          <a href="http://tomnick.org">{' Tom Nick '}</a>
-          <span>{' & Taisia Tikhnovetskaya'}</span>
-        </Footer>
       </div>
     );
   }
 };
 
-
-const ProvidedAnagramania = () => {
-  return <Anagramania />;
-};
-
-export default ProvidedAnagramania;
-
+export default Anagramania;

@@ -19,6 +19,10 @@ export default {
         component: "src/pages/Anagramania",
       },
       {
+        path: "/anagrams",
+        component: "src/pages/Anagramania",
+      },
+      {
         path: "/about",
         component: "src/pages/About",
       },
