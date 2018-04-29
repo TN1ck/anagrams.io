@@ -12,7 +12,7 @@ export default {
   getSiteData: () => ({
     title: "Anagrams.io",
   }),
-  // siteRoot: "https://tomnick.org",
+  siteRoot: "https://anagrams.io",
   getRoutes: () => {
     return [
       {
