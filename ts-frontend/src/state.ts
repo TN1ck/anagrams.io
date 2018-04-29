@@ -25,7 +25,7 @@ export class AnagramState {
   @observable cleanedQueryWithSpaces: string = '';
 
   @observable.shallow subanagrams: anagram.Word[] = [];
-  @observable.shallow dictionaries: Dictionary[] = [];
+  @observable.shallow dictionaries: Dictionary[] = [{"id":"en","name":"English"},{"id":"de","name":"German"}];
   @observable selectedDictionaries: string = 'en';
 
   @observable counter: number = 0;

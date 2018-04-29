@@ -306,6 +306,7 @@ class AnagramaniaHeader extends React.Component<{
           <HeaderContainer>
             <SearchBar
               value={query}
+              disabled={dictionaries.length === 0}
               innerRef={this.setInputRef}
               onChange={this.onQueryChange}
               onSubmit={(e) => {
@@ -313,6 +314,17 @@ class AnagramaniaHeader extends React.Component<{
                 requestAnagram();
               }}
             />
+            {
+              dictionaries.length === 0 ? (
+                <SmallButton
+                  active={false}
+                  style={{
+                    marginRight: THEME.margins.m1,
+                    marginTop: THEME.margins.m2,
+                  }}
+                >{'Loading dictionaries...'}</SmallButton>
+              ) : null
+            }
             {dictionaries.map(d => {
               return (
                 <SmallButton
