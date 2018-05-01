@@ -11,6 +11,7 @@ const AnagramWorker = require('./anagram.worker');
 
 export enum AppState {
   none = 'none',
+  fetchingSubanagrams = 'fetchingSubanagrms',
   search = 'search',
   done = 'done',
   anagramViewer = 'anagramViewer',
@@ -98,7 +99,7 @@ export class AnagramState {
 
   @computed
   get showInfoArea() {
-    return this.appState === AppState.search || this.appState === AppState.done;
+    return this.appState === AppState.search || this.appState === AppState.fetchingSubanagrams || this.appState === AppState.done;
   }
 
   get isDone() {
@@ -111,12 +112,21 @@ export class AnagramState {
     const numberOfSolvedSubanagrams = solvedSubanagrams.length;
     const numberOfAnagrams = this.subanagrams.length;
 
+    if (this.appState === AppState.fetchingSubanagrams) {
+      return 0;
+    }
+
     if (numberOfAnagrams === 0) {
       return 100;
     }
 
     const progress = Math.ceil((numberOfSolvedSubanagrams / numberOfAnagrams) * 100);
     return progress;
+  }
+
+  @computed
+  get noResultsYet() {
+    return this.appState === AppState.fetchingSubanagrams || (this.appState === AppState.search && this._expandedSolutions.length === 0);
   }
 
   @computed
@@ -298,8 +308,15 @@ export class AnagramState {
       this.worker.terminate();
     }
 
+    const cleanedQuery = anagram.sanitizeQuery(this.query);
+    const cleanedQueryWithSpaces = anagram.sanitizeQuery(this.query, false);
+
+    if (cleanedQuery.length === 0) {
+      return;
+    }
+
     const clear = () => {
-      this.appState = AppState.search;
+      this.appState = AppState.fetchingSubanagrams;
       this._expandedSolutions = [];
       this.finished = false;
       this.solvedSubanagrams = [];
@@ -314,17 +331,11 @@ export class AnagramState {
     clear();
     runInAction(clear);
 
-    const cleanedQuery = anagram.sanitizeQuery(this.query);
-    const cleanedQueryWithSpaces = anagram.sanitizeQuery(this.query, false);
-
-    if (cleanedQuery.length === 0) {
-      return;
-    }
-
     const result = await getSubAnagrams(cleanedQuery, this.selectedDictionaries);
     const {anagrams: subanagrams} = result.data;
 
     runInAction(() => {
+      this.appState = AppState.search;
       this.unsolvedSubanagrams = subanagrams.map((_, i) => i);
       this.subanagrams = subanagrams;
       this.queryStatus = RequestStatus.loading;

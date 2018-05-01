@@ -157,14 +157,13 @@ class AnagramResults extends React.Component<{
     const store = this.props.store;
 
     const query = store.query;
-    const groupedAnagrams = store.groupedAnagrams;
     const grouped = store.grouped;
 
     const {
       columnWidth,
     } = store.getColumnWidth;
 
-    const noResultsYet = groupedAnagrams.length === 0 && store.appState === AppState.search;
+    const noResultsYet = store.noResultsYet;
 
     return (
       <AnagramResultsContainer innerRef={this.setRef}>
