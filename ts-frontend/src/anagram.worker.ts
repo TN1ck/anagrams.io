@@ -19,9 +19,10 @@ ctx.addEventListener('message', (message) => {
     query: string;
     subanagrams: anagram.Word[];
     subanagram: anagram.Word;
+    nextWorkerIndex: number;
   } = message.data;
 
-  const {query, subanagrams, subanagram} = data;
+  const {query, subanagrams, subanagram, nextWorkerIndex} = data;
   const anagramSolver = anagram.findAnagramSentencesForSubAnagram(query, subanagrams, subanagram);
 
   const {generator} = anagramSolver;
@@ -49,8 +50,9 @@ ctx.addEventListener('message', (message) => {
       }
   }
 
-  ctx.postMessage(serializeAnagramStep(state));
+  const serializedState = serializeAnagramStep(state);
+  (serializedState as any).nextWorkerIndex = nextWorkerIndex;
+  ctx.postMessage(serializedState);
   ctx.postMessage('finish');
-  self.close();
-
+  // self.close();
 });

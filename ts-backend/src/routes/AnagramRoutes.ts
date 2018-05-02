@@ -14,7 +14,12 @@ router.get(
     const sanitizedQuery = anagram.sanitizeQuery(query);
     const dictionary = dictionaries.find(d => d.id === dictionaryKey) || dictionaries[0];
     const sortedSubAnagrams = anagram.findSortedAndGroupedSubAnagrams(sanitizedQuery, dictionary.dict)
-    response.json({anagrams: sortedSubAnagrams, success: true});
+    const optimizedForTransport = sortedSubAnagrams.map(w => {
+      // TODO
+      (w as any).set = anagram.binaryToString(w.set);
+      return w;
+    });
+    response.json({anagrams: optimizedForTransport, success: true});
   }
 );
 

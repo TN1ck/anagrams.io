@@ -11,6 +11,6 @@ export function parseDictionary(rawDictionary: string): SimpleWord[] {
 
 export function filterDictionaryFromDictionary(dict1: SimpleWord[], dict2: SimpleWord[]) {
   return dict1.filter(w => {
-    return w.word.length > 3;
-  }).concat(dict2.filter(w => w.set.length >= 1));
+    return w.length > 3;
+  }).concat(dict2.filter(w => w.length >= 1));
 }

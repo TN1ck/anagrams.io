@@ -16,7 +16,8 @@ export function testPerformanceOne(): PerformanceWithSolutions {
   const executed = new Date();
   const start = performance.now();
   const test = mockData.testOne;
-  const generators = anagram.findAnagramSentences(test.string, test.subanagrams);
+  // TODO
+  const generators = anagram.findAnagramSentences(test.string, test.subanagrams as any);
   generators.map(({generator}) => {
     const gen = generator;
     const values = [...gen].map(v => v.solutions);

@@ -295,7 +295,6 @@ export class AnagramState {
   closeModal() {
     this.showModal = false;
   }
-
   @action
   saveAnagram(anagram: string, word: string) {
     this.modalAnagram = anagram;
@@ -307,6 +306,46 @@ export class AnagramState {
     if (this.worker) {
       this.worker.terminate();
     }
+    this.worker = new AnagramWorker();
+
+    const updateState = (state: anagram.AnagramGeneratorStepSerialized) => {
+      if (this.finished) {
+        return;
+      }
+
+      runInAction(() => {
+        this.numberOfPossibilitiesChecked += state.numberOfPossibilitiesChecked;
+        const newExpandedSolutions = anagram.expandSolutions(state.solutions, subanagrams);
+        this._expandedSolutions.push(...newExpandedSolutions);
+      });
+
+      // (window as any).applicationState = this;
+    };
+
+    const eventListener = message => {
+      if (message.data === 'finish') {
+
+        runInAction(() => {
+          this.solvedSubanagrams.push(message.data.index + 1);
+          this.currentSubanagrams.shift();
+        });
+
+        // stop!
+        if (this.solvedSubanagrams.length === subanagrams.length) {
+          runInAction(() => {
+            this.appState = AppState.done;
+          });
+          return;
+        }
+        startNextWorker();
+        return;
+      }
+      const newState: anagram.AnagramGeneratorStepSerialized = message.data;
+      updateState(newState);
+    };
+
+    this.worker.addEventListener('message', eventListener);
+
 
     const cleanedQuery = anagram.sanitizeQuery(this.query);
     const cleanedQueryWithSpaces = anagram.sanitizeQuery(this.query, false);
@@ -350,20 +389,6 @@ export class AnagramState {
       return;
     }
 
-    const updateState = (state: anagram.AnagramGeneratorStepSerialized) => {
-      if (this.finished) {
-        return;
-      }
-
-      runInAction(() => {
-        this.numberOfPossibilitiesChecked += state.numberOfPossibilitiesChecked;
-        const newExpandedSolutions = anagram.expandSolutions(state.solutions, subanagrams);
-        this._expandedSolutions.push(...newExpandedSolutions);
-      });
-
-      // (window as any).applicationState = this;
-    };
-
     const startNextWorker = () => {
       if (this.unsolvedSubanagrams.length === 0) {
         return;
@@ -373,38 +398,13 @@ export class AnagramState {
 
       runInAction(() => {
         this.currentSubanagrams.push(nextWorkerIndex);
-      })
-
-      const worker = new AnagramWorker();
-      this.worker = worker;
-
-      worker.addEventListener('message', message => {
-        if (message.data === 'finish') {
-
-          runInAction(() => {
-            this.solvedSubanagrams.push(nextWorkerIndex);
-            this.currentSubanagrams.shift();
-          });
-
-          worker.terminate();
-          // stop!
-          if (this.solvedSubanagrams.length === subanagrams.length) {
-            runInAction(() => {
-              this.appState = AppState.done;
-            });
-            return;
-          }
-          startNextWorker();
-          return;
-        }
-        const newState: anagram.AnagramGeneratorStepSerialized = message.data;
-        updateState(newState);
       });
 
-      worker.postMessage({
+      this.worker.postMessage({
         type: 'start',
         query: cleanedQuery,
         subanagram: subanagrams[nextWorkerIndex],
+        nextWorkerIndex,
         subanagrams,
       });
 

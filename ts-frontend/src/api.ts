@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {Word} from './anagram';
+import {Word, stringToBinary} from './anagram';
 import {Performance} from './performance/performance';
 
 import {BACKEND_URL} from './constants';
@@ -15,7 +15,14 @@ export function getSubAnagrams(query: string, dictionaries: string)  {
   return axios.get<{
     success: boolean;
     anagrams: Word[];
-  }>(BACKEND_URL + '/anagram/' + query + '?dictionary=' + dictionaries);
+  }>(BACKEND_URL + '/anagram/' + query + '?dictionary=' + dictionaries).then(data => {
+    data.data.anagrams = data.data.anagrams.map(w => {
+      // TODO
+      w.set = stringToBinary((w as any).set);
+      return w;
+    });
+    return data;
+  });
 }
 
 export interface Dictionary {

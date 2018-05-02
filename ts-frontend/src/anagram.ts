@@ -1,12 +1,15 @@
-import {sortBy, drop, uniqBy, groupBy} from 'lodash';
+import {sortBy, drop, groupBy} from 'lodash';
+
+const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
 //
 // interfaces
 //
 
 export interface BasicWord {
-  set: string;
+  set: Uint8Array;
   index: number;
+  length: number;
 }
 
 export interface SimpleWord extends BasicWord {
@@ -17,7 +20,7 @@ export interface Word extends BasicWord {
   words: string[];
 }
 
-type AnagramSolution = [number[], string];
+type AnagramSolution = [number[], BasicWord["set"], BasicWord["length"]];
 
 type OptimizedAnagramSolution = number[];
 
@@ -81,127 +84,105 @@ export function sanitizeQuery(str: string, removeSpaces: boolean = true): string
   }
 }
 
-export function stringToWord (str: string): SimpleWord {
-  const sorted = str.split('').sort().join('');
+export function binaryToString(bin: Uint8Array) {
+  let word = '';
+  for (let i = 0; i < ALPHABET.length; i++) {
+    const letter = ALPHABET[i];
+    const frequency = bin[i];
+    for (let j = 0; j < frequency; j++) {
+      word += letter;
+    }
+  }
+  return word;
+}
+
+export function stringToBinary(str: string): Uint8Array {
+  const buffer = new ArrayBuffer(ALPHABET.length);
+  const frequency = new Uint8Array(buffer);
+  for (const l of str) {
+    const position = ALPHABET.indexOf(l);
+    frequency[position] += 1;
+  }
+  return frequency;
+}
+
+export function stringToWord(str: string): SimpleWord {
+  // const sorted = str.split('').sort().join('');
   return {
-    set: sorted,
+    set: stringToBinary(str),
     word: str,
     index: -1,
+    length: str.length,
   };
 }
 
-
-// this is correct!
-export function joinTwoStringsNaive(w1: string, w2: string) {
-  return stringToWord(w1 + w2).set;
+export function joinTwoBinary(bin1: Uint8Array, bin2: Uint8Array): Uint8Array {
+  const buffer = new ArrayBuffer(ALPHABET.length);
+  const frequency = new Uint8Array(buffer);
+  for (let i = 0; i < ALPHABET.length; i++) {
+    frequency[i] = bin1[i] + bin2[i];
+  }
+  return frequency;
 }
 
-// w1 is the longer word
-export function joinTwoStrings(w1: string, w2: string): string {
-  let combined = '';
-  let index1 = 0;
-  let index2 = 0;
-  const w1Length = w1.length;
-  const w2Length = w2.length;
-  if (w1Length < w2Length) {
-    return joinTwoStrings(w2, w1);
-  }
-  while (index1 < w1Length) {
-
-    if (index2 >= w2Length) {
-      while(index1 < w1Length) {
-        const c = w1[index1];
-        combined += c;
-        index1++;
-      }
-      return combined;
-    }
-    const c1 = w1[index1];
-    const c2 = w2[index2];
-
-    if (c1 < c2) {
-      combined += c1;
-      index1++;
-    } else if (c1 > c2) {
-      combined += c2;
-      index2++;
-    } else if (c1 === c2) {
-      const startChar = c1;
-      let char = startChar;
-      let index = 0;
-      while (char === startChar) {
-        combined += char;
-        index++;
-        const newIndex = index1 + index;
-        if (newIndex >= w1Length) {
-          break;
-        }
-        char = w1[newIndex];
-      }
-      index1 += index;
-      let newIndex = 0;
-      char = startChar;
-      while (char === startChar) {
-        combined += char;
-        index++;
-        newIndex++;
-        // checking the index instead of char === undefined 10%
-        const newIndex2 = index2 + newIndex;
-        if (newIndex2 >= w2Length) {
-          break;
-        }
-        char = w2[newIndex2];
-      }
-      index2 += newIndex;
+function isBinarySubset(bin1: Uint8Array, bin2: Uint8Array): boolean {
+  for (let i = 0; i < ALPHABET.length; i++) {
+    if (bin1[i] > bin2[i]) {
+      return false;
     }
   }
-  // substr is not faster
-  while(index2 < w2Length) {
-    const c2 = w2[index2];
-    combined += c2;
-    index2++;
-  }
-  return combined;
+  return true;
 }
 
-function isSubset(nStr1: string, nStr2: string): boolean {
-  const length1 = nStr1.length;
-  const length2 = nStr2.length;
+// function isSubset(nStr1: string, nStr2: string): boolean {
+//   const length1 = nStr1.length;
+//   const length2 = nStr2.length;
 
-  let searchIndex = 0;
-  for (let i = 0; i < length2; i++) {
-    if (searchIndex >= length1) {
-      // we have a success!
-      return true;
-    }
-    const current1 = nStr1[searchIndex];
-    const current2 = nStr2[i];
-    if (current1 === current2) {
-      searchIndex += 1;
+//   let searchIndex = 0;
+//   for (let i = 0; i < length2; i++) {
+//     if (searchIndex >= length1) {
+//       // we have a success!
+//       return true;
+//     }
+//     const current1 = nStr1[searchIndex];
+//     const current2 = nStr2[i];
+//     if (current1 === current2) {
+//       searchIndex += 1;
+//     }
+//   }
+//   // when length2 === length1
+//   return searchIndex === length1;
+// }
+
+function isBinarySame(bin1: Uint8Array, bin2: Uint8Array): boolean {
+  for (let i = 0; i < ALPHABET.length; i++) {
+    if (bin1[i] !== bin2[i]) {
+      return false;
     }
   }
-  // when length2 === length1
-  return searchIndex === length1;
+  return true;
 }
 
-function isSame(nStr1: string, nStr2: string): boolean {
-  return nStr1 === nStr2;
-}
+// function isSame(nStr1: string, nStr2: string): boolean {
+//   return nStr1 === nStr2;
+// }
 
 export function findAnagrams(query: string, dictionary: Word[]): Word[] {
   const nQuery = stringToWord(query);
   return dictionary.filter(nStr => {
-    return isSame(nStr.set, nQuery.set);
+    return isBinarySame(nStr.set, nQuery.set);
   });
 }
 
 export function findSubAnagrams(query: string, dictionary: SimpleWord[]): SimpleWord[] {
   const nQuery = stringToWord(query);
   // not sure why uniqBy is needed, have to investigate
-  return uniqBy(dictionary.filter(nStr => {
-    return isSubset(nStr.set, nQuery.set);
+  // return uniqBy(
+  return dictionary.filter(nStr => {
+    return isBinarySubset(nStr.set, nQuery.set);
   // w.set should be used, but we have to do some stuff for it
-  }), w => w.word);
+  });
+  // , w => w.word);
 }
 
 export function sortWordList<T extends BasicWord>(wordList: T[]): T[] {
@@ -223,15 +204,16 @@ export function findSortedSubAnagrmns(query: string, dictionary: SimpleWord[]): 
 
 export function findSortedAndGroupedSubAnagrams(query: string, dictionary: SimpleWord[]): Word[] {
   const _subanagrams = findSubAnagrams(query, dictionary);
-  const groupedSubanagrams = groupBy(_subanagrams, s => s.set);
+  const groupedSubanagrams = groupBy(_subanagrams, s => binaryToString(s.set));
   const groups = Object.keys(groupedSubanagrams);
   const sortedGroups = sortBy(groups, g => -g.length);
   const subanagrams = sortedGroups.map((set, index) => {
     const words = groupedSubanagrams[set].map(w => w.word);
     return {
-      set,
+      set: groupedSubanagrams[set][0].set,
       words,
       index,
+      length: groupedSubanagrams[set][0].length,
     };
   });
 
@@ -283,12 +265,12 @@ export function findAnagramSentencesForInitialStack(
     while(stack.length !== 0 && numberOfSolutions < MAX_SOLUTIONS) {
       const current = stack.shift() as AnagramSolution;
 
-      if (isSame(nQuery.set, current[1])) {
+      if (isBinarySame(nQuery.set, current[1])) {
         // solutions.push(current);
         newSolutions.push(current);
       } else {
 
-        const charsMissing = queryLength - current[1].length;
+        const charsMissing = queryLength - current[2];
 
         // drop all subanagrams that were before index
         const droppedSubanagrams = drop(subanagrams, current[0][0]);
@@ -297,25 +279,26 @@ export function findAnagramSentencesForInitialStack(
 
         // first filter those out, that are too big
         const possibleSubanagrams = droppedSubanagrams.filter(s => {
-          return s.set.length <= charsMissing;
+          return s.length <= charsMissing;
         });
 
         const combinedWords = possibleSubanagrams.map(w => {
           return {
             word: w,
-            combined: joinTwoStrings(current[1], w.set)
+            combined: joinTwoBinary(current[1], w.set)
           };
         });
 
         // check if the result is still a subset
         const filterCombined = combinedWords.filter(cw => {
-          return isSubset(cw.combined, nQuery.set);
+          return isBinarySubset(cw.combined, nQuery.set);
         });
 
         const newAnagramSolutions: AnagramSolution[] = filterCombined.map(cw => {
           return [
             [cw.word.index].concat(current[0]),
             cw.combined,
+            cw.word.length + current[2]
           ] as AnagramSolution;
         });
 
@@ -340,6 +323,7 @@ export function findAnagramSentencesForSubAnagram(query: string, subanagrams: Wo
     [
       [subanagram.index],
       subanagram.set,
+      subanagram.length,
     ]
   ];
   const generator = findAnagramSentencesForInitialStack(query, initialStack, subanagrams);
