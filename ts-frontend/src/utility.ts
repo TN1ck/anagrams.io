@@ -36,6 +36,10 @@ export function parseSearch(search: string) {
 
 }
 
+export function getNumberOfCPUs() {
+  return navigator.hardwareConcurrency || 1;
+}
+
 //
 // Drawing cool paths
 // * M is the start point
@@ -63,7 +67,7 @@ L ${x2} ${y2}`;
 
 export function drawPathOld(x1: number, y1: number, x2: number, y2: number, yOffset: number, arcRadius: number): string {
   const intermediateY = y1 + (yOffset);
-  
+
   if (x2 > x1) {
     return `
 M ${x1}, ${y1}
@@ -136,15 +140,15 @@ export const EasingFunctions = {
   easeOutQuad: function (t) { return t*(2-t) },
   // acceleration until halfway, then deceleration
   easeInOutQuad: function (t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t },
-  // accelerating from zero velocity 
+  // accelerating from zero velocity
   easeInCubic: function (t) { return t*t*t },
-  // decelerating to zero velocity 
+  // decelerating to zero velocity
   easeOutCubic: function (t) { return (--t)*t*t+1 },
-  // acceleration until halfway, then deceleration 
+  // acceleration until halfway, then deceleration
   easeInOutCubic: function (t) { return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1 },
-  // accelerating from zero velocity 
+  // accelerating from zero velocity
   easeInQuart: function (t) { return t*t*t*t },
-  // decelerating to zero velocity 
+  // decelerating to zero velocity
   easeOutQuart: function (t) { return 1-(--t)*t*t*t },
   // acceleration until halfway, then deceleration
   easeInOutQuart: function (t) { return t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t },
@@ -152,6 +156,6 @@ export const EasingFunctions = {
   easeInQuint: function (t) { return t*t*t*t*t },
   // decelerating to zero velocity
   easeOutQuint: function (t) { return 1+(--t)*t*t*t*t },
-  // acceleration until halfway, then deceleration 
+  // acceleration until halfway, then deceleration
   easeInOutQuint: function (t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t }
 };

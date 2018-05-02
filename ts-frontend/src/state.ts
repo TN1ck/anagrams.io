@@ -1,11 +1,11 @@
 import {observable, action, runInAction, computed} from 'mobx';
-import {min, max, groupBy} from 'lodash';
+import {min, max, groupBy, throttle} from 'lodash';
 import * as anagram from 'src/anagram';
 
 import {parseSearch} from 'src/utility';
 import {RequestStatus, getSubAnagrams, getDictionaries, Dictionary} from 'src/api';
 
-import {partitionArray} from 'src/utility';
+import {partitionArray, getNumberOfCPUs} from 'src/utility';
 
 const AnagramWorker = require('./anagram.worker');
 
@@ -40,7 +40,7 @@ export class AnagramState {
   @observable modalWord: string = 'anagrams io';
   @observable showModal: boolean = false;
 
-  @observable worker: Worker;
+  @observable workers: Worker[] = [];
   @observable finished: boolean = false;
 
   @observable width: number = 1;
@@ -303,12 +303,11 @@ export class AnagramState {
 
   async requestAnagram() {
 
-    if (this.worker) {
-      this.worker.terminate();
-    }
-    this.worker = new AnagramWorker();
+    this.workers.forEach(w => {
+      w.terminate();
+    });
 
-    const updateState = (state: anagram.AnagramGeneratorStepSerialized) => {
+    const updateState = throttle((state: anagram.AnagramGeneratorStepSerialized) => {
       if (this.finished) {
         return;
       }
@@ -319,32 +318,43 @@ export class AnagramState {
         this._expandedSolutions.push(...newExpandedSolutions);
       });
 
-      // (window as any).applicationState = this;
-    };
+    }, 100);
 
-    const eventListener = message => {
-      if (message.data === 'finish') {
+    const numberOfCPUs = getNumberOfCPUs();
+    // make sure there is one core left
+    const useCPUs = numberOfCPUs - 1;
+    console.log(`${numberOfCPUs} cores available. Using ${useCPUs}.`)
+    this.workers = Array(useCPUs).fill(0).map((i) => {
+      const worker = new AnagramWorker();
+      const eventListener = message => {
+        if (message.data === 'finish') {
 
-        runInAction(() => {
-          this.solvedSubanagrams.push(message.data.index + 1);
-          this.currentSubanagrams.shift();
-        });
-
-        // stop!
-        if (this.solvedSubanagrams.length === subanagrams.length) {
           runInAction(() => {
-            this.appState = AppState.done;
+            this.solvedSubanagrams.push(message.data.index + 1);
+            this.currentSubanagrams = this.currentSubanagrams.filter(n => {
+              return n !== message.data.index;
+            });
           });
+
+          // stop!
+          if (this.solvedSubanagrams.length === subanagrams.length) {
+            runInAction(() => {
+              this.appState = AppState.done;
+            });
+            return;
+          }
+          startNextWorker(i);
           return;
         }
-        startNextWorker();
-        return;
-      }
-      const newState: anagram.AnagramGeneratorStepSerialized = message.data;
-      updateState(newState);
-    };
+        const newState: anagram.AnagramGeneratorStepSerialized = message.data;
+        updateState(newState);
+      };
+      worker.addEventListener('message', eventListener);
+      return worker;
+    });
 
-    this.worker.addEventListener('message', eventListener);
+
+
 
 
     const cleanedQuery = anagram.sanitizeQuery(this.query);
@@ -389,7 +399,7 @@ export class AnagramState {
       return;
     }
 
-    const startNextWorker = () => {
+    const startNextWorker = (index) => {
       if (this.unsolvedSubanagrams.length === 0) {
         return;
       }
@@ -400,7 +410,8 @@ export class AnagramState {
         this.currentSubanagrams.push(nextWorkerIndex);
       });
 
-      this.worker.postMessage({
+      const worker = this.workers[index];
+      worker.postMessage({
         type: 'start',
         query: cleanedQuery,
         subanagram: subanagrams[nextWorkerIndex],
@@ -410,7 +421,9 @@ export class AnagramState {
 
     };
 
-    startNextWorker();
+    this.workers.forEach((_, index) => {
+      startNextWorker(index);
+    })
 
   }
 
