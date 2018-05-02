@@ -307,16 +307,25 @@ export class AnagramState {
       w.terminate();
     });
 
-    const updateState = throttle((state: anagram.AnagramGeneratorStepSerialized) => {
+    const currentTempState: anagram.AnagramGeneratorStepSerialized = {
+      numberOfPossibilitiesChecked: 0,
+      solutions: [],
+    };
+
+    const updateState = throttle(() => {
       if (this.finished) {
         return;
       }
 
       runInAction(() => {
-        this.numberOfPossibilitiesChecked += state.numberOfPossibilitiesChecked;
-        const newExpandedSolutions = anagram.expandSolutions(state.solutions, subanagrams);
+        this.numberOfPossibilitiesChecked += currentTempState.numberOfPossibilitiesChecked;
+        const newExpandedSolutions = anagram.expandSolutions(currentTempState.solutions, subanagrams);
         this._expandedSolutions.push(...newExpandedSolutions);
       });
+
+      currentTempState.numberOfPossibilitiesChecked = 0;
+      currentTempState.solutions = [];
+
 
     }, 100);
 
@@ -347,7 +356,9 @@ export class AnagramState {
           return;
         }
         const newState: anagram.AnagramGeneratorStepSerialized = message.data;
-        updateState(newState);
+        currentTempState.numberOfPossibilitiesChecked += newState.numberOfPossibilitiesChecked;
+        currentTempState.solutions.push(...newState.solutions);
+        updateState();
       };
       worker.addEventListener('message', eventListener);
       return worker;
