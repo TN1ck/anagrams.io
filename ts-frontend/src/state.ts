@@ -322,7 +322,7 @@ export class AnagramState {
 
     const numberOfCPUs = getNumberOfCPUs();
     // make sure there is one core left
-    const useCPUs = numberOfCPUs - 1;
+    const useCPUs = Math.max(numberOfCPUs - 1, 1);
     console.log(`${numberOfCPUs} cores available. Using ${useCPUs}.`)
     this.workers = Array(useCPUs).fill(0).map((i) => {
       const worker = new AnagramWorker();
