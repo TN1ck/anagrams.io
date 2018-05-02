@@ -5,8 +5,6 @@ export const Header = styled.div`
   background: ${THEME.colors.backgroundBright};
   color: ${THEME.colors.foregroundText};
   padding: ${THEME.margins.m4} 0 ${THEME.margins.m4};
-  display: flex;
-  justify-content: center;
 `;
 
 export const HeaderContainer = styled.div`
