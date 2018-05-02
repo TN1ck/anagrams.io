@@ -17,7 +17,10 @@ export function testPerformanceOne(): PerformanceWithSolutions {
   const start = performance.now();
   const test = mockData.testOne;
   // TODO
-  const generators = anagram.findAnagramSentences(test.string, test.subanagrams as any);
+  const realSubanagrams = test.subanagrams.map(s => {
+    return {...s, set: anagram.stringToBinary(s.set)};
+  })
+  const generators = anagram.findAnagramSentences(test.string, realSubanagrams as any);
   generators.map(({generator}) => {
     const values = generator();
     return values;
