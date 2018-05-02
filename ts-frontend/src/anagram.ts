@@ -186,7 +186,7 @@ export function findSubAnagrams(query: string, dictionary: SimpleWord[]): Simple
 }
 
 export function sortWordList<T extends BasicWord>(wordList: T[]): T[] {
-  return sortBy(wordList, w => -w.set.length);
+  return sortBy(wordList, w => -w.length);
 }
 
 export function findSortedSubAnagrmns(query: string, dictionary: SimpleWord[]): BasicWord[] {

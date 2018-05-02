@@ -72,7 +72,7 @@ export class AnagramState {
   get expandedSolutions() {
     if (this.allowOnlyOneSmallWord) {
       return this._expandedSolutions.filter(w => {
-        return w.filter(word => word.length < 4).length <= 1;
+        return w.filter(word => word.word.length < 4).length <= 1;
       });
     }
     return this._expandedSolutions;
