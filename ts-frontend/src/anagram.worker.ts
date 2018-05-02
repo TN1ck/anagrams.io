@@ -35,19 +35,18 @@ ctx.addEventListener('message', (message) => {
 
   const MINIMUM_TIME = 200;
 
-  for (let stateStep of generator) {
-    state.solutions = state.solutions.concat(stateStep.solutions);
-    state.numberOfPossibilitiesChecked += stateStep.numberOfPossibilitiesChecked;
-    const currentDate = +(new Date());
-    const diff = currentDate - lastTimeSendDate;
-    if (diff > MINIMUM_TIME
-      ) {
-        const lastTimeSend = serializeAnagramStep(state);
-        lastTimeSendDate = +(new Date());
-        ctx.postMessage(lastTimeSend);
-        state.solutions = [];
-        state.numberOfPossibilitiesChecked = 0;
-      }
+  const stateStep = generator();
+  state.solutions = state.solutions.concat(stateStep.solutions);
+  state.numberOfPossibilitiesChecked += stateStep.numberOfPossibilitiesChecked;
+  const currentDate = +(new Date());
+  const diff = currentDate - lastTimeSendDate;
+  if (diff > MINIMUM_TIME
+    ) {
+      const lastTimeSend = serializeAnagramStep(state);
+      lastTimeSendDate = +(new Date());
+      ctx.postMessage(lastTimeSend);
+      state.solutions = [];
+      state.numberOfPossibilitiesChecked = 0;
   }
 
   const serializedState = serializeAnagramStep(state);

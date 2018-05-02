@@ -29,11 +29,11 @@ export interface AnagramGeneratorStep {
   numberOfPossibilitiesChecked: number,
 };
 
-export type AnagramGenerator = IterableIterator<AnagramGeneratorStep>;
+// export type AnagramGenerator = IterableIterator<AnagramGeneratorStep>;
 
 export interface SubanagramSolver {
   subanagram: Word;
-  generator: AnagramGenerator;
+  generator: () => AnagramGeneratorStep;
 }
 
 export interface AnagramIteratorState {
@@ -252,13 +252,14 @@ export function findAnagramSentencesForInitialStack(
 ) {
   const nQuery = stringToWord(query);
   const queryLength = nQuery.word.length;
-  const generator = function* () {
+  const calculateAnagrams = () => {
     let stack: AnagramSolution[] = initialStack;
     // const solutions: AnagramSolution[] = [];
 
     let numberOfPossibilitiesChecked = initialStack.length;
 
     let newSolutions: AnagramSolution[] = [];
+    const solutions: AnagramSolution[] = []
     let numberOfSolutions = 0;
     const MAX_SOLUTIONS = 100;
 
@@ -305,17 +306,18 @@ export function findAnagramSentencesForInitialStack(
         stack.unshift(...newAnagramSolutions);
       }
 
-      yield {
-        solutions: newSolutions,
-        numberOfPossibilitiesChecked,
-      };
+      solutions.push(...newSolutions);
+
       numberOfSolutions += newSolutions.length;
       newSolutions = [];
     }
-
+    return {
+      solutions,
+      numberOfPossibilitiesChecked,
+    }
   }
+  return calculateAnagrams;
 
-  return generator();
 }
 
 export function findAnagramSentencesForSubAnagram(query: string, subanagrams: Word[], subanagram: Word): SubanagramSolver {
