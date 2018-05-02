@@ -34,6 +34,11 @@ injectGlobal`
     position: relative;
   }
 
+  a.link {
+    color: black;
+    font-weight: bold;
+  }
+
   /*
   When the modal is opened a ReactModal__Body--open class is added to the body tag.
   You can use this to remove scrolling on the body while the modal is open.
@@ -105,7 +110,8 @@ const App: React.StatelessComponent<{}> = () => {
           <Routes />
           <Footer>
             <span>{'Made by '}</span>
-            <a href="http://tomnick.org">{' Tom Nick '}</a>
+            <a href="http://tomnick.org">{'Tom Nick'}</a>
+            {' '}
             <span>{' & Taisia Tikhnovetskaya'}</span>
           </Footer>
         </div>

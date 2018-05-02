@@ -57,6 +57,7 @@ class SearchBar extends React.Component<{
   onSubmit: any;
   onChange: any;
   value: string;
+  placeholder?: string;
   disabled: boolean;
   innerRef?: (dom: HTMLInputElement) => any;
 }> {
@@ -67,10 +68,12 @@ class SearchBar extends React.Component<{
       onChange,
       value,
       disabled,
+      placeholder,
     } = this.props;
     return (
       <SearchBarForm onSubmit={onSubmit}>
         <SearchBarInput
+          placeholder={placeholder}
           type="text"
           disabled={disabled}
           value={value}

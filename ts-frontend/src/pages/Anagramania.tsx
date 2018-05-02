@@ -6,7 +6,6 @@ import {MARGIN_RAW, THEME} from 'src/theme';
 import store from 'src/state';
 
 import {
-  Footer,
   SearchBar,
   Header,
   InnerContainer,

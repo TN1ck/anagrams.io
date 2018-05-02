@@ -13,10 +13,16 @@ const ProfileContainer = styled.div`
   max-width: 300px;
   width: 100%;
   margin: ${THEME.margins.m2};
+
+  @media (max-width: 400px) {
+    margin-left: 0;
+    margin-right: 0;
+  }
 `;
 
 const ProfileImage = styled.img`
-  width: 100%;
+  height: 280px;
+  width: 280px;
 `;
 
 export class Profile extends React.Component<{
@@ -25,7 +31,9 @@ export class Profile extends React.Component<{
   render() {
     return (
       <ProfileContainer>
-        <ProfileImage src={this.props.avatar}/>
+        <ProfileImage
+          src={this.props.avatar}
+        />
         {this.props.children}
       </ProfileContainer>
     );
