@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import * as anagram from './anagram';
 
 const ctx: Worker = self as any;
