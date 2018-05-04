@@ -17,6 +17,8 @@ export enum AppState {
   anagramViewer = 'anagramViewer',
 }
 
+type VoidFunction = () => void;
+
 export class AnagramState {
   @observable queryStatus: RequestStatus = RequestStatus.none;
   @observable appState: string = AppState.none;
@@ -53,6 +55,8 @@ export class AnagramState {
   // caches
   groupedSpecialCache: {[key: string]: anagram.GroupedWordsDict} = {};
   groupedAnagramsCache: anagram.GroupedWordsDict = {};
+
+  updateState: _.Cancelable & VoidFunction;
 
   constructor() {
     this.setQuery = this.setQuery.bind(this);
@@ -312,7 +316,11 @@ export class AnagramState {
       solutions: [],
     };
 
-    const updateState = throttle(() => {
+    if (this.updateState) {
+      this.updateState.cancel();
+    }
+
+    this.updateState = throttle(() => {
       if (this.finished) {
         return;
       }
@@ -358,14 +366,11 @@ export class AnagramState {
         const newState: anagram.AnagramGeneratorStepSerialized = message.data;
         currentTempState.numberOfPossibilitiesChecked += newState.numberOfPossibilitiesChecked;
         currentTempState.solutions.push(...newState.solutions);
-        updateState();
+        this.updateState();
       };
       worker.addEventListener('message', eventListener);
       return worker;
     });
-
-
-
 
 
     const cleanedQuery = anagram.sanitizeQuery(this.query);
