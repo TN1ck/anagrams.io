@@ -210,7 +210,7 @@ class ExcludeOptions extends React.Component<{
             active={false}
             onClick={store.toggleExclude}
           >
-            {store.showExclude ? 'Use Own Words -' : 'Use Own Words +'}
+            {store.showExclude ? 'Preselect Words -' : 'Preselect Words +'}
           </SmallButton>
         </div>
       </div>

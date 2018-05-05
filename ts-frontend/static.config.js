@@ -64,7 +64,7 @@ export default {
         <meta property="og:type" content="website"/>
         <meta property="og:url" content="https://anagrams.io"/>
         <meta property="og:description" content="Find anagrams with the best anagram finder in the world!"/>
-        <meta property="og:image" content="https://anagrams.io/so-i-anagram-logo.png"/>
+        <meta property="og:image" content="https://anagrams.io/logo-512.png"/>
         <meta property="og:image:type" content="image/png"/>
         <meta property="og:image:width" content="512"/>
         <meta property="og:image:height" content="512"/>
