@@ -10,6 +10,8 @@ export const ProfilesContainer = styled.div`
 `;
 
 const ProfileContainer = styled.div`
+  margin-top: ${THEME.margins.m3};
+  margin-bottom: ${THEME.margins.m4};
   max-width: 300px;
   width: 100%;
   // margin: ${THEME.margins.m2};
