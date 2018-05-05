@@ -485,7 +485,7 @@ export class AnagramState {
       this.queryStatus = RequestStatus.loading;
       this.cleanedQuery = cleanedQuery;
       this.cleanedQueryWithSpaces = cleanedQueryWithSpaces;
-      this.exludedWordsToUse = excludedWordsCleaned;
+      this.exludedWordsToUse = anagram.sanitizeQuery(this.excludeWords, false);
     });
 
     if (subanagrams.length === 0) {
