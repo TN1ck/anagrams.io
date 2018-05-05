@@ -110,9 +110,9 @@ export class AnagramState {
 
     const excludedWords = this.excludedWordsAsSimpleWords;
     // const expanded = this._expandedSolutions;
-    const expanded = this._expandedSolutions.map(s => {
+    const expanded = excludedWords.length > 0 ? this._expandedSolutions.map(s => {
       return [...s, ...excludedWords];
-    });
+    }) : this._expandedSolutions;
 
     if (this.allowOnlyOneSmallWord) {
       return expanded.filter(w => {
