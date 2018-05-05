@@ -51,19 +51,31 @@ export default {
     <Html lang="en-US">
       <Head>
         <meta charSet="UTF-8" />
+        <title>anagrams.io</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, shrink-to-fit=no, user-scalable=no" />
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
         <link rel="icon" href="favicon.ico" type="image/x-icon" />
-        <title>anagrams.io</title>
         <meta name="description" content="Find anagrams with the best anagram finder in the world!"/>
         <meta name="keywords" content="Anagrams,Anagram,Subanagram,Anagram Sentences,Wordplays"/>
         <meta property="og:title" content="anagrams.io"/>
         <meta property="og:site_name" content="anagrams.io"/>
         <meta property="og:type" content="website"/>
-        <meta name="msapplication-TileColor" content="#e4e4e4" />
-        <meta name="msapplication-TileImage" content="/images/mstile-150x150.png" />
-        <meta name="theme-color" content="#e4e4e4" />
+        <meta property="og:type" content="website"/>
+        <meta property="og:url" content="https://anagrams.io"/>
+        <meta property="og:description" content="Find anagrams with the best anagram finder in the world!"/>
+        <meta property="og:image" content="https://anagrams.io/so-i-anagram-logo.png"/>
+        <meta property="og:image:type" content="image/png"/>
+        <meta property="og:image:width" content="512"/>
+        <meta property="og:image:height" content="512"/>
+
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#999999" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff" />
         <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" rel="stylesheet" />
         {renderMeta.styleTags}
       </Head>
