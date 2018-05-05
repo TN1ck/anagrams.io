@@ -2,6 +2,8 @@ import React from 'react';
 import * as Components from '../components';
 import {MARGIN_RAW} from 'src/theme';
 import {ProfilesContainer, Profile} from '../components/Profile';
+import tom from 'src/assets/tom.svg';
+import taisia from 'src/assets/taisia.svg';
 
 class About extends React.Component {
   render() {
@@ -28,7 +30,7 @@ class About extends React.Component {
             }}
           />
           <ProfilesContainer>
-            <Profile avatar={'http://via.placeholder.com/300x300'}>
+            <Profile avatar={tom}>
               <p>
               {`Tom is a software engineer by heart and loves to build products.
               He's always up for a technical challenge and to try out new technologies, but also likes to improve his UX and Design skills.`}
@@ -39,7 +41,7 @@ class About extends React.Component {
                 {', where he leads a team to create next gen storytelling tools.'}
               </p>
             </Profile>
-            <Profile avatar={'http://via.placeholder.com/300x300'}>
+            <Profile avatar={taisia}>
               <p>
                 {`When Taisia is not drawing furiously on her iPad, she's probably creating beats in Logic - just everything to create an amazing story.
                 Taisia helped to create key visuals and the UX. She was also a great motivation.`}
