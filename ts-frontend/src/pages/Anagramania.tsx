@@ -17,6 +17,7 @@ import {
   SmallTitle,
   TitleContainer,
   AnagramVisualizer,
+  SearchBarForm,
 } from 'src/components';
 
 import {withProps} from 'src/utility';
@@ -209,7 +210,7 @@ class ExcludeOptions extends React.Component<{
             active={false}
             onClick={store.toggleExclude}
           >
-            {store.showOptions ? 'Use Own Words -' : 'Use Own Words +'}
+            {store.showExclude ? 'Use Own Words -' : 'Use Own Words +'}
           </SmallButton>
         </div>
       </div>
@@ -330,60 +331,66 @@ class AnagramaniaHeader extends React.Component<{
             </SmallTitle>
           </TitleContainer>
           <HeaderContainer>
-            <SearchBar
-              value={query}
-              disabled={dictionaries.length === 0}
-              innerRef={this.setInputRef}
-              onChange={this.onQueryChange}
-              onSubmit={(e) => {
-                e.preventDefault();
-                requestAnagram();
-              }}
-            />
-            {
-              dictionaries.length === 0 ? (
-                <SmallButton
-                  active={false}
-                  style={{
-                    marginRight: THEME.margins.m1,
-                    marginTop: THEME.margins.m2,
-                  }}
-                >{'Loading dictionaries...'}</SmallButton>
-              ) : null
-            }
-            {dictionaries.map(d => {
-              return (
-                <SmallButton
-                  style={{
-                    marginRight: THEME.margins.m1,
-                    marginTop: THEME.margins.m2,
-                  }}
-                  key={d.id}
-                  onClick={() => setDictionary(d.id)}
-                  active={selectedDictionaries === d.id}
-                >
-                  {d.name}
-                </SmallButton>
-              );
-            })}
-            <ExcludeOptions />
-            <OptionsCollapse show={store.showExclude}>
-              <div style={{
-                paddingRight: 45,
-                marginTop: MARGIN_RAW.m2,
-                width: '100%',
-              }}>
-                <SearchBarInput
-                  value={store.excludeWords}
-                  placeholder={"Words that appear in the results"}
-                  type="text"
-                  onChange={e => store.setExcludeWords(e.target.value)}
-                />
-                <div style={{marginTop: MARGIN_RAW.m1}}>
-                  {store.excludeWordsHint}
-                </div>
-              </div>
-            </OptionsCollapse>
+              <SearchBar
+                value={query}
+                disabled={dictionaries.length === 0}
+                innerRef={this.setInputRef}
+                onChange={this.onQueryChange}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  requestAnagram();
+                }}
+              />
+              {
+                dictionaries.length === 0 ? (
+                  <SmallButton
+                    active={false}
+                    style={{
+                      marginRight: THEME.margins.m1,
+                      marginTop: THEME.margins.m2,
+                    }}
+                  >{'Loading dictionaries...'}</SmallButton>
+                ) : null
+              }
+              {dictionaries.map(d => {
+                return (
+                  <SmallButton
+                    style={{
+                      marginRight: THEME.margins.m1,
+                      marginTop: THEME.margins.m2,
+                    }}
+                    key={d.id}
+                    onClick={() => setDictionary(d.id)}
+                    active={selectedDictionaries === d.id}
+                  >
+                    {d.name}
+                  </SmallButton>
+                );
+              })}
+              <ExcludeOptions />
+              <SearchBarForm
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  requestAnagram();
+                }}
+              >
+                <OptionsCollapse show={store.showExclude}>
+                  <div style={{
+                    paddingRight: 45,
+                    marginTop: MARGIN_RAW.m2,
+                    width: '100%',
+                  }}>
+                    <SearchBarInput
+                      value={store.excludeWords}
+                      type="text"
+                      onChange={e => store.setExcludeWords(e.target.value)}
+                    />
+                    <div style={{marginTop: MARGIN_RAW.m1, color: 'red'}}>
+                      {store.isExcludeInputValid ? '' : 'The words you entered do not appear in the search result. You cannot search with these words.'}
+                    </div>
+                  </div>
+                </OptionsCollapse>
+              </SearchBarForm>
           </HeaderContainer>
         </InnerContainer>
       </Header>

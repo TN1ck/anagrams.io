@@ -25,6 +25,7 @@ export class AnagramState {
 
   @observable query: string = '';
   @observable queryToUse: string = '';
+  @observable exludedWordsToUse: string = '';
   @observable cleanedQuery: string = '';
   @observable cleanedQueryWithSpaces: string = '';
 
@@ -78,28 +79,22 @@ export class AnagramState {
     this.init();
   }
 
-  get excludeWordsHint() {
-    const excludedWordsClean = this.excludedWordsCleaned.join('');
+  get isExcludeInputValid() {
+    const excludedWordsClean = anagram.sanitizeQuery(this.excludeWords);
     const cleanedQuery = anagram.sanitizeQuery(this.query);
 
     const set1 = anagram.stringToBinary(excludedWordsClean);
     const set2 = anagram.stringToBinary(cleanedQuery);
 
-    if (anagram.isBinarySubset(set1, set2)) {
-      return '';
-    };
-
-    return 'The words you entered do not appear in the search result.';
+    return anagram.isBinarySubset(set1, set2);
   }
 
-  get excludedWordsCleaned() {
-    return this.excludeWords.split(' ').map(word => {
+  @computed
+  get excludedWordsAsSimpleWords(): anagram.SimpleWord[] {
+    const excludedWordsCleaned = this.exludedWordsToUse.split(' ').map(word => {
       return anagram.sanitizeQuery(word);
     }).filter(d => d !== '');
-  }
-
-  get excludedWordsAsSimpleWords(): anagram.SimpleWord[] {
-    return this.excludedWordsCleaned.map((s, i) => {
+    return excludedWordsCleaned.map((s, i) => {
       const w: anagram.SimpleWord = {
         set: anagram.stringToBinary(s),
         index: this.subanagrams.length + i,
@@ -110,11 +105,9 @@ export class AnagramState {
     })
   }
 
-
   get expandedSolutions() {
 
     const excludedWords = this.excludedWordsAsSimpleWords;
-    console.log(excludedWords);
     // const expanded = this._expandedSolutions;
     const expanded = this._expandedSolutions.map(s => {
       return [...s, ...excludedWords];
@@ -447,6 +440,10 @@ export class AnagramState {
       return;
     }
 
+    if (this.showExclude && !this.isExcludeInputValid) {
+      return;
+    }
+
     const clear = () => {
       this.appState = AppState.fetchingSubanagrams;
       this._expandedSolutions = [];
@@ -458,14 +455,16 @@ export class AnagramState {
       this.groupedAnagramsCache = {};
       this.groupedSpecialCache = {};
       this.subanagrams = [];
+      this.exludedWordsToUse = '';
     };
 
     clear();
     runInAction(clear);
 
+    const excludedWordsCleaned = this.showExclude ? anagram.sanitizeQuery(this.excludeWords) : '';
     // remove excluded words from cleanedQuery
     const cleanedQuerySet = anagram.stringToBinary(cleanedQuery);
-    const excludedWordsSet = anagram.stringToBinary(this.excludedWordsCleaned.join(''));
+    const excludedWordsSet = anagram.stringToBinary(excludedWordsCleaned);
     const excludedRemoved = anagram.removeBinary(cleanedQuerySet, excludedWordsSet);
     this.queryToUse = anagram.binaryToString(excludedRemoved);
 
@@ -479,6 +478,7 @@ export class AnagramState {
       this.queryStatus = RequestStatus.loading;
       this.cleanedQuery = cleanedQuery;
       this.cleanedQueryWithSpaces = cleanedQueryWithSpaces;
+      this.exludedWordsToUse = excludedWordsCleaned;
     });
 
     if (subanagrams.length === 0) {

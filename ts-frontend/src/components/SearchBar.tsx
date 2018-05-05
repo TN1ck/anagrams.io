@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {THEME} from 'src/theme';
 import Lense from './Lense';
 
-const SearchBarForm = styled.form`
+export const SearchBarForm = styled.form`
   display: flex;
   position: relative;
   width: 100%;
