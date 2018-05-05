@@ -125,7 +125,22 @@ export function joinTwoBinary(bin1: Uint8Array, bin2: Uint8Array): Uint8Array {
   return frequency;
 }
 
-function isBinarySubset(bin1: Uint8Array, bin2: Uint8Array): boolean {
+/**
+ * Remove all occurences of letters in bin2 from bin1 (bin1 - bin2)
+ *
+ * @param bin1 binary array from which we remove
+ * @param bin2 binary array which we use to remove
+ */
+export function removeBinary(bin1: Uint8Array, bin2: Uint8Array): Uint8Array {
+  const buffer = new ArrayBuffer(ALPHABET.length);
+  const frequency = new Uint8Array(buffer);
+  for (let i = 0; i < ALPHABET.length; i++) {
+    frequency[i] = bin1[i] - bin2[i];
+  }
+  return frequency;
+}
+
+export function isBinarySubset(bin1: Uint8Array, bin2: Uint8Array): boolean {
   for (let i = 0; i < ALPHABET.length; i++) {
     if (bin1[i] > bin2[i]) {
       return false;

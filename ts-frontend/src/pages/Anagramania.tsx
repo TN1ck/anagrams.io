@@ -7,6 +7,7 @@ import store from 'src/state';
 
 import {
   SearchBar,
+  SearchBarInput,
   Header,
   InnerContainer,
   SubTitle,
@@ -190,6 +191,32 @@ class AnagramaniaOptions extends React.Component<{
   }
 }
 
+@inject('store')
+@observer
+class ExcludeOptions extends React.Component<{
+  store?: AnagramState;
+}> {
+  render() {
+    return (
+      <div style={{
+        display: 'inline-block',
+        float: 'right',
+        paddingTop: MARGIN_RAW.m2,
+        paddingRight: 40,
+      }}>
+        <div>
+          <SmallButton
+            active={false}
+            onClick={store.toggleExclude}
+          >
+            {store.showOptions ? 'Use Own Words -' : 'Use Own Words +'}
+          </SmallButton>
+        </div>
+      </div>
+    );
+  }
+}
+
 
 @inject('store')
 @observer
@@ -339,6 +366,24 @@ class AnagramaniaHeader extends React.Component<{
                 </SmallButton>
               );
             })}
+            <ExcludeOptions />
+            <OptionsCollapse show={store.showExclude}>
+              <div style={{
+                paddingRight: 45,
+                marginTop: MARGIN_RAW.m2,
+                width: '100%',
+              }}>
+                <SearchBarInput
+                  value={store.excludeWords}
+                  placeholder={"Words that appear in the results"}
+                  type="text"
+                  onChange={e => store.setExcludeWords(e.target.value)}
+                />
+                <div style={{marginTop: MARGIN_RAW.m1}}>
+                  {store.excludeWordsHint}
+                </div>
+              </div>
+            </OptionsCollapse>
           </HeaderContainer>
         </InnerContainer>
       </Header>

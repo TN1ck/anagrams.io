@@ -9,7 +9,7 @@ const SearchBarForm = styled.form`
   width: 100%;
 `;
 
-const SearchBarInput = styled.input`
+export const SearchBarInput = styled.input`
   margin: 0;
   border: 1px solid ${THEME.colors.border};
   border: none;
