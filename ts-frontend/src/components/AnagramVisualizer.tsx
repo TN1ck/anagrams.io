@@ -224,6 +224,22 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
   constructor(props) {
     super(props);
 
+    this.resetState();
+
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+
+    this.onTouchMove = this.onTouchMove.bind(this);
+    this.onTouchStart = this.onTouchStart.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
+
+    this.setContainerRef = this.setContainerRef.bind(this);
+    this.setEditMode = this.setEditMode.bind(this);
+    this.setNormalMode = this.setNormalMode.bind(this);
+  }
+
+  resetState() {
     const word = this.props.word;
     const anagram = this.props.anagram;
     const state = this.setAnagram(anagram, word);
@@ -245,18 +261,8 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       },
       viewState: this.props.viewState || 'normal',
     };
-    this.onMouseMove = this.onMouseMove.bind(this);
-    this.onMouseDown = this.onMouseDown.bind(this);
-    this.onMouseUp = this.onMouseUp.bind(this);
-
-    this.onTouchMove = this.onTouchMove.bind(this);
-    this.onTouchStart = this.onTouchStart.bind(this);
-    this.onTouchEnd = this.onTouchEnd.bind(this);
-
-    this.setContainerRef = this.setContainerRef.bind(this);
-    this.setEditMode = this.setEditMode.bind(this);
-    this.setNormalMode = this.setNormalMode.bind(this);
   }
+
   componentDidMount() {
     if (typeof document !== 'undefined') {
       document.addEventListener('mousemove',this.onMouseMove);
@@ -264,7 +270,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       document.addEventListener('touchend', this.onTouchEnd);
       document.addEventListener('touchmove', this.onTouchMove);
     }
-
   }
   componentWillUnmount() {
     if (typeof document !== 'undefined') {
@@ -485,6 +490,11 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
   }
 
   render() {
+
+    const isWindowUndefined = typeof window === 'undefined';
+    if (isWindowUndefined) {
+      return null;
+    }
 
     let {word, anagram} = this.props;
     let {word: currentWord, anagram: currentAnagram} = this.state;

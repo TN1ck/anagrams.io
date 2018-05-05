@@ -13,6 +13,9 @@ class About extends React.Component<{
   componentWillmount() {
     this.props.store.setShareWords();
   }
+  componentDidMount() {
+    this.props.store.setShareWords();
+  }
   render() {
     const store = this.props.store;
     return (
