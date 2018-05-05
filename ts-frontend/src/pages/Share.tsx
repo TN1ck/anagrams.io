@@ -10,6 +10,9 @@ import {MARGIN_RAW} from 'src/theme';
 class About extends React.Component<{
   store?: AnagramState;
 }> {
+  componentWillmount() {
+    this.props.store.setShareWords();
+  }
   render() {
     const store = this.props.store;
     return (

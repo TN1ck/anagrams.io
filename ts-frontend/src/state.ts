@@ -69,6 +69,7 @@ export class AnagramState {
     this.closeModal = this.closeModal.bind(this);
     this.saveAnagram = this.saveAnagram.bind(this);
     this.requestAnagram = this.requestAnagram.bind(this);
+    this.setShareWords = this.setShareWords.bind(this);
     // options
     this.toggleGroupByNumberOfWords = this.toggleGroupByNumberOfWords.bind(this);
     this.toggleShowOptions = this.toggleShowOptions.bind(this);
@@ -306,7 +307,8 @@ export class AnagramState {
     return groups;
   }
 
-  async init() {
+  @action
+  setShareWords() {
     if (typeof window !== 'undefined') {
       const location = window.location;
       const search = location.search;
@@ -320,6 +322,11 @@ export class AnagramState {
         });
       }
     }
+  }
+
+  async init() {
+
+    this.setShareWords();
 
     const result = await getDictionaries();
     runInAction(() => {
