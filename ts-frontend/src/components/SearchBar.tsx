@@ -25,6 +25,10 @@ export const SearchBarInput = styled.input`
   &:focus {
     outline: 0;
   }
+
+  @media (max-width: 600px) {
+    font-size: ${THEME.font.sizeBase};
+  }
 `;
 
 const SearchButton = styled.button`

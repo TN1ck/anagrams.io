@@ -207,6 +207,8 @@ class ExcludeOptions extends React.Component<{
       }}>
         <div>
           <SmallButton
+            // fix for mobile, so it does not wrap
+            style={{marginLeft: -10}}
             active={false}
             onClick={store.toggleExclude}
           >

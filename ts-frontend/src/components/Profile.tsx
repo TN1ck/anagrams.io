@@ -25,6 +25,11 @@ const ProfileContainer = styled.div`
 const ProfileImage = styled.img`
   height: 280px;
   width: 280px;
+
+  @media (max-width: 600px) {
+    width: 230px;
+    height: 230px;
+  }
 `;
 
 export class Profile extends React.Component<{
