@@ -20,21 +20,20 @@ class About extends React.Component<{
     const store = this.props.store;
     return (
       <div>
-        <Components.Header style={{paddingBottom: MARGIN_RAW.m2}}>
-          <Components.InnerContainer>
+        <Components.Header style={{paddingBottom: MARGIN_RAW.m2, background: 'transparent'}}>
+          <Components.InnerContainer style={{maxWidth: 670}}>
             <Components.Title>
               {'Share'}
             </Components.Title>
           </Components.InnerContainer>
         </Components.Header>
-        <Components.InnerContainer>
-          <div style={{marginTop: 30}}>
-            <Components.AnagramVisualizer
-              anagram={store.modalAnagram}
-              word={store.modalWord}
-              save={store.saveAnagram}
-            />
-          </div>
+        <Components.InnerContainer style={{maxWidth: 740}}>
+          <Components.AnagramVisualizer
+            asBlock
+            anagram={store.modalAnagram}
+            word={store.modalWord}
+            save={store.saveAnagram}
+          />
         </Components.InnerContainer>
       </div>
     );

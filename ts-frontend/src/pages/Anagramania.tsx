@@ -383,6 +383,7 @@ class AnagramaniaHeader extends React.Component<{
                     <SearchBarInput
                       value={store.excludeWords}
                       type="text"
+                      placeholder={'Words to be always included...'}
                       onChange={e => store.setExcludeWords(e.target.value)}
                     />
                     <div style={{marginTop: MARGIN_RAW.m1, color: 'red'}}>

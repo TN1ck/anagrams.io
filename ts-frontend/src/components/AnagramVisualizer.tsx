@@ -170,6 +170,7 @@ interface AnagramVisualizerProps {
   viewState?: string;
   save?: (word: string, anagram: string) => any;
   close?: () => any;
+  asBlock?: boolean;
 }
 
 function splitWord(word: string) {
@@ -583,7 +584,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
 
     return (
       <div style={{display: 'flex', justifyContent: 'center'}}>
-        <Card style={{display: 'inline-block', maxWidth: '100%'}}>
+        <Card style={{display: this.props.asBlock ? 'block' : 'inline-block', maxWidth: '100%', width: this.props.asBlock ? '100%' : 'auto'}}>
           <WordContainer>
             <div>
               <div style={{marginBottom: MARGIN_RAW.m2}}>

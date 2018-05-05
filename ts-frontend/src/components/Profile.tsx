@@ -12,7 +12,7 @@ export const ProfilesContainer = styled.div`
 const ProfileContainer = styled.div`
   max-width: 300px;
   width: 100%;
-  margin: ${THEME.margins.m2};
+  // margin: ${THEME.margins.m2};
 
   @media (max-width: 400px) {
     margin-left: 0;
@@ -27,10 +27,11 @@ const ProfileImage = styled.img`
 
 export class Profile extends React.Component<{
   avatar: string;
+  style: any;
 }> {
   render() {
     return (
-      <ProfileContainer>
+      <ProfileContainer style={this.props.style}>
         <ProfileImage
           src={this.props.avatar}
         />
