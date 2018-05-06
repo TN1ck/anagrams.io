@@ -15,6 +15,10 @@ const BEST_OF_DATA_ENGLISH = [
   //   anagram: 'Cowards Lie'
   // },
   {
+    word: 'United States of America',
+    anagram: 'Administrates a cute foe'
+  },
+  {
     word: 'Russian Federation',
     anagram: 'Infantries aroused'
   },
@@ -52,6 +56,10 @@ const BEST_OF_DATA_GERMAN = [
   {
     word: 'Albert Einstein',
     anagram: 'Internatsliebe'
+  },
+  {
+    word: 'Martin Schulz',
+    anagram: 'Schmilzt Uran'
   }
 ];
 
