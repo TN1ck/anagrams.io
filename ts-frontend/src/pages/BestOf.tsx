@@ -1,6 +1,6 @@
 import React from 'react';
 import * as Components from '../components';
-import {MARGIN_RAW} from 'src/theme';
+import {MARGIN_RAW, THEME} from 'src/theme';
 import {
   ResultBestOf,
 } from 'src/molecules/AnagramResult';
@@ -113,8 +113,10 @@ class About extends React.Component {
               );
             })
           }
+          <Components.SubTitleContainer style={{textAlign: 'center', marginTop: THEME.margins.m4}}>
+            <a className="link" href="mailto:tomwanick@gmail.com">Found a cool anagram? Send it to us!</a>
+          </Components.SubTitleContainer>
         </div>
-
         </Components.InnerContainer>
       </div>
     );
