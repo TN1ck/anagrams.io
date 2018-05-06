@@ -221,6 +221,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     y: number;
   }[]
 }> {
+  componentIsMounted: boolean = false;
   container: HTMLElement;
   constructor(props) {
     super(props);
@@ -265,6 +266,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
   }
 
   componentDidMount() {
+    this.componentIsMounted = true;
     if (typeof document !== 'undefined') {
       document.addEventListener('mousemove',this.onMouseMove);
       document.addEventListener('mouseup', this.onMouseUp);
@@ -273,6 +275,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     }
   }
   componentWillUnmount() {
+    this.componentIsMounted = false;
     if (typeof document !== 'undefined') {
       document.removeEventListener('mousemove', this.onMouseMove);
       document.removeEventListener('mouseup', this.onMouseMove);
@@ -322,7 +325,9 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     this.onDown(pageX, pageY, wordIndex);
   }
   onDown(pageX: number, pageY: number, wordIndex: number) {
-
+    if (!this.componentIsMounted) {
+      return;
+    }
     const wordOffset = this.state.wordOffsets[wordIndex];
 
     this.setState({
@@ -339,6 +344,9 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     this.onMouseUp();
   }
   onMouseUp() {
+    if (!this.componentIsMounted) {
+      return;
+    }
     this.state.wordDragState.activeIndex = -1;
     this.setState({
       wordDragState: {
@@ -396,6 +404,9 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
   }
 
   onMove(pageX, pageY) {
+    if (!this.componentIsMounted) {
+      return;
+    }
     const dragState = this.state.wordDragState;
     if (dragState.mouseDown) {
 

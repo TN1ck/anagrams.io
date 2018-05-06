@@ -25,12 +25,19 @@ interface AnagramSausage {
 export default class AnagramSausages extends React.Component<AnagramSausagesProps, {
   sausages: AnagramSausage[],
 }> {
+  componentIsMounted: boolean = false;
   constructor(props) {
     super(props);
     const sausages = this.calculateSausages(props);
     this.state = {
       sausages,
     };
+  }
+  componentWillMount() {
+    this.componentIsMounted = true;
+  }
+  componentWillUnmount() {
+    this.componentIsMounted = false;
   }
   componentWillReceiveProps(newProps: AnagramSausagesProps) {
     if (newProps.anagram !== this.props.anagram || newProps.word !== this.props.word) {
@@ -64,6 +71,9 @@ export default class AnagramSausages extends React.Component<AnagramSausagesProp
     const animationDuration = this.props.animationDuration || 500;
     const startTime = +(new Date());
     const updater = () => {
+      if (!this.componentIsMounted) {
+        return;
+      }
       const now = +(new Date());
       const diff = now - startTime;
       const progress = diff / animationDuration;
