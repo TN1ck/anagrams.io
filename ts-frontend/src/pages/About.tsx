@@ -24,7 +24,7 @@ class About extends React.Component {
             dangerouslySetInnerHTML={{
               __html: `
                 <p style="margin-top: 0;">
-                  We created <a class="link" href="https://anagrams.io">anagrams.io</a> with the intention to provide the best anagram finder in the world to the world.
+                  We created <a class="link" href="https://anagrams.io">anagrams.io</a> with the intention to provide the best anagram finder in the world, to the world.
                   We hope you'll have as much fun as we did exploring the anagrams.
                 </p>
 
@@ -36,7 +36,7 @@ class About extends React.Component {
             <Profile avatar={tom} style={{marginRight: MARGIN_RAW.m2}}>
               <p>
               {`Tom is a software engineer by heart and loves to build products.
-              He's always up for a technical challenge and to try out new technologies, but also likes to improve his UX and Design skills.`}
+              He's always up for a technical challenge and to try out new technologies, but also likes to improve his UX and design skills.`}
               </p>
               <p>
                 {' Tom is currently working as Head of Software Engineering at the '}
@@ -52,7 +52,7 @@ class About extends React.Component {
               <p>
                 {`Taisia is currently employeed as a infographis trainee at the `}
                 <a className="link" href="https://infographics.group">{'infographics.group'}</a>
-                {`, where she's creating amazing stories to enable knowledge.`}
+                {`, where she's creating amazing stories to teach about complex topics.`}
               </p>
             </Profile>
           </ProfilesContainer>

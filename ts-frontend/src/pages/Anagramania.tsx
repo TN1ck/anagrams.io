@@ -389,7 +389,7 @@ class AnagramaniaHeader extends React.Component<{
                       onChange={e => store.setExcludeWords(e.target.value)}
                     />
                     <div style={{marginTop: MARGIN_RAW.m1, color: 'red'}}>
-                      {store.isExcludeInputValid ? '' : 'The words you entered do not appear in the search result. You cannot search with these words.'}
+                      {store.isExcludeInputValid ? '' : 'The words you entered do not appear in the search query. You cannot search with these words.'}
                     </div>
                   </div>
                 </OptionsCollapse>
