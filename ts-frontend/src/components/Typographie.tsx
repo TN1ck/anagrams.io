@@ -25,6 +25,12 @@ export const SubTitle = styled.h2`
   text-align: center;
 `;
 
+export const SubTitleContainer = styled.div`
+  float: left;
+  width: 100%;
+  margin-left: ${THEME.margins.m2};
+`;
+
 export const SmallTitle = styled.div`
   font-weight: normal;
 `;

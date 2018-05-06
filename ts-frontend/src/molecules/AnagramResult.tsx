@@ -16,16 +16,18 @@ import AnagramSausages from 'src/components/AnagramSausages';
 
 const MAX_ITEMS_TO_SHOW_AT_ONCE = 3;
 
-class ResultVisualisation extends React.Component<{
+export class ResultVisualisation extends React.Component<{
   word: string,
   query: string,
   index: number,
+  noMargin?: boolean,
 }> {
   render() {
     const {
       word,
       query,
       index,
+      noMargin,
     } = this.props;
 
     const {
@@ -39,7 +41,7 @@ class ResultVisualisation extends React.Component<{
     const paddingTop = 10;
     const paddingBottom = 10;
 
-    const marginLeft = (('' + (index + 1)).length + 2) * letterWidth;
+    const marginLeft = noMargin ? 0 : (('' + (index + 1)).length + 2) * letterWidth;
 
     return (
       <div style={{marginLeft: marginLeft, marginTop: 2, marginBottom: -3}}>
@@ -58,7 +60,88 @@ class ResultVisualisation extends React.Component<{
   }
 }
 
-class Result extends React.Component<{
+export class ResultBestOf extends React.Component<{
+  word: string;
+  anagram: string;
+  share?: (anagram: string, word: string) => any;
+}> {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    const {word, anagram: wordAnagram} = this.props;
+    console.log(word, wordAnagram);
+
+    const {
+      height,
+      width,
+      letterHeight,
+      letterWidth,
+      strokeWidth,
+    } = calculateWidths(wordAnagram, word, 14);
+
+    const paddingTop = 10;
+    const paddingBottom = 10;
+
+    return (
+      <AnagramResultGroup
+        state={anagram.AnagramResultState.solved}
+        noResults={false}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          minWidth: 233,
+          width: 'auto',
+        }}
+      >
+        <ResultContainer
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+
+          <div style={{display: 'flex', justifyContent: 'center'}}>
+            <div style={{display: 'flex', flexDirection: 'column'}}>
+              <div style={{
+                fontWeight: 'bold',
+              }}>
+                {word}
+              </div>
+              <AnagramSausages
+                word={word}
+                anagram={wordAnagram}
+                height={height + paddingBottom * 2}
+                wordWidth={width}
+                characterWidth={letterWidth}
+                characterHeight={letterHeight}
+                paddingTop={paddingTop}
+                strokeWidth={strokeWidth}
+              />
+              <div style={{
+                fontWeight: 'bold',
+              }}>{wordAnagram}</div>
+            </div>
+          </div>
+
+          <div style={{textAlign: 'center'}}>
+            <SmallButton
+              onClick={(e) => {
+                this.props.share(wordAnagram, word);
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              active={false}>{'CHANGE & SHARE'}</SmallButton>
+          </div>
+
+        </ResultContainer>
+      </AnagramResultGroup>
+    );
+  }
+}
+
+export class Result extends React.Component<{
   result: anagram.SimpleWord[];
   index: number;
   query: string;

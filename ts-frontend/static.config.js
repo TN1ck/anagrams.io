@@ -36,6 +36,10 @@ export default {
         component: "src/pages/Styleguide",
       },
       {
+        path: "/bestof",
+        component: "src/pages/BestOf",
+      },
+      {
         is404: true,
         component: "src/pages/404",
       },

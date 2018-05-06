@@ -8,20 +8,15 @@ import {
   AnagramResultsContainer,
   AnagramResultRow,
   SmallButton,
+  SubTitleContainer,
 } from 'src/components';
 
-import {AnagramState, AppState} from '../state';
+import {AnagramState} from '../state';
 
 import * as anagram from 'src/anagram';
 
 import AnagramResult from './AnagramResult';
 import { AnagramResultState } from 'src/anagram';
-
-const SubTitleContainer = styled.div`
-  float: left;
-  width: 100%;
-  margin-left: ${THEME.margins.m2};
-`;
 
 const ShowMoreButtonContainer = styled.div`
   margin-top: ${THEME.margins.m2};

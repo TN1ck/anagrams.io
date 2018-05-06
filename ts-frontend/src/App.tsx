@@ -93,7 +93,7 @@ const App: React.StatelessComponent<{}> = () => {
               >{'About'}</SmallButton>
             </Link>
             <Link
-              to='/share'
+              to='/bestof'
               exact
               activeStyle={{
                 fontWeight: 'bold',
@@ -103,7 +103,7 @@ const App: React.StatelessComponent<{}> = () => {
                 active={false}
                 useFontWeightHover
                 style={{fontWeight: 'inherit'}}
-              >{'Share'}</SmallButton>
+              >{'Best Of'}</SmallButton>
             </Link>
           </div>
 

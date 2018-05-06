@@ -31,6 +31,7 @@ export const Card = styled.div`
   color: ${THEME.colors.foregroundText};
   padding: ${THEME.margins.m4};
   box-shadow: ${THEME.dropShadow.s1};
+  border-radius: ${THEME.borderRadius};
   position: relative;
 `;
 
