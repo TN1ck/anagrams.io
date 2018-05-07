@@ -92,6 +92,7 @@ export class ResultBestOf extends React.Component<{
           justifyContent: 'center',
           minWidth: 233,
           width: 'auto',
+          paddingBottom: 20,
         }}
       >
         <ResultContainer
@@ -125,7 +126,7 @@ export class ResultBestOf extends React.Component<{
             </div>
           </div>
 
-          <div style={{textAlign: 'center'}}>
+          {/* <div style={{textAlign: 'center'}}>
             <SmallButton
               onClick={(e) => {
                 this.props.share(wordAnagram, word);
@@ -133,7 +134,7 @@ export class ResultBestOf extends React.Component<{
                 e.stopPropagation();
               }}
               active={false}>{'CHANGE & SHARE'}</SmallButton>
-          </div>
+          </div> */}
 
         </ResultContainer>
       </AnagramResultGroup>
