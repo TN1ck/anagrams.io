@@ -41,6 +41,14 @@ const BEST_OF_DATA_ENGLISH = [
   {
     word: 'Christianity',
     anagram: 'Hi tiny racist'
+  },
+  {
+    word: 'Make a selfie',
+    anagram: 'Same fake lie'
+  },
+  {
+    word: 'We won this',
+    anagram: 'Now we shit'
   }
 ];
 

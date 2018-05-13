@@ -80,19 +80,6 @@ const App: React.StatelessComponent<{}> = () => {
               >{'Search'}</SmallButton>
             </Link>
             <Link
-              to='/about'
-              exact
-              activeStyle={{
-                fontWeight: 'bold',
-              }}
-            >
-              <SmallButton
-                active={false}
-                useFontWeightHover
-                style={{fontWeight: 'inherit'}}
-              >{'About'}</SmallButton>
-            </Link>
-            <Link
               to='/bestof'
               exact
               activeStyle={{
@@ -104,6 +91,19 @@ const App: React.StatelessComponent<{}> = () => {
                 useFontWeightHover
                 style={{fontWeight: 'inherit'}}
               >{'Best Of'}</SmallButton>
+            </Link>
+            <Link
+              to='/about'
+              exact
+              activeStyle={{
+                fontWeight: 'bold',
+              }}
+            >
+              <SmallButton
+                active={false}
+                useFontWeightHover
+                style={{fontWeight: 'inherit'}}
+              >{'About'}</SmallButton>
             </Link>
           </div>
 
