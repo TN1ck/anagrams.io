@@ -63,6 +63,15 @@ class About extends React.Component {
               `
             }}
           />
+          <br />
+          <div
+            dangerouslySetInnerHTML={{
+              __html: `
+                The used datasets were created by Torsten Brischalle and can be found <a class="link" href="http://www.aaabbb.de/WordList/WordList_en.php">here</a>.
+                Some words are taken from datasets by Hermit Dave and can be found <a class="link" href="https://github.com/hermitdave/FrequencyWords">here</a>.
+              `
+            }}
+          />
         </Card>
         </Components.InnerContainer>
       </div>
