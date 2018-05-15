@@ -92,7 +92,7 @@ export default {
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
 
-          gtag('config', 'UA-58665819-4', { 'anonymize_ip': true });
+          gtag('config', 'UA-58665819-3', { 'anonymize_ip': true });
         ` }}
       />
       <script src="https://cdn.ravenjs.com/3.22.2/raven.min.js" crossOrigin="anonymous"></script>
