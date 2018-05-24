@@ -84,8 +84,8 @@ export default {
         {renderMeta.styleTags}
       </Head>
       <Body>{children}</Body>
-      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-58665819-3" />
-      <script
+      {/* <script async src="https://www.googletagmanager.com/gtag/js?id=UA-58665819-3" /> */}
+      {/* <script
         dangerouslySetInnerHTML={{
           __html: `
           window.dataLayer = window.dataLayer || [];
@@ -96,7 +96,7 @@ export default {
         ` }}
       />
       <script src="https://cdn.ravenjs.com/3.22.2/raven.min.js" crossOrigin="anonymous"></script>
-      <script dangerouslySetInnerHTML={{__html: `Raven.config('https://ca404d6267644f978c26ee64994a5066@sentry.io/286292').install();`}} />
+      <script dangerouslySetInnerHTML={{__html: `Raven.config('https://ca404d6267644f978c26ee64994a5066@sentry.io/286292').install();`}} /> */}
     </Html>
   ),
   webpack: (config, { defaultLoaders, stage }) => {
