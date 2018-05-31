@@ -8,9 +8,7 @@ We may change this privacy policy from time to time by updating this page. You s
 ## I. General
 If we collect, manage, process or make use of your personal data, we do so in accordance with the German and European data protection regulation.
 
-You can browse this website without giving us any information, and we won’t know who you are. You are free to enter personal data, for example when you decide to contact us, subscribe to our newsletter or submit a project request. This personal data can include: first and last name, email address and project-specific information. We use this data to answer your request.
-
-Within the scope of legal provisions, we may analyse anonymised user profiles for the purpose of advertising, market research and to improve our services, provided you have not made use of your legal right to object this use of your data.
+You can browse this website without giving us any information, and we won’t know who you are. When searching for anagrams on this website, no information is stored on the server. We also like to point out, that before sending the query to the server, non-letters are removed and the letters are sorted. That means, "Angela Merkel" would be seen as "aaeeegkllmnr" by the server. Which makes it impossible to get personal information out of anagram queries.
 
 ## II. Consent and revocation
 If we use data for a purpose that in accordance with the legal regulations requires your permission, we will ask you explicitly for your permission. You can revoke this consent at any time. If you want to revoke a consent, please contact us at [tomwanick@gmail.com](mailto:tomwanick@gmail.com).
