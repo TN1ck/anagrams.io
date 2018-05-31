@@ -60,6 +60,7 @@
     "react-router": "4.2.0",
     "react-router-dom": "4.2.2",
     "recharts": "1.0.0-beta.1",
+    "showdown": "^1.8.6",
     "styled-components": "3.2.6",
     "styled-theming": "2.2.0"
   }

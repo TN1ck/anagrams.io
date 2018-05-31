@@ -4,8 +4,21 @@ import path from "path";
 import fs from "fs";
 import ExtractTextPlugin from "extract-text-webpack-plugin";
 const convPaths = require("convert-tsconfig-paths-to-webpack-aliases").default;
+import showdown from "showdown";
+
+const converter = new showdown.Converter();
+
 
 const typescriptWebpackPaths = require("./webpack.config.js");
+
+function getPrivacyHtml() {
+  return new Promise(resolve => {
+    fs.readFile(path.join(__dirname, 'src/privacy.md'), 'utf8', (err, text) => {
+      const html = converter.makeHtml(text);
+      resolve(html);
+    })
+  });
+}
 
 export default {
   entry: path.join(__dirname, "src", "index.tsx"),
@@ -13,7 +26,8 @@ export default {
     title: "Anagrams.io",
   }),
   siteRoot: "https://anagrams.io",
-  getRoutes: () => {
+  getRoutes: async () => {
+    const privacyHtml = await getPrivacyHtml();
     return [
       {
         path: "/",
@@ -26,6 +40,13 @@ export default {
       {
         path: "/share",
         component: "src/pages/Share",
+      },
+      {
+        path: "/privacy",
+        component: "src/pages/Privacy",
+        getData: () => ({
+          privacyHtml,
+        })
       },
       {
         path: "/performance",

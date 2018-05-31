@@ -33,6 +33,11 @@ export const Card = styled.div`
   box-shadow: ${THEME.dropShadow.s1};
   border-radius: ${THEME.borderRadius};
   position: relative;
+
+  a {
+    color: black;
+    font-weight: bold;
+  }
 `;
 
 export const Footer = styled.div`

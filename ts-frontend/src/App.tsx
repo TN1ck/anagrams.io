@@ -113,6 +113,9 @@ const App: React.StatelessComponent<{}> = () => {
             <a href="http://tomnick.org">{'Tom Nick'}</a>
             {' '}
             <span>{' & Taisia Tikhnovetskaya'}</span>
+            <div style={{marginTop: MARGIN_RAW.m2}}>
+              <Link to="/privacy">{'Privacy'}</Link>
+            </div>
           </Footer>
         </div>
       </Router>
