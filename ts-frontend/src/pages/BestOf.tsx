@@ -70,6 +70,10 @@ const BEST_OF_DATA_GERMAN = [
     anagram: 'Schmilzt Uran'
   },
   {
+    word: 'Franz Josef Strauss',
+    anagram: 'Erfasst Sonjas Furz',
+  },
+  {
     word: 'Jan Boehmermann',
     anagram: 'Ehrenmann am Job',
     foundBy: 'Schulzenbrothers',
@@ -106,14 +110,8 @@ const BEST_OF_DATA_GERMAN = [
     foundBy: 'EHEC',
   },
   {
-    word: 'Markus Söder',
+    word: 'Markus Soeder',
     anagram: 'Ausserdem Ork',
-    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzqbx16',
-    foundBy: 'EHEC',
-  },
-  {
-    word: 'Franz Josef Strauß',
-    anagram: 'Sanfter Sojafurz',
     link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzqbx16',
     foundBy: 'EHEC',
   },

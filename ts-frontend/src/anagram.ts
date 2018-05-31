@@ -75,7 +75,8 @@ export function sanitizeQuery(str: string, removeSpaces: boolean = true): string
 
   const umlauts = str.replace(/[üÜ]/g, 'ue')
     .replace(/[äÄ]/g, 'ae')
-    .replace(/[öÖ]/g, 'oe');
+    .replace(/[öÖ]/g, 'oe')
+    .replace(/[ß]/g, 'ss');
 
   if (removeSpaces) {
     return umlauts.toLowerCase().replace(/[^a-z]/g, '');
