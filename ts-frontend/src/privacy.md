@@ -25,7 +25,9 @@ You can prevent cookies from being saved on your end device by setting your brow
 ## 1. Web analytics cookies
 Web analytics cookies collect aggregated data that helps us understand how you use our website and how we can improve your experience of our website. For this purpose, the following tools create reports and statistics of the use of our website and further browsing habits:
 
-* __Google Analytics__: We use Google Analytics to evaluate the user behaviour on our website. Google analyzes your use of our website and creates reports and statistics about website activities and further browsing habits. You can prevent the information collected by cookies from being used by Google with the browser plugin available under the following link: [https://tools.google.com/dlpage/gaoptout?hl=de](https://tools.google.com/dlpage/gaoptout?hl=de).
+* __Google Analytics__: We use Google Analytics to evaluate the user behaviour on our website. Google analyzes your use of our website and creates reports and statistics about website activities and further browsing habits.
+We would like to point out that on this website Google Analytics has been extended to include IP anonymisation in order to ensure anonymous collection of IP addresses (so-called IP masking).
+You can prevent the information collected by cookies from being used by Google with the browser plugin available under the following link: [https://tools.google.com/dlpage/gaoptout?hl=de](https://tools.google.com/dlpage/gaoptout?hl=de).
 
 IV. Disclosure, amendment and deletion of data
 You may request details of personal information which we hold about you. If you would like a copy of the information held on you please contact us at [tomwanick@gmail.com](mailto:tomwanick@gmail.com). If you think any information we have about you is incorrect or incomplete, please contact us at [tomwanick@gmail.com](mailto:tomwanick@gmail.com). We will correct, delete or update any information as soon as possible.
