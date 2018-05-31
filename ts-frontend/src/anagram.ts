@@ -425,6 +425,10 @@ export enum AnagramResultState {
   solved = "solved",
 }
 
+export function isLetter(letter) {
+  // ignore the dot for now: TODO, refactor
+  return letter.match(/[a-z]/i) || ['ü', 'ä', 'ö', 'ß', '.'].includes(letter);
+}
 
 export function getAnagramMapping(w1: string, w2: string): number[] {
   w1 = w1.toLowerCase();
@@ -435,7 +439,8 @@ export function getAnagramMapping(w1: string, w2: string): number[] {
   // let index2 = 0;
   // let index = 0;
   for (let s of w1) {
-    if (s === ' ') {
+    // if it's not a letter, ignore it
+    if (!isLetter(s)) {
       resultMapping.push(undefined);
       continue;
     }

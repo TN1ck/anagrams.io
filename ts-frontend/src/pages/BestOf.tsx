@@ -68,6 +68,102 @@ const BEST_OF_DATA_GERMAN = [
   {
     word: 'Martin Schulz',
     anagram: 'Schmilzt Uran'
+  },
+  {
+    word: 'Jan Boehmermann',
+    anagram: 'Ehrenmann am Job',
+    foundBy: 'Schulzenbrothers',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzprme2',
+  },
+  {
+    word: 'Alternative für Deutschland',
+    anagram: 'Aufrüttelnder Vitalschaden',
+    foundBy: 'Schulzenbrothers',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzprme2',
+  },
+  {
+    word: 'Bundesagentur fuer Arbeit',
+    anagram: 'Stadtruinen, Feuer, Bergbau',
+    foundBy: 'Schulzenbrothers',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzprme2'
+  },
+  {
+    word: 'I am lord Voldemort',
+    anagram: 'Dralle Omi vorm Tod',
+    foundBy: 'Brisanzbremse',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzpeiwu',
+  },
+  {
+    word: 'Edmund Stoiber',
+    anagram: 'Bierdunst Demo',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzqbx16',
+    foundBy: 'EHEC',
+  },
+  {
+    word: 'Frank-Walter Steinmeier',
+    anagram: 'Kasernenleiter: warm & fit',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzqbx16',
+    foundBy: 'EHEC',
+  },
+  {
+    word: 'Markus Söder',
+    anagram: 'Ausserdem Ork',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzqbx16',
+    foundBy: 'EHEC',
+  },
+  {
+    word: 'Franz Josef Strauß',
+    anagram: 'Sanfter Sojafurz',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzqbx16',
+    foundBy: 'EHEC',
+  },
+  {
+    word: 'Krieg der Sterne',
+    anagram: 'Erst Nerd-Kriege',
+    foundBy: 'Brisanzbremse',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzpeiwu',
+  },
+  {
+    word: 'Karl Theodor zu Guttenberg',
+    anagram: 'Ganzer Betrug! Doktor heult.',
+    foundBy: 'Brisanzbremse',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzpeiwu',
+  },
+  {
+    word: 'Bundeskanzlerin',
+    anagram: 'Bankzinsenluder',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzpuj4t',
+    foundBy: '523Oliver',
+  },
+  {
+   word: 'Vereinigte Arabische Emirate',
+   anagram: 'Geheimnisverraeter Abtei CIA' ,
+   link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzqfq3v',
+   foundBy: 'Lipsia',
+  },
+  {
+    word: 'Nordrhein-Westfalen',
+    anagram: 'Freilanderntenshow',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzqfq3v',
+    foundBy: 'Lipsia',
+  },
+  {
+    word: 'Stadt Muenchen',
+    anagram: 'Demnaechst tun',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzr7haq',
+    foundBy: 'DasSkelett',
+  },
+  {
+    word: 'Freie Demokratische Partei',
+    anagram: 'Dachpartei fies roter Keime',
+    foundBy: 'Baerenfell',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzrmlo7',
+  },
+  {
+    word: 'Piratenpartei',
+    anagram: 'Trainierte App',
+    foundBy: 'PZon',
+    link: 'https://www.reddit.com/r/de/comments/8mpqaq/hey_brudis_ich_habe_diesen_anagrammfinder_gebaut/dzroa6i'
   }
 ];
 
@@ -111,12 +207,14 @@ class About extends React.Component {
             </Components.SubTitle>
           </Components.SubTitleContainer>
           {
-            BEST_OF_DATA_GERMAN.map(({word, anagram}, i) => {
+            BEST_OF_DATA_GERMAN.map(({word, anagram, foundBy, link}, i) => {
               return (
                 <ResultBestOf
                   key={i}
                   anagram={anagram}
                   word={word}
+                  foundBy={foundBy}
+                  link={link}
                 />
               );
             })

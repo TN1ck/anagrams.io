@@ -13,12 +13,13 @@ import {
 
 import AnagramSausages from './AnagramSausages';
 
-const Copyright = styled.div`
+export const Copyright = styled.div`
   font-size: ${THEME.font.sizeSmall};
   position: absolute;
   top: ${THEME.margins.m2};
   left: ${THEME.margins.m2};
   opacity: 0.3;
+  color: black;
   text-decoration: none;
 `;
 
@@ -136,6 +137,10 @@ export class Word extends React.Component<{
       </StyledWord>
     );
   }
+}
+
+export function createShareLink(word, anagram) {
+  return `${FRONTEND_URL}/share?anagram=${encodeURIComponent(anagram)}&word=${encodeURIComponent(word)}`;;
 }
 
 export function calculateWidths(
@@ -523,7 +528,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
 
     const mapping = getAnagramMapping(word, anagram);
 
-    const LINK = `${FRONTEND_URL}/share?anagram=${encodeURIComponent(currentAnagram)}&word=${encodeURIComponent(currentWord)}`;
+    const LINK = createShareLink(word, anagram);
 
     const wordComponents = [];
     let wordIndex = 0;
@@ -658,7 +663,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
             {'Close'}
           </SmallButton> : null}
           <Link to="/">
-            <Copyright >
+            <Copyright>
               {'anagrams.io'}
             </Copyright>
           </Link>

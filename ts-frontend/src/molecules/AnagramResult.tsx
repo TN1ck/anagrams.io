@@ -2,6 +2,7 @@ import React from 'react';
 import {take} from 'lodash';
 
 import * as anagram from 'src/anagram';
+import {THEME} from 'src/theme';
 import {
   ShowAllButton,
   MutedButton,
@@ -11,7 +12,7 @@ import {
 } from 'src/components';
 
 
-import {calculateWidths} from 'src/components/AnagramVisualizer';
+import {calculateWidths, Copyright} from 'src/components/AnagramVisualizer';
 import AnagramSausages from 'src/components/AnagramSausages';
 
 const MAX_ITEMS_TO_SHOW_AT_ONCE = 3;
@@ -60,17 +61,29 @@ export class ResultVisualisation extends React.Component<{
   }
 }
 
+const AnagramResultGroupBestOf = AnagramResultGroup.extend`
+  position: relative;
+  text-decoration: none;
+  cursor: default;
+`;
+
+const CopyrightBestOf = Copyright.withComponent('a').extend`
+  top: auto;
+  bottom: ${THEME.margins.m2};
+`;
+
 export class ResultBestOf extends React.Component<{
   word: string;
   anagram: string;
+  foundBy?: string;
+  link?: string;
   share?: (anagram: string, word: string) => any;
 }> {
   constructor(props) {
     super(props);
   }
   render() {
-    const {word, anagram: wordAnagram} = this.props;
-    console.log(word, wordAnagram);
+    const {word, anagram: wordAnagram, foundBy, link} = this.props;
 
     const {
       height,
@@ -84,15 +97,18 @@ export class ResultBestOf extends React.Component<{
     const paddingBottom = 10;
 
     return (
-      <AnagramResultGroup
+      <AnagramResultGroupBestOf
+        // @ts-ignore
+        // href={createShareLink(word, wordAnagram)}
+        target="_blank"
         state={anagram.AnagramResultState.solved}
         noResults={false}
         style={{
           display: 'flex',
           justifyContent: 'center',
-          minWidth: 233,
+          minWidth: 260,
           width: 'auto',
-          paddingBottom: 20,
+          paddingBottom: foundBy ? 40 : 20,
         }}
       >
         <ResultContainer
@@ -100,6 +116,7 @@ export class ResultBestOf extends React.Component<{
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
+            cursor: 'default',
           }}
         >
 
@@ -137,7 +154,12 @@ export class ResultBestOf extends React.Component<{
           </div> */}
 
         </ResultContainer>
-      </AnagramResultGroup>
+        {foundBy && <CopyrightBestOf
+          // @ts-ignore
+          href={link}
+          target="_blank"
+        >{`By: ${foundBy}`}</CopyrightBestOf>}
+      </AnagramResultGroupBestOf>
     );
   }
 }
