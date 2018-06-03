@@ -1,8 +1,18 @@
 import 'babel-polyfill';
+import Raven from 'raven-js';
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
 import App from './App';
+
+try {
+  Raven.config('https://ca404d6267644f978c26ee64994a5066@sentry.io/286292', {
+    release: '1.0.0',
+  }).install();
+  Raven.setRelease('1.0.0');
+} catch (e) {
+  console.error(e);
+}
 
 //
 // https://stackoverflow.com/questions/37808180/disable-viewport-zooming-ios-10-safari

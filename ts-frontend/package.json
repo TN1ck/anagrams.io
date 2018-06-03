@@ -54,6 +54,7 @@
     "lodash": "4.17.10",
     "mobx": "4.1.0",
     "mobx-react": "5.0.0",
+    "raven-js": "^3.25.2",
     "react": "16.3.2",
     "react-dom": "16.3.2",
     "react-modal": "3.1.11",

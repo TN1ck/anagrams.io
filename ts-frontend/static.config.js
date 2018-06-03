@@ -116,9 +116,6 @@ export default {
           gtag('config', 'UA-58665819-3', { 'anonymize_ip': true });
         ` }}
       />
-      {/*
-      <script src="https://cdn.ravenjs.com/3.22.2/raven.min.js" crossOrigin="anonymous"></script>
-      <script dangerouslySetInnerHTML={{__html: `Raven.config('https://ca404d6267644f978c26ee64994a5066@sentry.io/286292').install();`}} /> */}
     </Html>
   ),
   webpack: (config, { defaultLoaders, stage }) => {
