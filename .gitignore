@@ -13,3 +13,4 @@ ts-frontend/tmp
 ts-frontend/dist.tar.gz
 ts-frontend/node_modules
 yarn.lock
+*.bin
