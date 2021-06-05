@@ -9,6 +9,7 @@ import (
 	"tn1ck/anagramania/golang/anagrams"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 )
 
@@ -99,6 +100,9 @@ func init() {
 
 func main() {
 	app := fiber.New()
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "https://anagrams.io",
+	}))
 	app.Use(pprof.New())
 	app.Get("/anagram-dictionaries", ListDictionariesHandler)
 	app.Get("/anagram/:query", AnagramsHandler)
