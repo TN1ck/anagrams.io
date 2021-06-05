@@ -21,20 +21,25 @@ type DictionaryInformation struct {
 	bin      string
 }
 
+type DictionaryListResponse struct {
+	Success      bool                    `json:"success"`
+	Dictionaries []DictionaryInformation `json:"dictionaries"`
+}
+
 var Dictionaries = map[string]DictionaryInformation{
-	"de": {
-		Id:       "de",
-		Name:     "German",
-		path:     "./dictionaries/de-100k.csv",
-		bin:      "de-100k.bin",
-		Language: "de",
-	},
 	"en": {
 		Id:       "en",
 		Name:     "English",
 		path:     "./dictionaries/eng-100k.csv",
 		bin:      "en-100k.bin",
 		Language: "en",
+	},
+	"de": {
+		Id:       "de",
+		Name:     "German",
+		path:     "./dictionaries/de-100k.csv",
+		bin:      "de-100k.bin",
+		Language: "de",
 	},
 }
 
@@ -72,7 +77,11 @@ func SaveDictionary(path string, outpath string) {
 
 func ListDictionariesHandler(c *fiber.Ctx) error {
 	c.Accepts("json")
-	c.JSON(Dictionaries)
+	response := DictionaryListResponse{Success: true}
+	for _, dict := range Dictionaries {
+		response.Dictionaries = append(response.Dictionaries, dict)
+	}
+	c.JSON(response)
 	return nil
 }
 
