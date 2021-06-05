@@ -26,6 +26,11 @@ type DictionaryListResponse struct {
 	Dictionaries []DictionaryInformation `json:"dictionaries"`
 }
 
+type AnagramsResponse struct {
+	Success  bool                   `json:"sucess"`
+	Anagrams []anagrams.GroupedWord `json:"anagrams"`
+}
+
 var Dictionaries = map[string]DictionaryInformation{
 	"en": {
 		Id:       "en",
@@ -97,7 +102,9 @@ func AnagramsHandler(c *fiber.Ctx) error {
 	dictionary := GetDictionary(dictionaryInformation.bin)
 	subanagrams := anagrams.FindSubAnagrams(queryWord, dictionary)
 	grouped := anagrams.GroupAnagramsList(subanagrams)
-	c.JSON(grouped)
+	response := AnagramsResponse{Success: true}
+	response.Anagrams = grouped
+	c.JSON(response)
 	return nil
 }
 
