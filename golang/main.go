@@ -103,5 +103,5 @@ func main() {
 	app.Get("/anagram-dictionaries", ListDictionariesHandler)
 	app.Get("/anagram/:query", AnagramsHandler)
 	log.Println("Started the Server")
-	log.Fatal(app.Listen(":3002"))
+	log.Fatal(app.Listen(":3000"))
 }
