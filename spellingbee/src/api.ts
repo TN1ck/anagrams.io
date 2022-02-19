@@ -3,8 +3,7 @@ interface SpellingBeeResponse {
   words: string[];
 }
 
-// const SERVER_URL = 'https://api.anagrams.io';
-const SERVER_URL = 'http://localhost:3005';
+const SERVER_URL = process.env.NODE_ENV === 'production' ? 'https://api.anagrams.io' : 'http://localhost:3005';
 
 export async function getSpellingBeeSolutions(mustLetters: string, allowedLetters: string): Promise<SpellingBeeResponse> {
   try {
