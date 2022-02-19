@@ -156,5 +156,5 @@ func main() {
 	app.Get("/anagram/:query", AnagramsHandler)
 	app.Get("/spellingbee", SubsetWordsHandler)
 	log.Println("Started the Server")
-	log.Fatal(app.Listen(":3005"))
+	log.Fatal(app.Listen(":3000"))
 }
