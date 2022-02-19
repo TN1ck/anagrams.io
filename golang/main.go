@@ -149,12 +149,12 @@ func init() {
 func main() {
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "https://anagrams.io",
+		AllowOrigins: "*",
 	}))
 	app.Use(pprof.New())
 	app.Get("/anagram-dictionaries", ListDictionariesHandler)
 	app.Get("/anagram/:query", AnagramsHandler)
-	app.Get("/subsetwords", SubsetWordsHandler)
+	app.Get("/spellingbee", SubsetWordsHandler)
 	log.Println("Started the Server")
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(":3005"))
 }
