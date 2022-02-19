@@ -6,6 +6,7 @@ import (
 	"encoding/gob"
 	"log"
 	"os"
+	"sort"
 	"tn1ck/anagramania/golang/anagrams"
 
 	"github.com/gofiber/fiber/v2"
@@ -27,7 +28,7 @@ type DictionaryListResponse struct {
 }
 
 type AnagramsResponse struct {
-	Success  bool                   `json:"sucess"`
+	Success  bool                   `json:"success"`
 	Anagrams []anagrams.GroupedWord `json:"anagrams"`
 }
 
@@ -108,6 +109,37 @@ func AnagramsHandler(c *fiber.Ctx) error {
 	return nil
 }
 
+type SubsetWordsResponse struct {
+	Success bool     `json:"success"`
+	Words   []string `json:"words"`
+}
+
+func SubsetWordsHandler(c *fiber.Ctx) error {
+	c.Accepts("json")
+	mustLetters := c.Query("mustLetters")
+	allowedLetters := c.Query("allowedLetters")
+	dictId := c.Query("dictionary")
+	mustWord := anagrams.StringToWord(mustLetters)
+	allowedWord := anagrams.StringToWord(allowedLetters)
+	dictionaryInformation, ok := Dictionaries[dictId]
+	if !ok {
+		dictionaryInformation = Dictionaries["en"]
+	}
+	dictionary := GetDictionary(dictionaryInformation.bin)
+	subwords := anagrams.FindSubsetWords(mustWord.Binary, allowedWord.Binary, dictionary)
+
+	words := make([]string, len(subwords))
+	for i, w := range subwords {
+		words[i] = w.Word
+	}
+	sort.SliceStable(words, func(i, j int) bool {
+		return len(words[i]) > len(words[j]) || words[i] < words[j]
+	})
+
+	response := SubsetWordsResponse{Success: true, Words: words}
+	return c.JSON(response)
+}
+
 func init() {
 	for _, dict := range Dictionaries {
 		SaveDictionary(dict.path, dict.bin)
@@ -122,6 +154,7 @@ func main() {
 	app.Use(pprof.New())
 	app.Get("/anagram-dictionaries", ListDictionariesHandler)
 	app.Get("/anagram/:query", AnagramsHandler)
+	app.Get("/subsetwords", SubsetWordsHandler)
 	log.Println("Started the Server")
 	log.Fatal(app.Listen(":3000"))
 }

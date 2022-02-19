@@ -10,8 +10,10 @@ import (
 	"strings"
 )
 
+type BinaryWord = [26]uint8
+
 type SimpleWord struct {
-	Binary [26]uint8
+	Binary BinaryWord
 	Word   string
 }
 
@@ -48,7 +50,7 @@ func BinaryToSortedString(frequency [26]uint8) string {
 	return b.String()
 }
 
-func isBinarySubset(bin [26]uint8, subbin [26]uint8) bool {
+func isBinarySubset(bin BinaryWord, subbin BinaryWord) bool {
 	for i := range bin {
 		if bin[i] > subbin[i] {
 			return false
@@ -108,6 +110,28 @@ func FindSubAnagrams(query SimpleWord, dictionary []SimpleWord) []SimpleWord {
 	var result []SimpleWord
 	for _, word := range dictionary {
 		if isBinarySubset(word.Binary, query.Binary) {
+			result = append(result, word)
+		}
+	}
+	return result
+}
+
+func isCorrectWord(mustLetters BinaryWord, allowedLetters BinaryWord, bin BinaryWord) bool {
+	for i := range bin {
+		if mustLetters[i] > 0 && bin[i] == 0 {
+			return false
+		}
+		if bin[i] > 0 && allowedLetters[i] == 0 && mustLetters[i] == 0 {
+			return false
+		}
+	}
+	return true
+}
+
+func FindSubsetWords(mustLetters BinaryWord, allowedLetters BinaryWord, dictionary []SimpleWord) []SimpleWord {
+	var result []SimpleWord
+	for _, word := range dictionary {
+		if isCorrectWord(mustLetters, allowedLetters, word.Binary) {
 			result = append(result, word)
 		}
 	}
