@@ -110,7 +110,7 @@ const App: React.StatelessComponent<{}> = () => {
           <Routes />
           <Footer>
             <span>{'Made by '}</span>
-            <a href="http://tomnick.org">{'Tom Nick'}</a>
+            <a href="http://tn1ck.com">{'Tom Nick'}</a>
             {' '}
             <span>{' & Taisia Tikhnovetskaya'}</span>
             <div style={{marginTop: MARGIN_RAW.m2}}>
