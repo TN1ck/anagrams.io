@@ -2,6 +2,7 @@ import english90kDict from '../../dictionaries-new/english-90k.txt'
 import german600kDict from '../../dictionaries-new/german-600k.txt'
 import french300kDict from '../../dictionaries-new/french-300k.txt'
 import spanish70kDict from '../../dictionaries-new/spanish-70k.txt'
+import portuguese300kDict from '../../dictionaries-new/portuguese-300k.txt'
 
 export interface LetterMapping {
   letter: string
@@ -144,4 +145,32 @@ export const DICTIONARIES = [
       },
     ]
   },
+  // {
+  //   id: 'pr-70k',
+  //   name: 'Portuguese',
+  //   file: portuguese300kDict,
+  //   mapping: [
+  //     ...ACCENTS,
+  //     {
+  //       letter: 'ç',
+  //       mapping: 'c',
+  //       active: true,
+  //     },
+  //     {
+  //       letter: 'ã',
+  //       mapping: 'a',
+  //       active: true,
+  //     },
+  //     {
+  //       letter: 'õ',
+  //       mapping: 'o',
+  //       active: true,
+  //     },
+  //     {
+  //       letter: 'ü',
+  //       mapping: 'u',
+  //       active: true,
+  //     },
+  //   ]
+  // },
 ];
