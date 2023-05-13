@@ -1,4 +1,4 @@
-import {observable, action, runInAction, computed} from 'mobx';
+import {observable, action, runInAction, computed, makeObservable} from 'mobx';
 import {min, max, groupBy, throttle} from 'lodash';
 import * as anagram from 'src/anagram';
 
@@ -6,8 +6,6 @@ import {parseSearch} from 'src/utility';
 import {RequestStatus, getSubAnagrams, getDictionaries, Dictionary} from 'src/api';
 
 import {partitionArray, getNumberOfCPUs} from 'src/utility';
-
-const AnagramWorker = require('./anagram.worker');
 
 export enum AppState {
   none = 'none',
@@ -20,41 +18,41 @@ export enum AppState {
 type VoidFunction = () => void;
 
 export class AnagramState {
-  @observable queryStatus: RequestStatus = RequestStatus.none;
-  @observable appState: string = AppState.none;
+  queryStatus: RequestStatus = RequestStatus.none;
+  appState: string = AppState.none;
 
-  @observable query: string = '';
-  @observable queryToUse: string = '';
-  @observable exludedWordsToUse: string = '';
-  @observable cleanedQuery: string = '';
-  @observable cleanedQueryWithSpaces: string = '';
+  query: string = '';
+  queryToUse: string = '';
+  exludedWordsToUse: string = '';
+  cleanedQuery: string = '';
+  cleanedQueryWithSpaces: string = '';
 
-  @observable.shallow subanagrams: anagram.Word[] = [];
-  @observable.shallow dictionaries: Dictionary[] = [{"id":"en","name":"English"},{"id":"de","name":"German"}];
-  @observable selectedDictionaries: string = 'en';
+  subanagrams: anagram.Word[] = [];
+  dictionaries: Dictionary[] = [{"id":"en","name":"English"},{"id":"de","name":"German"}];
+  selectedDictionaries: string = 'en';
 
-  @observable counter: number = 0;
-  @observable numberOfPossibilitiesChecked: number = 0;
-  @observable.shallow _expandedSolutions: anagram.SimpleWord[][] = [];
-  @observable.shallow solvedSubanagrams: number[] = [];
-  @observable.shallow unsolvedSubanagrams: number[] = [];
-  @observable.shallow currentSubanagrams: number[] = [];
+  counter: number = 0;
+  numberOfPossibilitiesChecked: number = 0;
+  _expandedSolutions: anagram.SimpleWord[][] = [];
+  solvedSubanagrams: number[] = [];
+  unsolvedSubanagrams: number[] = [];
+  currentSubanagrams: number[] = [];
 
-  @observable modalAnagram: string = 'roams again';
-  @observable modalWord: string = 'anagrams io';
-  @observable showModal: boolean = false;
+  modalAnagram: string = 'roams again';
+  modalWord: string = 'anagrams io';
+  showModal: boolean = false;
 
-  @observable workers: Worker[] = [];
-  @observable finished: boolean = false;
+  workers: Worker[] = [];
+  finished: boolean = false;
 
-  @observable width: number = 1;
+  width: number = 1;
 
   // options
-  @observable groupByNumberOfWords: boolean = true;
-  @observable showOptions: boolean = false;
-  @observable showExclude: boolean = false;
-  @observable allowOnlyOneSmallWord: boolean = false;
-  @observable excludeWords: string = '';
+  groupByNumberOfWords: boolean = true;
+  showOptions: boolean = false;
+  showExclude: boolean = false;
+  allowOnlyOneSmallWord: boolean = false;
+  excludeWords: string = '';
 
   // caches
   groupedSpecialCache: {[key: string]: anagram.GroupedWordsDict} = {};
@@ -63,6 +61,58 @@ export class AnagramState {
   updateState: _.Cancelable & VoidFunction;
 
   constructor() {
+    makeObservable(this, {
+      queryStatus: observable,
+      appState: observable,
+      query: observable,
+      queryToUse: observable,
+      exludedWordsToUse: observable,
+      cleanedQuery: observable,
+      cleanedQueryWithSpaces: observable,
+      selectedDictionaries: observable,
+      counter: observable,
+      numberOfPossibilitiesChecked: observable,
+      modalAnagram: observable,
+      modalWord: observable,
+      showModal: observable,
+      workers: observable,
+      finished: observable,
+      width: observable,
+      groupByNumberOfWords: observable,
+      showOptions: observable,
+      showExclude: observable,
+      allowOnlyOneSmallWord: observable,
+      excludeWords: observable,
+      subanagrams: observable.shallow,
+      dictionaries: observable.shallow,
+      _expandedSolutions: observable.shallow,
+      solvedSubanagrams: observable.shallow,
+      unsolvedSubanagrams: observable.shallow,
+      currentSubanagrams: observable.shallow,
+
+      setWidth: action,
+      setShareWords: action,
+      setExcludeWords: action,
+      setQuery: action,
+      setDictionary: action,
+      openModal: action,
+      closeModal: action,
+      saveAnagram: action,
+      toggleGroupByNumberOfWords: action,
+      toggleShowOptions: action,
+      toggleExclude: action,
+      toggleAllowOnlyOneSmallWord: action,
+
+      excludedWordsAsSimpleWords: computed,
+      getColumnWidth: computed,
+      showInfoArea: computed,
+      progress: computed,
+      noResultsYet: computed,
+      stats: computed,
+      subAnagramsWithExcludedWords: computed,
+      grouped: computed,
+  })
+
     this.setQuery = this.setQuery.bind(this);
     this.setDictionary = this.setDictionary.bind(this);
     this.openModal = this.openModal.bind(this);
@@ -90,7 +140,6 @@ export class AnagramState {
     return anagram.isBinarySubset(set1, set2);
   }
 
-  @computed
   get excludedWordsAsSimpleWords(): anagram.SimpleWord[] {
     const excludedWordsCleaned = this.exludedWordsToUse.split(' ').map(word => {
       return anagram.sanitizeQuery(word);
@@ -123,12 +172,10 @@ export class AnagramState {
     return expanded;
   }
 
-  @action
   setWidth(width: number) {
     this.width = width;
   }
 
-  @computed
   get getColumnWidth() {
     const MIN_COLUMN_WIDTH = Math.max(250, this.cleanedQuery.length * 14.5);
 
@@ -142,7 +189,6 @@ export class AnagramState {
 
   }
 
-  @computed
   get showInfoArea() {
     return this.appState === AppState.search || this.appState === AppState.fetchingSubanagrams || this.appState === AppState.done;
   }
@@ -151,7 +197,6 @@ export class AnagramState {
     return this.appState === AppState.done;
   }
 
-  @computed
   get progress(): number {
     const solvedSubanagrams = this.solvedSubanagrams;
     const numberOfSolvedSubanagrams = solvedSubanagrams.length;
@@ -169,12 +214,10 @@ export class AnagramState {
     return progress;
   }
 
-  @computed
   get noResultsYet() {
     return this.appState === AppState.fetchingSubanagrams || (this.appState === AppState.search && this._expandedSolutions.length === 0);
   }
 
-  @computed
   get stats() {
     const solutions = this.expandedSolutions;
     const numberOfWordsPerSolution = solutions.map(s => s.length);
@@ -190,7 +233,6 @@ export class AnagramState {
     return wordStats;
   }
 
-  @computed
   get subAnagramsWithExcludedWords() {
     const excludedWords: anagram.Word[] = this.excludedWordsAsSimpleWords.map(({word, set, index, length}) => {
       return {
@@ -268,7 +310,6 @@ export class AnagramState {
     return groups;
   }
 
-  @computed
   get grouped(): Array<{
     name: string,
     group: anagram.GroupedAnagramSolutions[][],
@@ -307,7 +348,6 @@ export class AnagramState {
     return groups;
   }
 
-  @action
   setShareWords() {
     if (typeof window !== 'undefined') {
       const location = window.location;
@@ -334,17 +374,14 @@ export class AnagramState {
     });
   }
 
-  @action
   setExcludeWords(excludeWords) {
     this.excludeWords = excludeWords;
   }
 
-  @action
   setQuery(query) {
     this.query = query;
   }
 
-  @action
   setDictionary(value) {
     this.selectedDictionaries = value;
     if (this.subanagrams.length > 0 && this.query.length > 0) {
@@ -353,18 +390,15 @@ export class AnagramState {
     }
   }
 
-  @action
   openModal(anagram: string, word: string) {
     this.showModal = true;
     this.modalAnagram = anagram;
     this.modalWord = word;
   }
 
-  @action
   closeModal() {
     this.showModal = false;
   }
-  @action
   saveAnagram(anagram: string, word: string) {
     this.modalAnagram = anagram;
     this.modalWord = word;
@@ -409,7 +443,9 @@ export class AnagramState {
     const useCPUs = Math.max(numberOfCPUs - 1, 1);
     console.log(`${numberOfCPUs} cores available. Using ${useCPUs}.`)
     this.workers = Array(useCPUs).fill(0).map((i) => {
-      const worker = new AnagramWorker();
+      const worker = new Worker(new URL('./anagram.worker.ts', import.meta.url), {
+        type: 'module',
+      })
       const eventListener = message => {
         if (message.data === 'finish') {
 
@@ -524,22 +560,22 @@ export class AnagramState {
   }
 
     // options stuff
-    @action
+
     toggleGroupByNumberOfWords() {
       this.groupByNumberOfWords = !this.groupByNumberOfWords;
     }
 
-    @action
+
     toggleShowOptions() {
       this.showOptions = !this.showOptions;
     }
 
-    @action
+
     toggleExclude() {
       this.showExclude = !this.showExclude;
     }
 
-    @action
+
     toggleAllowOnlyOneSmallWord() {
       this.allowOnlyOneSmallWord = !this.allowOnlyOneSmallWord;
       // we need to reset the cache

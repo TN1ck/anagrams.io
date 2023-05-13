@@ -1,42 +1,66 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, shrink-to-fit=no, user-scalable=no">    
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta charset="UTF-8" />
     <title>anagrams.io</title>
-    <meta name="description" content="Find anagrams with the best anagram finder in the world!"/>
-    <meta name="keywords" content="Anagrams,Anagram,Subanagram,Anagram Sentences,Wordplays"/>
-    <meta property="og:title" content="anagrams.io"/>
-    <meta property="og:site_name" content="anagrams.io"/>
-    <meta property="og:type" content="website"/>
-    <meta name="theme-color" content="#242064">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1.0, shrink-to-fit=no, user-scalable=no"
+    />
+    <meta httpEquiv="x-ua-compatible" content="ie=edge" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <meta
+      name="description"
+      content="Find anagrams with the best anagram finder in the world!"
+    />
+    <meta
+      name="keywords"
+      content="Anagrams,Anagram,Subanagram,Anagram Sentences,Wordplays"
+    />
+    <meta property="og:title" content="anagrams.io" />
+    <meta property="og:site_name" content="anagrams.io" />
+    <meta property="og:type" content="website" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://anagrams.io" />
+    <meta
+      property="og:description"
+      content="Find anagrams with the best anagram finder in the world!"
+    />
+    <meta property="og:image" content="https://anagrams.io/logo-512.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
 
-    <!-- <link href="https://fonts.googleapis.com/css?family=Bitter:400,700" rel="stylesheet"> -->
-    <!-- <link href="https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700" rel="stylesheet"> -->
-    <!-- <link href="https://fonts.googleapis.com/css?family=Bitter:400,700|PT+Mono" rel="stylesheet"> -->
-    <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" rel="stylesheet">
-
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#999999" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="theme-color" content="#ffffff" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700"
+      rel="stylesheet"
+    />
 
     <!-- It's nice to know how many people use this -->
-    <script src="https://cdn.ravenjs.com/3.22.2/raven.min.js" crossorigin="anonymous"></script>
-    <script>
-      Raven.config('https://ca404d6267644f978c26ee64994a5066@sentry.io/286292').install();
-    </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-58665819-3"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-58665819-3"
+    ></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-      gtag('config', 'UA-58665819-3');
+      gtag("config", "UA-58665819-3");
     </script>
-
   </head>
   <body>
-    <div id="root">
-    </div>
+    <div id="root"></div>
   </body>
+  <script type="module" src="/src/App.tsx"></script>
 </html>

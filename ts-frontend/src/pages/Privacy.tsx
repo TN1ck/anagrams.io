@@ -1,12 +1,11 @@
 import React from 'react';
 import * as Components from '../components';
 import {MARGIN_RAW} from 'src/theme';
-import { withRouteData } from "react-static";
 
 
 import {Card} from 'src/components/Layout';
 
-class About extends React.Component<{
+class Privacy extends React.Component<{
   privacyHtml: string;
 }> {
   render() {
@@ -28,4 +27,4 @@ class About extends React.Component<{
   }
 }
 
-export default withRouteData(About);
+export default Privacy;

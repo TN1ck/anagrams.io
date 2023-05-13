@@ -35,6 +35,7 @@ const ProfileImage = styled.img`
 export class Profile extends React.Component<{
   avatar: string;
   style: any;
+  children: React.ReactNode;
 }> {
   render() {
     return (

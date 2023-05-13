@@ -1,7 +1,14 @@
 import React from 'react';
+import {createRoot} from 'react-dom/client'
 import {Provider} from 'mobx-react';
-import { Router, Link } from "react-static";
-import { hot } from "react-hot-loader";
+import {
+  Link,
+  MakeGenerics,
+  Outlet,
+  ReactLocation,
+  Router,
+  useMatch,
+} from "@tanstack/react-location";
 
 import {injectGlobal} from 'styled-components';
 import store from 'src/state';
@@ -9,8 +16,11 @@ import store from 'src/state';
 import {MARGIN_RAW, THEME} from './theme';
 import {Footer} from './components';
 import {SmallButton} from './components';
-
-import Routes from "react-static-routes";
+import Anagramania from './pages/Anagramania';
+import About from './pages/About';
+import Privacy from './pages/Privacy';
+import Styleguide from './pages/Styleguide';
+import Page404 from './pages/404';
 
 injectGlobal`
   * {
@@ -54,10 +64,47 @@ injectGlobal`
   }
 `;
 
-const App: React.StatelessComponent<{}> = () => {
+
+const location = new ReactLocation();
+const routes = [
+    { path: "/", element: <Anagramania /> },
+    {
+      path: "/about",
+      element: About,
+    },
+    {
+      path: "/share",
+      element: "src/pages/Share",
+    },
+    {
+      path: "/privacy",
+      element: Privacy,
+    },
+    {
+      path: "/performance",
+      element: Performance,
+    },
+    {
+      path: "/styleguide",
+      element: Styleguide,
+    },
+    // {
+    //   path: "/bestof",
+    //   element: BestOf
+    // },
+    {
+      path: "*",
+      element: Page404,
+    },
+  ];
+
+const App = () => {
   return (
     <Provider store={store}>
-      <Router>
+      <Router
+      location={location}
+      routes={routes}
+    >
         <div>
           <div style={{
             position: 'absolute',
@@ -68,9 +115,15 @@ const App: React.StatelessComponent<{}> = () => {
           }}>
             <Link
               to='/'
-              exact
-              activeStyle={{
-                fontWeight: 'bold',
+              activeOptions={{
+                exact: true,
+              }}
+              getActiveProps={() => {
+                return {
+                  style: {
+                    fontWeight: 'bold',
+                  },
+                };
               }}
             >
               <SmallButton
@@ -81,9 +134,15 @@ const App: React.StatelessComponent<{}> = () => {
             </Link>
             <Link
               to='/bestof'
-              exact
-              activeStyle={{
-                fontWeight: 'bold',
+              activeOptions={{
+                exact: true,
+              }}
+              getActiveProps={() => {
+                return {
+                  style: {
+                    fontWeight: 'bold',
+                  },
+                };
               }}
             >
               <SmallButton
@@ -94,9 +153,15 @@ const App: React.StatelessComponent<{}> = () => {
             </Link>
             <Link
               to='/about'
-              exact
-              activeStyle={{
-                fontWeight: 'bold',
+              activeOptions={{
+                exact: true,
+              }}
+              getActiveProps={() => {
+                return {
+                  style: {
+                    fontWeight: 'bold',
+                  },
+                };
               }}
             >
               <SmallButton
@@ -107,7 +172,7 @@ const App: React.StatelessComponent<{}> = () => {
             </Link>
           </div>
 
-          <Routes />
+          <Outlet />
           <Footer>
             <span>{'Made by '}</span>
             <a href="http://tn1ck.com">{'Tom Nick'}</a>
@@ -123,5 +188,5 @@ const App: React.StatelessComponent<{}> = () => {
   )
 };
 
-export default hot(module)(App);
+createRoot(document.getElementById("root")!).render(<App />)
 

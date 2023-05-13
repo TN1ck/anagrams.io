@@ -26,9 +26,7 @@ const ShowMoreButtonContainer = styled.div`
 `;
 
 
-@inject('store')
-@observer
-class AnagramResultGroup extends React.Component<{
+const AnagramResultGroup = inject('store')(observer(class AnagramResultGroup extends React.Component<{
   group: anagram.GroupedAnagramSolutions[][];
   name: string;
   store?: AnagramState;
@@ -113,11 +111,9 @@ class AnagramResultGroup extends React.Component<{
       </div>
     );
   }
-}
+}))
 
-@inject('store')
-@observer
-class AnagramResults extends React.Component<{
+const AnagramResults = inject('store')(observer(class AnagramResults extends React.Component<{
   store?: AnagramState;
 }, {
   expanded: boolean;
@@ -189,6 +185,6 @@ class AnagramResults extends React.Component<{
       </AnagramResultsContainer>
     );
   }
-};
+}));
 
 export default AnagramResults;

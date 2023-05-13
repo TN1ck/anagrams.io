@@ -89,11 +89,12 @@ const StyledCheckboxContainer = styled.div`
   position: relative;
 `;
 
-const Checkbox: React.StatelessComponent<{
+const Checkbox = ({id, onChange, checked, children}: {
   id: string;
   checked: boolean;
   onChange: () => any;
-}> = ({id, onChange, checked, children}) => {
+  children: React.ReactNode;
+}) => {
   return (
     <StyledCheckboxContainer>
       <StyledCheckbox
@@ -113,10 +114,8 @@ const Checkbox: React.StatelessComponent<{
   );
 };
 
-@inject('store')
-@observer
-class AnagramInfoArea extends React.Component<{
-  store?: AnagramState;
+const AnagramInfoArea = inject('store')(observer(class AnagramInfoArea extends React.Component<{
+  store: AnagramState;
 }> {
   render() {
     const store = this.props.store;
@@ -137,7 +136,7 @@ class AnagramInfoArea extends React.Component<{
       </div>
     );
   }
-}
+}))
 
 const OptionsContainer = styled.div`
   display: flex;
@@ -155,9 +154,7 @@ const OptionsCollapse = withProps<{
   flex-wrap: wrap;
 `;
 
-@inject('store')
-@observer
-class AnagramaniaOptions extends React.Component<{
+const AnagramaniaOptions = inject('store')(observer(class AnagramaniaOptions extends React.Component<{
   store?: AnagramState;
 }> {
   render() {
@@ -190,11 +187,9 @@ class AnagramaniaOptions extends React.Component<{
       </OptionsContainer>
     );
   }
-}
+}))
 
-@inject('store')
-@observer
-class ExcludeOptions extends React.Component<{
+const ExcludeOptions = inject('store')(observer(class ExcludeOptions extends React.Component<{
   store?: AnagramState;
 }> {
   render() {
@@ -218,13 +213,11 @@ class ExcludeOptions extends React.Component<{
       </div>
     );
   }
-}
+}))
 
 
-@inject('store')
-@observer
-class AnagramaniaHeader extends React.Component<{
-  store?: AnagramState;
+const AnagramaniaHeader = inject('store')(observer(class AnagramaniaHeader extends React.Component<{
+  store: AnagramState;
 }, {
   anagramIndex: number;
 }> {
@@ -232,7 +225,7 @@ class AnagramaniaHeader extends React.Component<{
   word: string = 'anagrams.io';
   mounted: boolean = false;
   updateTimeout: number = 0;
-  input: HTMLInputElement = null;
+  input: HTMLInputElement | null = null;
 
   constructor(props) {
     super(props);
@@ -242,7 +235,7 @@ class AnagramaniaHeader extends React.Component<{
       anagramIndex: 0,
     };
   }
-  setInputRef(dom) {
+  setInputRef(dom: HTMLInputElement) {
     this.input = dom;
     // is kind of annoying on mobile
     // if (this.input) {
@@ -399,11 +392,9 @@ class AnagramaniaHeader extends React.Component<{
       </Header>
     );
   }
-}
+}))
 
-@inject('store')
-@observer
-class Anagramania extends React.Component<{
+const Anagramania = inject('store')(observer(class Anagramania extends React.Component<{
   store?: AnagramState;
 }, {}> {
   worker: Worker;
@@ -476,6 +467,6 @@ class Anagramania extends React.Component<{
       </div>
     );
   }
-};
+}))
 
 export default Anagramania;
