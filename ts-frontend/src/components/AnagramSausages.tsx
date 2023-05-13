@@ -26,7 +26,7 @@ export default class AnagramSausages extends React.Component<AnagramSausagesProp
   sausages: AnagramSausage[],
 }> {
   componentIsMounted: boolean = false;
-  constructor(props) {
+  constructor(props: AnagramSausagesProps) {
     super(props);
     const sausages = this.calculateSausages(props);
     this.state = {
@@ -47,7 +47,7 @@ export default class AnagramSausages extends React.Component<AnagramSausagesProp
       // this.animateToProgress(oldSausages, newSausages, 0.2);
     }
   }
-  animateToProgress(oldSausages, newSausages, progress) {
+  animateToProgress(oldSausages: AnagramSausage[], newSausages: AnagramSausage[], progress: number) {
     const interpolatedSausages = oldSausages.map((s, i) => {
       const newSausage = newSausages[i];
       const pathInterpolator = interpolateArray(s.pathData, newSausage.pathData);
@@ -93,7 +93,7 @@ export default class AnagramSausages extends React.Component<AnagramSausagesProp
     };
     updater();
   }
-  calculateSausages(props: AnagramSausagesProps) {
+  calculateSausages(props: AnagramSausagesProps): AnagramSausage[] {
     const {
       height,
       characterWidth,
@@ -105,12 +105,13 @@ export default class AnagramSausages extends React.Component<AnagramSausagesProp
     } = props;
     const mapping = getAnagramMapping(word, anagram);
 
-    const opacityScale = (index) => {
+    const opacityScale = (index: number) => {
       return 0.2 + (0.8 / word.length * (word.length - index));
     };
 
     const values = mapping.map((newIndex, index) => {
       if (newIndex === undefined) {
+        // TODO: If this happens, it breaks.
         return null;
       }
       const x1 = (index * characterWidth) + characterWidth / 2;
@@ -131,7 +132,7 @@ export default class AnagramSausages extends React.Component<AnagramSausagesProp
         ],
       };
     });
-    return values;
+    return values as AnagramSausage[];
   }
 
   render() {

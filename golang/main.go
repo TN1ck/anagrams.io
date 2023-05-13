@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
+	"fmt"
 	"log"
 	"os"
 	"sort"
@@ -63,6 +64,20 @@ func GetDictionary(path string) []anagrams.SimpleWord {
 	return dictionary
 }
 
+func SaveOptimizedDictionary(dictionary []anagrams.DictionaryEntry, path string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	// Create a CSV out of the dictionary
+	for _, entry := range dictionary {
+		f.WriteString(anagrams.BinaryToSortedString(entry.Binary) + "," + fmt.Sprintf("%v", entry.WordIndexes) + "\n")
+	}
+	return nil
+}
+
 func SaveDictionary(path string, outpath string) {
 	dictionary := anagrams.ReadDictionary(path)
 	f, err := os.Create(outpath)
@@ -70,6 +85,10 @@ func SaveDictionary(path string, outpath string) {
 		log.Fatal("Couldn't open file")
 	}
 	defer f.Close()
+
+	optimized := anagrams.OptimizeDictionary(dictionary)
+	SaveOptimizedDictionary(optimized, outpath+".csv")
+
 	buf := new(bytes.Buffer)
 	enc := gob.NewEncoder(buf)
 	if err := enc.Encode(dictionary); err != nil {

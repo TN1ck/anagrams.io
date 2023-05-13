@@ -21,6 +21,7 @@ const LoadingBar = withProps<{
 
 class LoadingBarWrapped extends React.Component<{
   progress: number;
+  children?: React.ReactNode;
 }> {
   render() {
     return (

@@ -5,16 +5,14 @@ import {AnagramState} from '../state';
 import * as Components from '../components';
 import {MARGIN_RAW} from 'src/theme';
 
-@inject('store')
-@observer
-class About extends React.Component<{
+const About = inject('store')(observer(class About extends React.Component<{
   store?: AnagramState;
 }> {
   componentWillmount() {
-    this.props.store.setShareWords();
+    this.props.store!.setShareWords();
   }
   componentDidMount() {
-    this.props.store.setShareWords();
+    this.props.store!.setShareWords();
   }
   render() {
     const store = this.props.store;
@@ -30,14 +28,14 @@ class About extends React.Component<{
         <Components.InnerContainer style={{maxWidth: 740}}>
           <Components.AnagramVisualizer
             asBlock
-            anagram={store.modalAnagram}
-            word={store.modalWord}
-            save={store.saveAnagram}
+            anagram={store!.modalAnagram}
+            word={store!.modalWord}
+            save={store!.saveAnagram}
           />
         </Components.InnerContainer>
       </div>
     );
   }
-}
+}))
 
 export default About;

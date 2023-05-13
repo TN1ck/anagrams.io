@@ -39,20 +39,14 @@ class About extends React.Component {
               He's always up for a technical challenge and to try out new technologies, but also likes to improve his UX and design skills.`}
               </p>
               <p>
-                {' Tom is currently working as Head of Software Engineering at the '}
-                <a className="link" href="https://infographics.group">{'infographics.group'}</a>
-                {', where he leads a team to create next gen storytelling tools.'}
+                {' See his website for more information: '}
+                <a className="link" href="https://tn1ck.com">{'tn1ck.com'}</a>
               </p>
             </Profile>
             <Profile avatar={taisia} style={{marginLeft: MARGIN_RAW.m2}}>
               <p>
                 {`When Taisia is not drawing furiously on her iPad, she's probably creating beats in Logic - just everything to create an amazing story.
-                Taisia helped to create key visuals and the UX. She was also a great motivation.`}
-              </p>
-              <p>
-                {`Taisia is currently employeed as a infographis trainee at the `}
-                <a className="link" href="https://infographics.group">{'infographics.group'}</a>
-                {`, where she's creating amazing stories to teach about complex topics.`}
+                Taisia helped to create key visuals and the UX.`}
               </p>
             </Profile>
           </ProfilesContainer>
@@ -67,8 +61,15 @@ class About extends React.Component {
           <div
             dangerouslySetInnerHTML={{
               __html: `
-                The used datasets were created by Torsten Brischalle and can be found <a class="link" href="http://www.aaabbb.de/WordList/WordList_en.php">here</a>.
-                Some words are taken from datasets by Hermit Dave and can be found <a class="link" href="https://github.com/hermitdave/FrequencyWords">here</a>.
+                The used datasets:
+                <br/>
+                * <a href="https://github.com/enz/german-wordlist">https://github.com/enz/german-wordlist</a>
+                <br/>
+                * <a href="http://www.aaabbb.de/WordList/WordList_en.php">http://www.aaabbb.de/WordList/WordList_en.php</a>
+                <br/>
+                * <a href="https://github.com/hermitdave/FrequencyWords">https://github.com/hermitdave/FrequencyWords</a>
+                <br/>
+                * <a href="https://github.com/kkrypt0nn/wordlists">https://github.com/kkrypt0nn/wordlists</a>
               `
             }}
           />

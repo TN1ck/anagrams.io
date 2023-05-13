@@ -26,15 +26,17 @@ const ShowMoreButtonContainer = styled.div`
 `;
 
 
-const AnagramResultGroup = inject('store')(observer(class AnagramResultGroup extends React.Component<{
+interface AnagramResultGroupProps {
   group: anagram.GroupedAnagramSolutions[][];
   name: string;
   store?: AnagramState;
   index: number;
-}, {
+}
+
+const AnagramResultGroup = inject('store')(observer(class AnagramResultGroup extends React.Component<AnagramResultGroupProps, {
   expanded: boolean
 }> {
-  constructor(props) {
+  constructor(props: AnagramResultGroupProps) {
     super(props);
     this.state = {
       expanded: false,
@@ -56,11 +58,12 @@ const AnagramResultGroup = inject('store')(observer(class AnagramResultGroup ext
 
     const {
       columnWidth,
-    } = store.getColumnWidth;
-    const query = store.cleanedQueryWithSpaces;
+    } = store!.getColumnWidth;
+    const query = store!.cleanedQueryWithSpaces;
 
     const expanded = this.state.expanded;
 
+    const firstGroup = index === 0;
     const maxRows = index === 0 ? 1000 : Math.max((100 - 10 * index), 5);
     const expandedGroup = expanded ? group : group.slice(0, maxRows);
     const howManyHidden = group.length - maxRows;
@@ -77,12 +80,14 @@ const AnagramResultGroup = inject('store')(observer(class AnagramResultGroup ext
           return (
             <AnagramResultRow key={i}>
               {g.map((d) => {
+                const expanded = firstGroup && i === 0;
                 const {word, list, counter} = d;
                 const maxLengthInGroup = Math.max(...g.map(a => a.list.length));
                 return (
                   <AnagramResult
+                    expandFirst={expanded}
                     key={word}
-                    share={store.openModal}
+                    share={store!.openModal}
                     columnWidth={columnWidth}
                     result={AnagramResultState.solved}
                     word={word}
@@ -113,14 +118,17 @@ const AnagramResultGroup = inject('store')(observer(class AnagramResultGroup ext
   }
 }))
 
-const AnagramResults = inject('store')(observer(class AnagramResults extends React.Component<{
+interface AnagramResultsProps {
   store?: AnagramState;
-}, {
+}
+
+const AnagramResults = inject('store')(observer(class AnagramResults extends React.Component<AnagramResultsProps, {
   expanded: boolean;
 }> {
-  dom: HTMLElement;
-  constructor(props) {
+  dom: HTMLElement | null;
+  constructor(props: AnagramResultsProps) {
     super(props);
+    this.dom = null
     this.setRef = this.setRef.bind(this);
     this.setWidth = this.setWidth.bind(this);
   }
@@ -138,14 +146,14 @@ const AnagramResults = inject('store')(observer(class AnagramResults extends Rea
   setWidth() {
     if (this.dom) {
       const width = this.dom.clientWidth;
-      this.props.store.setWidth(width);
+      this.props.store!.setWidth(width);
     }
   }
-  setRef(dom) {
+  setRef(dom: HTMLDivElement) {
     this.dom = dom;
   }
   render() {
-    const store = this.props.store;
+    const store = this.props.store!;
 
     const query = store.query;
     const grouped = store.grouped;
@@ -161,6 +169,7 @@ const AnagramResults = inject('store')(observer(class AnagramResults extends Rea
         {
           noResultsYet ? (
             <AnagramResult
+              expandFirst={false}
               share={store.openModal}
               columnWidth={columnWidth}
               result={anagram.AnagramResultState.unsolved}

@@ -11,9 +11,16 @@ router.get(
   (request, response): void => {
     const query = request.params.query;
     const dictionaryKey = request.query.dictionary;
-    const sanitizedQuery = anagram.sanitizeQuery(query);
+    const sanitizedQuery = anagram.sanitizeQuery(query, {
+      "ä": "ae",
+      "ö": "oe",
+      "ü": "ue",
+      "ß": "ss",
+    }, true);
     const dictionary = dictionaries.find(d => d.id === dictionaryKey) || dictionaries[0];
-    const sortedSubAnagrams = anagram.findSortedAndGroupedSubAnagrams(sanitizedQuery, dictionary.dict)
+
+    const subanagrams = anagram.findSubAnagrams(sanitizedQuery, dictionary.dict);
+    const sortedSubAnagrams = anagram.findSortedAndGroupedSubAnagrams(subanagrams)
     const optimizedForTransport = sortedSubAnagrams.map(w => {
       // TODO
       (w as any).set = anagram.binaryToString(w.set);

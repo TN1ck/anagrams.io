@@ -72,14 +72,16 @@ const CopyrightBestOf = Copyright.withComponent('a').extend`
   bottom: ${THEME.margins.m2};
 `;
 
-export class ResultBestOf extends React.Component<{
+interface ResultBestOfProps {
   word: string;
   anagram: string;
   foundBy?: string;
   link?: string;
   share?: (anagram: string, word: string) => any;
-}> {
-  constructor(props) {
+}
+
+export class ResultBestOf extends React.Component<ResultBestOfProps> {
+  constructor(props: ResultBestOfProps) {
     super(props);
   }
   render() {
@@ -164,19 +166,24 @@ export class ResultBestOf extends React.Component<{
   }
 }
 
-export class Result extends React.Component<{
+interface ResultProps {
   result: anagram.SimpleWord[];
   index: number;
   query: string;
   share?: (anagram: string, word: string) => any;
   expandSelection: (index: number, expanded: boolean) => void;
-}, {
   expanded: boolean;
-}> {
-  constructor(props) {
+}
+
+interface ResultState {
+  expanded: boolean;
+}
+
+export class Result extends React.Component<ResultProps, ResultState> {
+  constructor(props: ResultProps) {
     super(props);
     this.state = {
-      expanded: false,
+      expanded: props.expanded,
     };
     this.toggleExpanded = this.toggleExpanded.bind(this);
   }
@@ -187,7 +194,7 @@ export class Result extends React.Component<{
     });
     this.props.expandSelection(this.props.index, expanded);
   }
-  shouldComponentUpdate(_, state) {
+  shouldComponentUpdate(props: ResultProps, state: ResultState) {
     return this.state !== state;
   }
   render() {
@@ -218,7 +225,7 @@ export class Result extends React.Component<{
               <span style={{opacity: 0}}>{(index + 1) + '. '}</span>
               <SmallButton
                 onClick={(e) => {
-                  this.props.share(word, query);
+                  this.props.share!(word, query);
                   e.preventDefault();
                   e.stopPropagation();
                 }}
@@ -240,19 +247,20 @@ interface AnagramResultProps {
   counter: number;
   columnWidth: number;
   maxLengthInGroup: number;
+  expandFirst: boolean;
 };
 
-class AnagramResult extends React.Component<AnagramResultProps,
-{
+interface AnagramResultState {
   showAll: boolean;
-  expandedSelections: {[key: number]: boolean};
+  expandedSelections: {[key: number]: boolean} | null;
 }
-> {
-  constructor(props) {
+
+class AnagramResult extends React.Component<AnagramResultProps, AnagramResultState> {
+  constructor(props: AnagramResultProps) {
     super(props);
     this.state = {
       showAll: false,
-      expandedSelections: null,
+      expandedSelections: props.expandFirst ? {[0]: true} : null,
     };
     this.toggleShowAll = this.toggleShowAll.bind(this);
     this.expandSelection = this.expandSelection.bind(this);
@@ -269,7 +277,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
       expandedSelections,
     });
   }
-  shouldComponentUpdate(newProps: AnagramResultProps, newState) {
+  shouldComponentUpdate(newProps: AnagramResultProps, newState: AnagramResultState) {
     if (this.props.counter !== newProps.counter ||
         this.props.columnWidth !== newProps.columnWidth ||
         this.state !== newState ||
@@ -334,6 +342,7 @@ class AnagramResult extends React.Component<AnagramResultProps,
           {take(sortedList, !this.state.showAll ? MAX_ITEMS_TO_SHOW_AT_ONCE : list.length).map((a, i) => {
             return (
               <Result
+                expanded={!!(this.state.expandedSelections && this.state.expandedSelections[i])}
                 key={i}
                 result={a}
                 index={i}

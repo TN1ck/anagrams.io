@@ -3,9 +3,9 @@ import {min, max, groupBy, throttle} from 'lodash';
 import * as anagram from 'src/anagram';
 
 import {parseSearch} from 'src/utility';
-import {RequestStatus, getSubAnagrams, getDictionaries, Dictionary} from 'src/api';
 
 import {partitionArray, getNumberOfCPUs} from 'src/utility';
+import { DICTIONARIES, Dictionary, LetterMapping } from './dictionaries';
 
 export enum AppState {
   none = 'none',
@@ -17,8 +17,30 @@ export enum AppState {
 
 type VoidFunction = () => void;
 
+export async function getSubAnagrams(query: string, dictionary: Dictionary, mapping: Record<string, string>): Promise<{data: {success: boolean, anagrams: anagram.Word[]}}>  {
+  const words = await fetch(dictionary.file)
+  .then(response => response.text())
+  .then((data) => {
+    return data.split('\n');
+  })
+  const wordsBinary = words.map(w => anagram.stringToWord(anagram.mapLetters(w, mapping)))
+  const subanagrams = anagram.findSubAnagrams(query, wordsBinary);
+  const sortedSubAnagrams = anagram.findSortedAndGroupedSubAnagrams(subanagrams)
+
+  return {data: {success: true, anagrams: sortedSubAnagrams}};
+}
+
+function letterMappingToDictionary(letterMappings: LetterMapping[]): Record<string, string> {
+  const result: Record<string, string> = {};
+  letterMappings.forEach(({letter, mapping, active}) => {
+    if (active) {
+      result[letter] = mapping;
+    }
+  });
+  return result;
+}
+
 export class AnagramState {
-  queryStatus: RequestStatus = RequestStatus.none;
   appState: string = AppState.none;
 
   query: string = '';
@@ -28,8 +50,9 @@ export class AnagramState {
   cleanedQueryWithSpaces: string = '';
 
   subanagrams: anagram.Word[] = [];
-  dictionaries: Dictionary[] = [{"id":"en","name":"English"},{"id":"de","name":"German"}];
-  selectedDictionaries: string = 'en';
+  dictionaries: Dictionary[] = DICTIONARIES;
+  selectedDictionary: string = DICTIONARIES[0].id;
+  dictionaryMapping: LetterMapping[] = DICTIONARIES[0].mapping;
 
   counter: number = 0;
   numberOfPossibilitiesChecked: number = 0;
@@ -58,18 +81,18 @@ export class AnagramState {
   groupedSpecialCache: {[key: string]: anagram.GroupedWordsDict} = {};
   groupedAnagramsCache: anagram.GroupedWordsDict = {};
 
-  updateState: _.Cancelable & VoidFunction;
+  updateState: _.Cancelable & VoidFunction | null;
 
   constructor() {
+    this.updateState = null;
     makeObservable(this, {
-      queryStatus: observable,
       appState: observable,
       query: observable,
       queryToUse: observable,
       exludedWordsToUse: observable,
       cleanedQuery: observable,
       cleanedQueryWithSpaces: observable,
-      selectedDictionaries: observable,
+      selectedDictionary: observable,
       counter: observable,
       numberOfPossibilitiesChecked: observable,
       modalAnagram: observable,
@@ -90,6 +113,8 @@ export class AnagramState {
       unsolvedSubanagrams: observable.shallow,
       currentSubanagrams: observable.shallow,
 
+      dictionaryMapping: observable,
+
       setWidth: action,
       setShareWords: action,
       setExcludeWords: action,
@@ -102,6 +127,7 @@ export class AnagramState {
       toggleShowOptions: action,
       toggleExclude: action,
       toggleAllowOnlyOneSmallWord: action,
+      setDictionaryMapping: action,
 
       excludedWordsAsSimpleWords: computed,
       getColumnWidth: computed,
@@ -131,8 +157,8 @@ export class AnagramState {
   }
 
   get isExcludeInputValid() {
-    const excludedWordsClean = anagram.sanitizeQuery(this.excludeWords);
-    const cleanedQuery = anagram.sanitizeQuery(this.query);
+    const excludedWordsClean = anagram.sanitizeQuery(this.excludeWords, letterMappingToDictionary(this.dictionaryMapping));
+    const cleanedQuery = anagram.sanitizeQuery(this.query, letterMappingToDictionary(this.dictionaryMapping));
 
     const set1 = anagram.stringToBinary(excludedWordsClean);
     const set2 = anagram.stringToBinary(cleanedQuery);
@@ -142,7 +168,7 @@ export class AnagramState {
 
   get excludedWordsAsSimpleWords(): anagram.SimpleWord[] {
     const excludedWordsCleaned = this.exludedWordsToUse.split(' ').map(word => {
-      return anagram.sanitizeQuery(word);
+      return anagram.sanitizeQuery(word, letterMappingToDictionary(this.dictionaryMapping));
     }).filter(d => d !== '');
     return excludedWordsCleaned.map((s, i) => {
       const w: anagram.SimpleWord = {
@@ -331,11 +357,11 @@ export class AnagramState {
         ag => ag.counter > 0 && ag.list.length === 0
       );
       const numberOfColumns = this.getColumnWidth.numberOfColumns;
-      const otherGroups = [,
-        {
-          name: 'Anagrams With No Own Solution',
-          group: partitionArray(anagramsWithNoOwnSolution,  numberOfColumns),
-        },
+      const otherGroups = [
+        // {
+        //   name: 'Anagrams With No Own Solution',
+        //   group: partitionArray(anagramsWithNoOwnSolution,  numberOfColumns),
+        // },
         {
           name: 'Subanagrams Without Solution',
           group: partitionArray(anagramsWithoutSolution, numberOfColumns),
@@ -365,25 +391,24 @@ export class AnagramState {
   }
 
   async init() {
-
     this.setShareWords();
-
-    const result = await getDictionaries();
-    runInAction(() => {
-      this.dictionaries = result.data.dictionaries;
-    });
   }
 
-  setExcludeWords(excludeWords) {
+  setExcludeWords(excludeWords: string) {
     this.excludeWords = excludeWords;
   }
 
-  setQuery(query) {
+  setQuery(query: string) {
     this.query = query;
   }
 
-  setDictionary(value) {
-    this.selectedDictionaries = value;
+  setDictionaryMapping(mapping: LetterMapping[]) {
+    this.dictionaryMapping = mapping;
+  }
+
+  setDictionary(value: string) {
+    this.selectedDictionary = value;
+    this.dictionaryMapping = DICTIONARIES.find(d => d.id === value)!.mapping;
     if (this.subanagrams.length > 0 && this.query.length > 0) {
       this.appState = AppState.search;
       this.requestAnagram();
@@ -440,19 +465,18 @@ export class AnagramState {
 
     const numberOfCPUs = getNumberOfCPUs();
     // make sure there is one core left
-    const useCPUs = Math.max(numberOfCPUs - 1, 1);
+    const useCPUs = 1 || Math.max(numberOfCPUs - 1, 1);
     console.log(`${numberOfCPUs} cores available. Using ${useCPUs}.`)
     this.workers = Array(useCPUs).fill(0).map((i) => {
       const worker = new Worker(new URL('./anagram.worker.ts', import.meta.url), {
         type: 'module',
       })
-      const eventListener = message => {
+      const eventListener = (message: MessageEvent<anagram.AnagramGeneratorStepSerialized | 'finish'>) => {
         if (message.data === 'finish') {
-
           runInAction(() => {
-            this.solvedSubanagrams.push(message.data.index + 1);
+            this.solvedSubanagrams.push(i);
             this.currentSubanagrams = this.currentSubanagrams.filter(n => {
-              return n !== message.data.index;
+              return n !== i;
             });
           });
 
@@ -469,15 +493,18 @@ export class AnagramState {
         const newState: anagram.AnagramGeneratorStepSerialized = message.data;
         currentTempState.numberOfPossibilitiesChecked += newState.numberOfPossibilitiesChecked;
         currentTempState.solutions.push(...newState.solutions);
-        this.updateState();
+        if (this.updateState) {
+          this.updateState();
+        }
       };
       worker.addEventListener('message', eventListener);
       return worker;
     });
 
 
-    const cleanedQuery = anagram.sanitizeQuery(this.query);
-    const cleanedQueryWithSpaces = anagram.sanitizeQuery(this.query, false);
+    const mapping = letterMappingToDictionary(this.dictionaryMapping);
+    const cleanedQuery = anagram.sanitizeQuery(this.query, mapping);
+    const cleanedQueryWithSpaces = anagram.sanitizeQuery(this.query, letterMappingToDictionary(this.dictionaryMapping), false);
 
     if (cleanedQuery.length === 0) {
       return;
@@ -504,24 +531,24 @@ export class AnagramState {
     clear();
     runInAction(clear);
 
-    const excludedWordsCleaned = this.showExclude ? anagram.sanitizeQuery(this.excludeWords) : '';
+    const excludedWordsCleaned = this.showExclude ? anagram.sanitizeQuery(this.excludeWords, letterMappingToDictionary(this.dictionaryMapping)) : '';
     // remove excluded words from cleanedQuery
     const cleanedQuerySet = anagram.stringToBinary(cleanedQuery);
     const excludedWordsSet = anagram.stringToBinary(excludedWordsCleaned);
     const excludedRemoved = anagram.removeBinary(cleanedQuerySet, excludedWordsSet);
     this.queryToUse = anagram.binaryToString(excludedRemoved);
+    const dictionary = DICTIONARIES.find(d => d.id === this.selectedDictionary)!;
 
-    const result = await getSubAnagrams(this.queryToUse, this.selectedDictionaries);
+    const result = await getSubAnagrams(this.queryToUse, dictionary, mapping);
     const {anagrams: subanagrams} = result.data;
 
     runInAction(() => {
       this.appState = AppState.search;
       this.unsolvedSubanagrams = subanagrams.map((_, i) => i);
       this.subanagrams = subanagrams;
-      this.queryStatus = RequestStatus.loading;
       this.cleanedQuery = cleanedQuery;
       this.cleanedQueryWithSpaces = cleanedQueryWithSpaces;
-      this.exludedWordsToUse = this.showExclude ? anagram.sanitizeQuery(this.excludeWords, false) : '';
+      this.exludedWordsToUse = this.showExclude ? anagram.sanitizeQuery(this.excludeWords, letterMappingToDictionary(this.dictionaryMapping), false) : '';
     });
 
     if (subanagrams.length === 0) {
@@ -531,12 +558,12 @@ export class AnagramState {
       return;
     }
 
-    const startNextWorker = (index) => {
+    const startNextWorker = (index: number) => {
       if (this.unsolvedSubanagrams.length === 0) {
         return;
       }
 
-      const nextWorkerIndex = this.unsolvedSubanagrams.shift();
+      const nextWorkerIndex = this.unsolvedSubanagrams.shift() as number;
 
       runInAction(() => {
         this.currentSubanagrams.push(nextWorkerIndex);

@@ -24,7 +24,8 @@ type GroupedWord struct {
 	Length int      `json:"length"`
 }
 
-var alphabet = "abcdefghijklmnopqrstuvwxyz"
+var ascii = "abcdefghijklmnopqrstuvwxyz"
+var alphabet = ascii
 
 func StringToBinary(str string) [26]uint8 {
 	var frequency [26]uint8
@@ -50,6 +51,14 @@ func BinaryToSortedString(frequency [26]uint8) string {
 	return b.String()
 }
 
+func BinaryToString(frequency [26]uint8) string {
+	var b bytes.Buffer
+	for _, amount := range frequency {
+		b.WriteByte(amount)
+	}
+	return b.String()
+}
+
 func isBinarySubset(bin BinaryWord, subbin BinaryWord) bool {
 	for i := range bin {
 		if bin[i] > subbin[i] {
@@ -61,7 +70,7 @@ func isBinarySubset(bin BinaryWord, subbin BinaryWord) bool {
 
 var onlyLetters = regexp.MustCompile("[^a-z]")
 
-func sanitizeWord(str string) string {
+func SanitizeWord(str string) string {
 	replaceMap := map[string]string{
 		"ä": "ae",
 		"Ä": "ae",
@@ -80,7 +89,7 @@ func sanitizeWord(str string) string {
 }
 
 func StringToWord(str string) SimpleWord {
-	sanitized := sanitizeWord(str)
+	sanitized := SanitizeWord(str)
 	return SimpleWord{
 		Binary: StringToBinary(sanitized),
 		Word:   sanitized,
@@ -104,6 +113,28 @@ func ReadDictionary(path string) []SimpleWord {
 		}
 		words = append(words, StringToWord(line))
 	}
+}
+
+type DictionaryEntry struct {
+	Binary      BinaryWord
+	WordIndexes []int
+}
+
+func OptimizeDictionary(dictionary []SimpleWord) []DictionaryEntry {
+	result := make(map[string][]int)
+	for i, word := range dictionary {
+		sortedString := BinaryToSortedString(word.Binary)
+		result[sortedString] = append(result[sortedString], i)
+	}
+
+	var entries []DictionaryEntry
+	for key, indexes := range result {
+		entries = append(entries, DictionaryEntry{
+			Binary:      StringToBinary(key),
+			WordIndexes: indexes,
+		})
+	}
+	return entries
 }
 
 func FindSubAnagrams(query SimpleWord, dictionary []SimpleWord) []SimpleWord {

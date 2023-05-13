@@ -1,5 +1,4 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
 import {sortBy} from 'lodash';
 import styled from 'styled-components';
 import { FRONTEND_URL } from 'src/constants';
@@ -12,6 +11,7 @@ import {
 } from './Buttons';
 
 import AnagramSausages from './AnagramSausages';
+import { Link } from '@tanstack/react-location';
 
 export const Copyright = styled.div`
   font-size: ${THEME.font.sizeSmall};
@@ -121,7 +121,7 @@ export class Word extends React.Component<{
     return (
       <StyledWord style={{fontSize: this.props.fontSize, height: this.props.fontSize}}>
         {word.split('').map((_, i) => {
-          const index = mapping[i]
+          const index = mapping[i]!
           const position = index * this.props.characterWidth;
           const c2 = anagram[index];
           return (
@@ -139,7 +139,7 @@ export class Word extends React.Component<{
   }
 }
 
-export function createShareLink(word, anagram) {
+export function createShareLink(word: string, anagram: string) {
   return `${FRONTEND_URL}/share?anagram=${encodeURIComponent(anagram)}&word=${encodeURIComponent(word)}`;;
 }
 
@@ -227,9 +227,10 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
   }[]
 }> {
   componentIsMounted: boolean = false;
-  container: HTMLElement;
-  constructor(props) {
+  container: HTMLElement | null;
+  constructor(props: AnagramVisualizerProps) {
     super(props);
+    this.container = null
 
     this.resetState();
 
@@ -288,7 +289,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       document.removeEventListener('touchend', this.onTouchEnd);
     }
   }
-  setContainerRef(container) {
+  setContainerRef(container: HTMLInputElement) {
     this.container = container;
     if (!container) {
       return;
@@ -397,18 +398,17 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     }
   }
 
-  onMouseMove(e) {
+  onMouseMove(e: MouseEvent) {
     this.onMove(e.pageX, e.pageY);
   }
 
-  onTouchMove(e) {
+  onTouchMove(e: TouchEvent) {
     const touches = e.touches;
     const touch = touches[0];
     this.onMove(touch.pageX, touch.pageY);
-    // console.log(e, 'move');
   }
 
-  onMove(pageX, pageY) {
+  onMove(pageX: number, pageY: number) {
     if (!this.componentIsMounted) {
       return;
     }
@@ -421,7 +421,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
 
       const wordPosition = this.state.wordOffsets[dragState.activeIndex];
 
-      // console.log(e);
       const offsetX = pageX - dragState.initialX;
       const offsetY = pageY - dragState.initialY;
 
@@ -552,11 +551,11 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       }
 
       const onMouseDown = ((wordIndex) => {
-        return (e) => this.onMouseDown(e, wordIndex)
+        return (e: React.MouseEvent<HTMLElement, MouseEvent>) => this.onMouseDown(e, wordIndex)
       })(wordIndex);
 
       const onTouchStart = ((wordIndex) => {
-        return (e) => this.onTouchStart(e, wordIndex)
+        return (e: React.TouchEvent<HTMLElement>) => this.onTouchStart(e, wordIndex)
       })(wordIndex);
 
       wordComponents.push(

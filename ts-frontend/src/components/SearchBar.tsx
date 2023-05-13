@@ -58,14 +58,13 @@ const SearchButton = styled.button`
 `;
 
 class SearchBar extends React.Component<{
-  onSubmit: any;
-  onChange: any;
+  onSubmit: React.FormEventHandler<HTMLFormElement>;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
   value: string;
   placeholder?: string;
   disabled: boolean;
   innerRef?: (dom: HTMLInputElement) => any;
 }> {
-  input: HTMLElement;
   render() {
     const {
       onSubmit,

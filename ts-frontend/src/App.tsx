@@ -18,9 +18,8 @@ import {Footer} from './components';
 import {SmallButton} from './components';
 import Anagramania from './pages/Anagramania';
 import About from './pages/About';
-import Privacy from './pages/Privacy';
 import Styleguide from './pages/Styleguide';
-import Page404 from './pages/404';
+import Share from './pages/Share';
 
 injectGlobal`
   * {
@@ -70,32 +69,28 @@ const routes = [
     { path: "/", element: <Anagramania /> },
     {
       path: "/about",
-      element: About,
+      element: <About/>,
     },
     {
       path: "/share",
-      element: "src/pages/Share",
-    },
-    {
-      path: "/privacy",
-      element: Privacy,
-    },
-    {
-      path: "/performance",
-      element: Performance,
+      element: <Share />,
     },
     {
       path: "/styleguide",
-      element: Styleguide,
+      element: <Styleguide/>,
     },
-    // {
-    //   path: "/bestof",
-    //   element: BestOf
-    // },
     {
       path: "*",
-      element: Page404,
+      element: <Anagramania />,
     },
+    // {
+    //   path: "/performance",
+    //   element: <Performance/>,
+    // },
+    // {
+    //   path: "/bestof",
+    //   element: <BestO/>f
+    // },
   ];
 
 const App = () => {
@@ -132,7 +127,7 @@ const App = () => {
                 style={{fontWeight: 'inherit'}}
               >{'Search'}</SmallButton>
             </Link>
-            <Link
+            {/* <Link
               to='/bestof'
               activeOptions={{
                 exact: true,
@@ -150,7 +145,7 @@ const App = () => {
                 useFontWeightHover
                 style={{fontWeight: 'inherit'}}
               >{'Best Of'}</SmallButton>
-            </Link>
+            </Link> */}
             <Link
               to='/about'
               activeOptions={{
@@ -178,9 +173,6 @@ const App = () => {
             <a href="http://tn1ck.com">{'Tom Nick'}</a>
             {' '}
             <span>{' & Taisia Tikhnovetskaya'}</span>
-            <div style={{marginTop: MARGIN_RAW.m2}}>
-              <Link to="/privacy">{'Privacy'}</Link>
-            </div>
           </Footer>
         </div>
       </Router>
