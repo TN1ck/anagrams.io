@@ -20,9 +20,6 @@
     "tslint": "5.5.0",
     "tslint-loader": "3.5.3"
   },
-  "engines": {
-    "node": "8.x.x"
-  },
   "author": "Tom Nick, Taisia Tikhnovetskaya",
   "license": "MIT",
   "main": "index.js",

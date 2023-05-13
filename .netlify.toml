@@ -1,0 +1,6 @@
+[build]
+  base = "ts-frontend/"
+  command = "yarn build"
+  publish = "dist"
+[build.environment]
+  NODE_VERSION = "18.12.0"
