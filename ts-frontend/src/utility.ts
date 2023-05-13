@@ -101,6 +101,8 @@ A ${arcRadius} ${arcRadius} 0 0 0 ${x2} ${intermediateY + arcRadius * 2}
 L ${x2} ${y2}
 `.replace(/\n/g, '');
   }
+
+  return ""
 }
 
 export function pathDataToPath(pathData: (string | number)[][]): string {
