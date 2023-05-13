@@ -137,11 +137,40 @@ export const DICTIONARIES = [
     name: 'Spanish',
     file: spanish70kDict,
     mapping: [
-      ...ACCENTS,
+      {
+        letter: 'é',
+        mapping: 'e',
+        active: true,
+      },
+      {
+        letter: 'á',
+        mapping: 'a',
+        active: true,
+      },
+      {
+        letter: 'í',
+        mapping: 'i',
+        active: true,
+      },
+      {
+        letter: 'ó',
+        mapping: 'o',
+        active: true,
+      },
+      {
+        letter: 'ú',
+        mapping: 'u',
+        active: true,
+      },
+      {
+        letter: 'ü',
+        mapping: 'u',
+        active: true,
+      },
       {
         letter: 'ñ',
         mapping: 'n',
-        active: false,
+        active: true,
       },
     ]
   },
