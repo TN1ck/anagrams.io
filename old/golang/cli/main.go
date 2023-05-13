@@ -25,6 +25,8 @@ func getNonAsciiLetters(str string) string {
 	return strings.Join(nonAsciiLetters, "")
 }
 
+var alphabet = "abcdefghijklmnopqrstuvwxyz"
+
 func main() {
 	// Parse command line arguments
 	inputFileName := flag.String("input", "", "Input file name")
@@ -65,13 +67,27 @@ func main() {
 	})
 
 	writer := bufio.NewWriter(outputFile)
+	nonAsciiLetters := map[rune]bool{}
 	for _, line := range lines {
+		for _, char := range line {
+			if !strings.Contains(alphabet, string(char)) {
+				nonAsciiLetters[char] = true
+			}
+		}
 		_, err := writer.WriteString(line + "\n")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error writing to output file: %s\n", err)
 			os.Exit(1)
 		}
 	}
+
+	nonAsciiString := []string{}
+	for key := range nonAsciiLetters {
+		nonAsciiString = append(nonAsciiString, string(key))
+	}
+	sort.Strings(nonAsciiString)
+
+	fmt.Println("Non-ASCII letters:", strings.Join(nonAsciiString, ""))
 	writer.Flush()
 
 	fmt.Println("Done!")

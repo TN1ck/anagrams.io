@@ -17,54 +17,6 @@ export interface Dictionary {
   mapping: LetterMapping[];
 }
 
-const ACCENTS = [
-  {
-    letter: 'é',
-    mapping: 'e',
-    active: true,
-  },
-  {
-    letter: 'è',
-    mapping: 'e',
-    active: true,
-  },
-  {
-    letter: 'ê',
-    mapping: 'e',
-    active: true,
-  },
-  {
-    letter: 'ë',
-    mapping: 'e',
-    active: true,
-  },
-  {
-    letter: 'à',
-    mapping: 'a',
-    active: true,
-  },
-  {
-    letter: 'â',
-    mapping: 'a',
-    active: true,
-  },
-  {
-    letter: 'ô',
-    mapping: 'o',
-    active: true,
-  },
-  {
-    letter: 'û',
-    mapping: 'u',
-    active: true,
-  },
-  {
-    letter: 'ù',
-    mapping: 'u',
-    active: true,
-  },
-];
-
 export const DICTIONARIES = [
   {
     id: 'en-90k',
@@ -104,10 +56,39 @@ export const DICTIONARIES = [
     name: 'French',
     file: french300kDict,
     mapping: [
-      ...ACCENTS,
       {
-        letter: 'ç',
-        mapping: 'c',
+        letter: 'à',
+        mapping: 'a',
+        active: true,
+      },
+      {
+        letter: 'â',
+        mapping: 'a',
+        active: true,
+      },
+      {
+        letter: 'ä',
+        mapping: 'a',
+        active: true,
+      },
+      {
+        letter: 'é',
+        mapping: 'e',
+        active: true,
+      },
+      {
+        letter: 'è',
+        mapping: 'e',
+        active: true,
+      },
+      {
+        letter: 'ê',
+        mapping: 'e',
+        active: true,
+      },
+      {
+        letter: 'ë',
+        mapping: 'e',
         active: true,
       },
       {
@@ -121,15 +102,46 @@ export const DICTIONARIES = [
         active: true,
       },
       {
-        letter: 'œ',
-        mapping: 'oe',
+        letter: 'ô',
+        mapping: 'o',
         active: true,
       },
       {
-        letter: 'æ',
-        mapping: 'ae',
+        letter: 'ö',
+        mapping: 'o',
         active: true,
       },
+      {
+        letter: 'ù',
+        mapping: 'u',
+        active: true,
+      },
+      {
+        letter: 'û',
+        mapping: 'u',
+        active: true,
+      },
+      {
+        letter: 'ü',
+        mapping: 'u',
+        active: true,
+      },
+      {
+        letter: 'ç',
+        mapping: 'c',
+        active: true,
+      },
+      // Dict doesn't have these.
+      // {
+      //   letter: 'œ',
+      //   mapping: 'oe',
+      //   active: true,
+      // },
+      // {
+      //   letter: 'æ',
+      //   mapping: 'ae',
+      //   active: true,
+      // },
     ]
   },
   {
@@ -138,13 +150,13 @@ export const DICTIONARIES = [
     file: spanish70kDict,
     mapping: [
       {
-        letter: 'é',
-        mapping: 'e',
+        letter: 'á',
+        mapping: 'a',
         active: true,
       },
       {
-        letter: 'á',
-        mapping: 'a',
+        letter: 'é',
+        mapping: 'e',
         active: true,
       },
       {
