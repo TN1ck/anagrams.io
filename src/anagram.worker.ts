@@ -1,18 +1,19 @@
 // import 'babel-polyfill';
-import * as anagram from './anagram';
+import * as anagram from "./anagram";
 
 const ctx: Worker = self as any;
 
-function serializeAnagramStep(step: anagram.AnagramGeneratorStep): anagram.AnagramGeneratorStepSerialized {
+function serializeAnagramStep(
+  step: anagram.AnagramGeneratorStep
+): anagram.AnagramGeneratorStepSerialized {
   return {
-    solutions: step.solutions.map(s => s[0].slice().reverse()),
-    numberOfPossibilitiesChecked: step.numberOfPossibilitiesChecked
+    solutions: step.solutions.map((s) => s[0].slice().reverse()),
+    numberOfPossibilitiesChecked: step.numberOfPossibilitiesChecked,
   };
 }
 
-ctx.addEventListener('message', (message) => {
-
-  if (message.data.type !== 'start') {
+ctx.addEventListener("message", (message) => {
+  if (message.data.type !== "start") {
     return;
   }
 
@@ -23,36 +24,39 @@ ctx.addEventListener('message', (message) => {
     nextWorkerIndex: number;
   } = message.data;
 
-  const {query, subanagrams, subanagram, nextWorkerIndex} = data;
-  const anagramSolver = anagram.findAnagramSentencesForSubAnagram(query, subanagrams, subanagram);
+  const { query, subanagrams, subanagram, nextWorkerIndex } = data;
+  const anagramSolver = anagram.findAnagramSentencesForSubAnagram(
+    query,
+    subanagrams,
+    subanagram
+  );
 
-  const {generator} = anagramSolver;
+  const { generator } = anagramSolver;
 
   let state: anagram.AnagramGeneratorStep = {
     solutions: [],
     numberOfPossibilitiesChecked: 0,
   };
-  let lastTimeSendDate = +(new Date());
+  let lastTimeSendDate = +new Date();
 
   const MINIMUM_TIME = 200;
 
   const stateStep = generator();
   state.solutions = state.solutions.concat(stateStep.solutions);
   state.numberOfPossibilitiesChecked += stateStep.numberOfPossibilitiesChecked;
-  const currentDate = +(new Date());
+  const currentDate = +new Date();
   const diff = currentDate - lastTimeSendDate;
-  if (diff > MINIMUM_TIME
-    ) {
-      const lastTimeSend = serializeAnagramStep(state);
-      lastTimeSendDate = +(new Date());
-      ctx.postMessage(lastTimeSend);
-      state.solutions = [];
-      state.numberOfPossibilitiesChecked = 0;
+  if (diff > MINIMUM_TIME) {
+    const lastTimeSend = serializeAnagramStep(state);
+    lastTimeSendDate = +new Date();
+    ctx.postMessage(lastTimeSend);
+    state.solutions = [];
+    state.numberOfPossibilitiesChecked = 0;
   }
 
   const serializedState = serializeAnagramStep(state);
   (serializedState as any).nextWorkerIndex = nextWorkerIndex;
   ctx.postMessage(serializedState);
-  ctx.postMessage('finish');
+  ctx.postMessage("finish");
   // self.close();
 });

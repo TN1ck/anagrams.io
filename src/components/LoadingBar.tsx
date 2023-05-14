@@ -1,7 +1,7 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
-import {THEME} from 'src/theme';
+import { THEME } from "src/theme";
 
 const LoadingBar = styled.div<{
   progress: number;
@@ -11,7 +11,7 @@ const LoadingBar = styled.div<{
   padding: ${THEME.margins.m1};
   // box-shadow: ${THEME.dropShadow.s1};
   border-radius: ${THEME.borderRadius};
-  background: ${props => {
+  background: ${(props) => {
     return `linear-gradient(to right, ${THEME.colors.primary} 0%, ${THEME.colors.primary} ${props.progress}%, ${THEME.colors.backgroundBright} ${props.progress}%, ${THEME.colors.backgroundBright} 100%);`;
   }}
   margin-bottom: ${THEME.margins.m2};
@@ -26,8 +26,13 @@ class LoadingBarWrapped extends React.Component<{
     return (
       <LoadingBar progress={this.props.progress}>
         {this.props.children}
-        <div style={{position: 'absolute', right: THEME.margins.m2, top: THEME.margins.m2}}>
-        </div>
+        <div
+          style={{
+            position: "absolute",
+            right: THEME.margins.m2,
+            top: THEME.margins.m2,
+          }}
+        ></div>
       </LoadingBar>
     );
   }

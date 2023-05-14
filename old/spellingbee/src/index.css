@@ -1,8 +1,0 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-body {
-  @apply p-8 bg-yellow-400 max-w-screen-lg;
-  margin: auto;
-}

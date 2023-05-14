@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import {THEME} from 'src/theme';
+import React from "react";
+import styled from "styled-components";
+import { THEME } from "src/theme";
 
 export const ProfilesContainer = styled.div`
   display: flex;
@@ -40,9 +40,7 @@ export class Profile extends React.Component<{
   render() {
     return (
       <ProfileContainer style={this.props.style}>
-        <ProfileImage
-          src={this.props.avatar}
-        />
+        <ProfileImage src={this.props.avatar} />
         {this.props.children}
       </ProfileContainer>
     );

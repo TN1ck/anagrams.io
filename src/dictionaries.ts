@@ -1,13 +1,13 @@
-import english90kDict from '../dictionaries/english-90k.txt'
-import german600kDict from '../dictionaries/german-600k.txt'
-import french300kDict from '../dictionaries/french-300k.txt'
-import spanish70kDict from '../dictionaries/spanish-70k.txt'
-import portuguese300kDict from '../dictionaries/portuguese-300k.txt'
+import english90kDict from "../dictionaries/english-90k.txt";
+import german600kDict from "../dictionaries/german-600k.txt";
+import french300kDict from "../dictionaries/french-300k.txt";
+import spanish70kDict from "../dictionaries/spanish-70k.txt";
+import portuguese300kDict from "../dictionaries/portuguese-300k.txt";
 
 export interface LetterMapping {
-  letter: string
-  mapping: string
-  active: boolean
+  letter: string;
+  mapping: string;
+  active: boolean;
 }
 
 export interface Dictionary {
@@ -19,116 +19,116 @@ export interface Dictionary {
 
 export const DICTIONARIES = [
   {
-    id: 'en-90k',
-    name: 'English',
+    id: "en-90k",
+    name: "English",
     file: english90kDict,
     mapping: [],
   },
   {
-    id: 'de-600k',
-    name: 'German',
+    id: "de-600k",
+    name: "German",
     file: german600kDict,
     mapping: [
       {
-        letter: 'ä',
-        mapping: 'a',
+        letter: "ä",
+        mapping: "a",
         active: false,
       },
       {
-        letter: 'ö',
-        mapping: 'o',
+        letter: "ö",
+        mapping: "o",
         active: false,
       },
       {
-        letter: 'ü',
-        mapping: 'u',
+        letter: "ü",
+        mapping: "u",
         active: false,
       },
       {
-        letter: 'ß',
-        mapping: 'ss',
+        letter: "ß",
+        mapping: "ss",
         active: true,
-      }
-    ]
+      },
+    ],
   },
   {
-    id: 'fr-300k',
-    name: 'French',
+    id: "fr-300k",
+    name: "French",
     file: french300kDict,
     mapping: [
       {
-        letter: 'à',
-        mapping: 'a',
+        letter: "à",
+        mapping: "a",
         active: true,
       },
       {
-        letter: 'â',
-        mapping: 'a',
+        letter: "â",
+        mapping: "a",
         active: true,
       },
       {
-        letter: 'ä',
-        mapping: 'a',
+        letter: "ä",
+        mapping: "a",
         active: true,
       },
       {
-        letter: 'é',
-        mapping: 'e',
+        letter: "é",
+        mapping: "e",
         active: true,
       },
       {
-        letter: 'è',
-        mapping: 'e',
+        letter: "è",
+        mapping: "e",
         active: true,
       },
       {
-        letter: 'ê',
-        mapping: 'e',
+        letter: "ê",
+        mapping: "e",
         active: true,
       },
       {
-        letter: 'ë',
-        mapping: 'e',
+        letter: "ë",
+        mapping: "e",
         active: true,
       },
       {
-        letter: 'î',
-        mapping: 'i',
+        letter: "î",
+        mapping: "i",
         active: true,
       },
       {
-        letter: 'ï',
-        mapping: 'i',
+        letter: "ï",
+        mapping: "i",
         active: true,
       },
       {
-        letter: 'ô',
-        mapping: 'o',
+        letter: "ô",
+        mapping: "o",
         active: true,
       },
       {
-        letter: 'ö',
-        mapping: 'o',
+        letter: "ö",
+        mapping: "o",
         active: true,
       },
       {
-        letter: 'ù',
-        mapping: 'u',
+        letter: "ù",
+        mapping: "u",
         active: true,
       },
       {
-        letter: 'û',
-        mapping: 'u',
+        letter: "û",
+        mapping: "u",
         active: true,
       },
       {
-        letter: 'ü',
-        mapping: 'u',
+        letter: "ü",
+        mapping: "u",
         active: true,
       },
       {
-        letter: 'ç',
-        mapping: 'c',
+        letter: "ç",
+        mapping: "c",
         active: true,
       },
       // Dict doesn't have these.
@@ -142,49 +142,49 @@ export const DICTIONARIES = [
       //   mapping: 'ae',
       //   active: true,
       // },
-    ]
+    ],
   },
   {
-    id: 'es-70k',
-    name: 'Spanish',
+    id: "es-70k",
+    name: "Spanish",
     file: spanish70kDict,
     mapping: [
       {
-        letter: 'á',
-        mapping: 'a',
+        letter: "á",
+        mapping: "a",
         active: true,
       },
       {
-        letter: 'é',
-        mapping: 'e',
+        letter: "é",
+        mapping: "e",
         active: true,
       },
       {
-        letter: 'í',
-        mapping: 'i',
+        letter: "í",
+        mapping: "i",
         active: true,
       },
       {
-        letter: 'ó',
-        mapping: 'o',
+        letter: "ó",
+        mapping: "o",
         active: true,
       },
       {
-        letter: 'ú',
-        mapping: 'u',
+        letter: "ú",
+        mapping: "u",
         active: true,
       },
       {
-        letter: 'ü',
-        mapping: 'u',
+        letter: "ü",
+        mapping: "u",
         active: true,
       },
       {
-        letter: 'ñ',
-        mapping: 'n',
+        letter: "ñ",
+        mapping: "n",
         active: true,
       },
-    ]
+    ],
   },
   // {
   //   id: 'pr-70k',

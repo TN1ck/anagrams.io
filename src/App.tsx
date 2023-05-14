@@ -1,6 +1,6 @@
-import React from 'react';
-import {createRoot} from 'react-dom/client'
-import {Provider} from 'mobx-react';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { Provider } from "mobx-react";
 import {
   Link,
   MakeGenerics,
@@ -10,16 +10,16 @@ import {
   useMatch,
 } from "@tanstack/react-location";
 
-import {createGlobalStyle} from 'styled-components';
-import store from 'src/state';
+import { createGlobalStyle } from "styled-components";
+import store from "src/state";
 
-import {MARGIN_RAW, THEME} from './theme';
-import {Footer} from './components';
-import {SmallButton} from './components';
-import Anagramania from './pages/Anagramania';
-import About from './pages/About';
-import Styleguide from './pages/Styleguide';
-import Share from './pages/Share';
+import { MARGIN_RAW, THEME } from "./theme";
+import { Footer } from "./components";
+import { SmallButton } from "./components";
+import Anagramania from "./pages/Anagramania";
+import About from "./pages/About";
+import Styleguide from "./pages/Styleguide";
+import Share from "./pages/Share";
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -63,61 +63,59 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-
 const location = new ReactLocation();
 const routes = [
-    { path: "/", element: <Anagramania /> },
-    {
-      path: "/about",
-      element: <About/>,
-    },
-    {
-      path: "/share",
-      element: <Share />,
-    },
-    {
-      path: "/styleguide",
-      element: <Styleguide/>,
-    },
-    {
-      path: "*",
-      element: <Anagramania />,
-    },
-    // {
-    //   path: "/performance",
-    //   element: <Performance/>,
-    // },
-    // {
-    //   path: "/bestof",
-    //   element: <BestO/>f
-    // },
-  ];
+  { path: "/", element: <Anagramania /> },
+  {
+    path: "/about",
+    element: <About />,
+  },
+  {
+    path: "/share",
+    element: <Share />,
+  },
+  {
+    path: "/styleguide",
+    element: <Styleguide />,
+  },
+  {
+    path: "*",
+    element: <Anagramania />,
+  },
+  // {
+  //   path: "/performance",
+  //   element: <Performance/>,
+  // },
+  // {
+  //   path: "/bestof",
+  //   element: <BestO/>f
+  // },
+];
 
 const App = () => {
   return (
     <Provider store={store}>
-      <Router
-      location={location}
-      routes={routes}
-    >
-      <GlobalStyle />
+      <Router location={location} routes={routes}>
+        <GlobalStyle />
         <div>
-          <div style={{
-            position: 'absolute',
-            top: MARGIN_RAW.m2,
-            right: MARGIN_RAW.m2,
-            background: THEME.colors.backgroundBright,
-            zIndex: 99,
-          }}>
+          <div
+            style={{
+              position: "absolute",
+              top: MARGIN_RAW.m2,
+              right: MARGIN_RAW.m2,
+              background: THEME.colors.backgroundBright,
+              zIndex: 99,
+            }}
+          >
             <Link
-              to='/'
+              to="/"
               activeOptions={{
                 exact: true,
               }}
               getActiveProps={() => {
                 return {
                   style: {
-                    fontWeight: 'bold',
+                    fontWeight: "bold",
                   },
                 };
               }}
@@ -125,8 +123,10 @@ const App = () => {
               <SmallButton
                 active={false}
                 useFontWeightHover
-                style={{fontWeight: 'inherit'}}
-              >{'Search'}</SmallButton>
+                style={{ fontWeight: "inherit" }}
+              >
+                {"Search"}
+              </SmallButton>
             </Link>
             {/* <Link
               to='/bestof'
@@ -148,14 +148,14 @@ const App = () => {
               >{'Best Of'}</SmallButton>
             </Link> */}
             <Link
-              to='/about'
+              to="/about"
               activeOptions={{
                 exact: true,
               }}
               getActiveProps={() => {
                 return {
                   style: {
-                    fontWeight: 'bold',
+                    fontWeight: "bold",
                   },
                 };
               }}
@@ -163,23 +163,23 @@ const App = () => {
               <SmallButton
                 active={false}
                 useFontWeightHover
-                style={{fontWeight: 'inherit'}}
-              >{'About'}</SmallButton>
+                style={{ fontWeight: "inherit" }}
+              >
+                {"About"}
+              </SmallButton>
             </Link>
           </div>
 
           <Outlet />
           <Footer>
-            <span>{'Made by '}</span>
-            <a href="http://tn1ck.com">{'Tom Nick'}</a>
-            {' '}
-            <span>{' & Taisia Tikhnovetskaya'}</span>
+            <span>{"Made by "}</span>
+            <a href="http://tn1ck.com">{"Tom Nick"}</a>{" "}
+            <span>{" & Taisia Tikhnovetskaya"}</span>
           </Footer>
         </div>
       </Router>
     </Provider>
-  )
+  );
 };
 
-createRoot(document.getElementById("root")!).render(<App />)
-
+createRoot(document.getElementById("root")!).render(<App />);

@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import {THEME} from 'src/theme';
+import styled from "styled-components";
+import { THEME } from "src/theme";
 
 export const Header = styled.div`
   background: ${THEME.colors.backgroundBright};

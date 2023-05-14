@@ -6,10 +6,13 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write '.'"
   },
   "keywords": [
-    "anagrams"
+    "anagrams",
+    "anagram generator",
+    "anagram solver"
   ],
   "author": "Tom Nick, Taisia Tikhnovetskaya",
   "license": "MIT",
@@ -30,6 +33,7 @@
     "lodash": "4.17.21",
     "mobx": "6.9.0",
     "mobx-react": "7.6.0",
+    "prettier": "^2.8.8",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-modal": "3.16.1",

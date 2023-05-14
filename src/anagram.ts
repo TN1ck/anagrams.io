@@ -1,4 +1,4 @@
-import {sortBy, drop, groupBy} from 'lodash';
+import { sortBy, drop, groupBy } from "lodash";
 
 // TODO: Use dictionaries to create the letter list.
 const ALPHABET = "abcdefghijklmnopqrstuvwxyzüäößéèêëàâôûùçîïœæñ";
@@ -15,7 +15,7 @@ export interface BasicWord {
 
 export interface SimpleWord extends BasicWord {
   word: string;
-};
+}
 
 export interface Word extends BasicWord {
   words: string[];
@@ -26,9 +26,9 @@ type AnagramSolution = [number[], BasicWord["set"], BasicWord["length"]];
 type OptimizedAnagramSolution = number[];
 
 export interface AnagramGeneratorStep {
-  solutions: AnagramSolution[],
-  numberOfPossibilitiesChecked: number,
-};
+  solutions: AnagramSolution[];
+  numberOfPossibilitiesChecked: number;
+}
 
 // export type AnagramGenerator = IterableIterator<AnagramGeneratorStep>;
 
@@ -57,11 +57,11 @@ export interface SerializedAnagramIteratorState {
 }
 
 export interface GroupedAnagramSolutions {
-  list: SimpleWord[][],
-  word: string,
-  counter: number,
+  list: SimpleWord[][];
+  word: string;
+  counter: number;
   wordIndex: number;
-};
+}
 
 export interface AnagramGeneratorStepSerialized {
   solutions: number[][];
@@ -72,29 +72,38 @@ export interface AnagramGeneratorStepSerialized {
 // functions
 //
 
-export function mapLetters(str: string, mapping: Record<string, string>): string {
+export function mapLetters(
+  str: string,
+  mapping: Record<string, string>
+): string {
   str = str.toLowerCase();
 
   for (let key of Object.keys(mapping)) {
     const value = mapping[key];
-    str = str.replace(new RegExp(key, 'g'), value);
+    str = str.replace(new RegExp(key, "g"), value);
   }
-  return str
+  return str;
 }
 
-export function sanitizeQuery(str: string, mapping: Record<string, string>, removeSpaces: boolean = true): string {
-  str = mapLetters(str, mapping)
-  str = [...str].filter(char => {
-    if (removeSpaces) {
-      return ALPHABET.includes(char)
-    }
-    return ALPHABET.includes(char) || char === ' '
-  }).join('')
-  return str
+export function sanitizeQuery(
+  str: string,
+  mapping: Record<string, string>,
+  removeSpaces: boolean = true
+): string {
+  str = mapLetters(str, mapping);
+  str = [...str]
+    .filter((char) => {
+      if (removeSpaces) {
+        return ALPHABET.includes(char);
+      }
+      return ALPHABET.includes(char) || char === " ";
+    })
+    .join("");
+  return str;
 }
 
 export function binaryToString(bin: Uint8Array) {
-  let word = '';
+  let word = "";
   for (let i = 0; i < ALPHABET.length; i++) {
     const letter = ALPHABET[i];
     const frequency = bin[i];
@@ -189,29 +198,38 @@ function isBinarySame(bin1: Uint8Array, bin2: Uint8Array): boolean {
 
 export function findAnagrams(query: string, dictionary: Word[]): Word[] {
   const nQuery = stringToWord(query);
-  return dictionary.filter(nStr => {
+  return dictionary.filter((nStr) => {
     return isBinarySame(nStr.set, nQuery.set);
   });
 }
 
-export function findSubAnagrams(query: string, dictionary: SimpleWord[]): SimpleWord[] {
+export function findSubAnagrams(
+  query: string,
+  dictionary: SimpleWord[]
+): SimpleWord[] {
   const nQuery = stringToWord(query);
-  return dictionary.filter(nStr => {
+  return dictionary.filter((nStr) => {
     return isBinarySubset(nStr.set, nQuery.set);
   });
 }
 
-export function findSubAnagramsStrings(query: string, dictionary: string[]): string[] {
-  return dictionary.filter(nStr => {
+export function findSubAnagramsStrings(
+  query: string,
+  dictionary: string[]
+): string[] {
+  return dictionary.filter((nStr) => {
     return isSubset(nStr, query);
   });
 }
 
 export function sortWordList<T extends BasicWord>(wordList: T[]): T[] {
-  return sortBy(wordList, w => -w.length);
+  return sortBy(wordList, (w) => -w.length);
 }
 
-export function findSortedSubAnagrmns(query: string, dictionary: SimpleWord[]): BasicWord[] {
+export function findSortedSubAnagrmns(
+  query: string,
+  dictionary: SimpleWord[]
+): BasicWord[] {
   const _subanagrams = findSubAnagrams(query, dictionary);
   // we like long words more
   const sorted = sortWordList(_subanagrams);
@@ -224,12 +242,14 @@ export function findSortedSubAnagrmns(query: string, dictionary: SimpleWord[]): 
   return subanagrams;
 }
 
-export function findSortedAndGroupedSubAnagrams(subanagrams: SimpleWord[]): Word[] {
-  const groupedSubanagrams = groupBy(subanagrams, s => binaryToString(s.set));
+export function findSortedAndGroupedSubAnagrams(
+  subanagrams: SimpleWord[]
+): Word[] {
+  const groupedSubanagrams = groupBy(subanagrams, (s) => binaryToString(s.set));
   const groups = Object.keys(groupedSubanagrams);
-  const sortedGroups = sortBy(groups, g => -g.length);
+  const sortedGroups = sortBy(groups, (g) => -g.length);
   return sortedGroups.map((set, index) => {
-    const words = groupedSubanagrams[set].map(w => w.word);
+    const words = groupedSubanagrams[set].map((w) => w.word);
     return {
       set: groupedSubanagrams[set][0].set,
       words,
@@ -252,21 +272,27 @@ export function anagramIteratorStateFactory(unsolvedGenerators = []) {
   return state;
 }
 
-export function serializeAnagramIteratorStateFactor(state: AnagramIteratorState): SerializedAnagramIteratorState {
-  const solutions = state.solutions.map(s => [...s[0]].reverse());
+export function serializeAnagramIteratorStateFactor(
+  state: AnagramIteratorState
+): SerializedAnagramIteratorState {
+  const solutions = state.solutions.map((s) => [...s[0]].reverse());
   return {
     counter: state.counter,
     numberOfPossibilitiesChecked: state.numberOfPossibilitiesChecked,
-    unsolvedSubanagrams: state.unsolvedGenerators.map(d => d.subanagram.index),
-    solvedSubanagrams: state.solvedGenerators.map(d => d.subanagram.index),
-    currentSubanagrams: state.currentGenerators.map(d => d.subanagram.index),
+    unsolvedSubanagrams: state.unsolvedGenerators.map(
+      (d) => d.subanagram.index
+    ),
+    solvedSubanagrams: state.solvedGenerators.map((d) => d.subanagram.index),
+    currentSubanagrams: state.currentGenerators.map((d) => d.subanagram.index),
     // use numbers to reduce memory footprint
     solutions,
-  }
+  };
 }
 
 export function findAnagramSentencesForInitialStack(
-  query: string, initialStack: AnagramSolution[], subanagrams: Word[],
+  query: string,
+  initialStack: AnagramSolution[],
+  subanagrams: Word[]
 ) {
   const nQuery = stringToWord(query);
   const queryLength = nQuery.word.length;
@@ -277,18 +303,17 @@ export function findAnagramSentencesForInitialStack(
     let numberOfPossibilitiesChecked = initialStack.length;
 
     let newSolutions: AnagramSolution[] = [];
-    const solutions: AnagramSolution[] = []
+    const solutions: AnagramSolution[] = [];
     let numberOfSolutions = 0;
     const MAX_SOLUTIONS = 100;
 
-    while(stack.length !== 0 && numberOfSolutions < MAX_SOLUTIONS) {
+    while (stack.length !== 0 && numberOfSolutions < MAX_SOLUTIONS) {
       const current = stack.shift() as AnagramSolution;
 
       if (isBinarySame(nQuery.set, current[1])) {
         // solutions.push(current);
         newSolutions.push(current);
       } else {
-
         const charsMissing = queryLength - current[2];
 
         // drop all subanagrams that were before index
@@ -297,29 +322,31 @@ export function findAnagramSentencesForInitialStack(
         numberOfPossibilitiesChecked += droppedSubanagrams.length;
 
         // first filter those out, that are too big
-        const possibleSubanagrams = droppedSubanagrams.filter(s => {
+        const possibleSubanagrams = droppedSubanagrams.filter((s) => {
           return s.length <= charsMissing;
         });
 
-        const combinedWords = possibleSubanagrams.map(w => {
+        const combinedWords = possibleSubanagrams.map((w) => {
           return {
             word: w,
-            combined: joinTwoBinary(current[1], w.set)
+            combined: joinTwoBinary(current[1], w.set),
           };
         });
 
         // check if the result is still a subset
-        const filterCombined = combinedWords.filter(cw => {
+        const filterCombined = combinedWords.filter((cw) => {
           return isBinarySubset(cw.combined, nQuery.set);
         });
 
-        const newAnagramSolutions: AnagramSolution[] = filterCombined.map(cw => {
-          return [
-            [cw.word.index].concat(current[0]),
-            cw.combined,
-            cw.word.length + current[2]
-          ] as AnagramSolution;
-        });
+        const newAnagramSolutions: AnagramSolution[] = filterCombined.map(
+          (cw) => {
+            return [
+              [cw.word.index].concat(current[0]),
+              cw.combined,
+              cw.word.length + current[2],
+            ] as AnagramSolution;
+          }
+        );
 
         stack.unshift(...newAnagramSolutions);
       }
@@ -332,29 +359,34 @@ export function findAnagramSentencesForInitialStack(
     return {
       solutions,
       numberOfPossibilitiesChecked,
-    }
-  }
+    };
+  };
   return calculateAnagrams;
-
 }
 
-export function findAnagramSentencesForSubAnagram(query: string, subanagrams: Word[], subanagram: Word): SubanagramSolver {
+export function findAnagramSentencesForSubAnagram(
+  query: string,
+  subanagrams: Word[],
+  subanagram: Word
+): SubanagramSolver {
   const initialStack: AnagramSolution[] = [
-    [
-      [subanagram.index],
-      subanagram.set,
-      subanagram.length,
-    ]
+    [[subanagram.index], subanagram.set, subanagram.length],
   ];
-  const generator = findAnagramSentencesForInitialStack(query, initialStack, subanagrams);
+  const generator = findAnagramSentencesForInitialStack(
+    query,
+    initialStack,
+    subanagrams
+  );
   return {
     subanagram,
     generator,
   };
 }
 
-export function findAnagramSentences(query: string, subanagrams: Word[]): SubanagramSolver[] {
-
+export function findAnagramSentences(
+  query: string,
+  subanagrams: Word[]
+): SubanagramSolver[] {
   const subanagramsGenerators = subanagrams.map((w) => {
     return findAnagramSentencesForSubAnagram(query, subanagrams, w);
   });
@@ -363,18 +395,18 @@ export function findAnagramSentences(query: string, subanagrams: Word[]): Subana
 }
 
 export interface GroupedWords {
-  list: SimpleWord[][],
-  counter: number,
-  word: string,
-  wordIndex: number,
+  list: SimpleWord[][];
+  counter: number;
+  word: string;
+  wordIndex: number;
 }
 
-export type GroupedWordsDict = Record<string, GroupedWords>
+export type GroupedWordsDict = Record<string, GroupedWords>;
 
 function createGroups(subanagrams: Word[]): GroupedWordsDict {
   const groups: GroupedWordsDict = {};
-  subanagrams.forEach(a => {
-    a.words.forEach(w => {
+  subanagrams.forEach((a) => {
+    a.words.forEach((w) => {
       const group = {
         word: w,
         counter: 0,
@@ -390,13 +422,14 @@ function createGroups(subanagrams: Word[]): GroupedWordsDict {
 export function groupWordsByStartWord(
   subanagrams: Word[],
   words: SimpleWord[][],
-  cache: {[key: string]: GroupedWords} = {},
-  cacheLength: number = 0,
+  cache: { [key: string]: GroupedWords } = {},
+  cacheLength: number = 0
 ): GroupedWordsDict {
   const values = Object.values(cache || {});
-  const groups: {[key: string]: GroupedWords} = values.length === 0 ? createGroups(subanagrams) : cache;
+  const groups: { [key: string]: GroupedWords } =
+    values.length === 0 ? createGroups(subanagrams) : cache;
   // TODO
-  cacheLength = values.reduce((a, c) => c.list.length + a, 0)
+  cacheLength = values.reduce((a, c) => c.list.length + a, 0);
 
   // let current = null;
   let currentWordIndex = 0;
@@ -418,9 +451,7 @@ export function groupWordsByStartWord(
   }
 
   return groups;
-
 }
-
 
 export enum AnagramResultState {
   active = "active",
@@ -430,10 +461,13 @@ export enum AnagramResultState {
 
 export function isLetter(letter: string) {
   // ignore the dot for now: TODO, refactor
-  return ALPHABET.includes(letter.toLocaleLowerCase()) || letter === '.';
+  return ALPHABET.includes(letter.toLocaleLowerCase()) || letter === ".";
 }
 
-export function getAnagramMapping(w1: string, w2: string): (number | undefined)[] {
+export function getAnagramMapping(
+  w1: string,
+  w2: string
+): (number | undefined)[] {
   w1 = w1.toLowerCase();
   w2 = w2.toLowerCase();
   const mapping: Record<string, number[]> = {};
@@ -479,28 +513,34 @@ function _expandArray<T>(array: T[][], current: T[][]): T[][] {
 
 export function expandArray<T>(array: T[][]): T[][] {
   const [start, ...rest] = array;
-  return _expandArray(rest, start.map(s => [s]));
+  return _expandArray(
+    rest,
+    start.map((s) => [s])
+  );
 }
 
-
-export function expandSolutions(solutions: OptimizedAnagramSolution[], subanagrams: Word[]): SimpleWord[][] {
-  const expandedSolutions: SimpleWord[][] = ([] as SimpleWord[][]).concat(...solutions.map(solution => {
-    const currentSolutions: SimpleWord[][] = solution.map(s => {
-      const subanagram = subanagrams[s];
-      return subanagram.words.map(w => {
-        const simpleWord: SimpleWord = {
-          word: w,
-          index: subanagram.index,
-          set: subanagram.set,
-          length: w.length,
-        }
-        return simpleWord
+export function expandSolutions(
+  solutions: OptimizedAnagramSolution[],
+  subanagrams: Word[]
+): SimpleWord[][] {
+  const expandedSolutions: SimpleWord[][] = ([] as SimpleWord[][]).concat(
+    ...solutions.map((solution) => {
+      const currentSolutions: SimpleWord[][] = solution.map((s) => {
+        const subanagram = subanagrams[s];
+        return subanagram.words.map((w) => {
+          const simpleWord: SimpleWord = {
+            word: w,
+            index: subanagram.index,
+            set: subanagram.set,
+            length: w.length,
+          };
+          return simpleWord;
+        });
       });
-    });
 
-    const expanded = expandArray(currentSolutions);
-    return expanded;
-  }));
+      const expanded = expandArray(currentSolutions);
+      return expanded;
+    })
+  );
   return expandedSolutions;
-
 }

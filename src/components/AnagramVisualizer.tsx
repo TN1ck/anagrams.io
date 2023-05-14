@@ -1,17 +1,15 @@
-import React from 'react';
-import {sortBy} from 'lodash';
-import styled from 'styled-components';
-import { FRONTEND_URL } from 'src/constants';
-import {getAnagramMapping} from 'src/anagram';
-import {Card} from 'src/components/Layout';
-import {THEME, MARGIN_RAW} from 'src/theme';
+import React from "react";
+import { sortBy } from "lodash";
+import styled from "styled-components";
+import { FRONTEND_URL } from "src/constants";
+import { getAnagramMapping } from "src/anagram";
+import { Card } from "src/components/Layout";
+import { THEME, MARGIN_RAW } from "src/theme";
 
-import {
-  SmallButton,
-} from './Buttons';
+import { SmallButton } from "./Buttons";
 
-import AnagramSausages from './AnagramSausages';
-import { Link } from '@tanstack/react-location';
+import AnagramSausages from "./AnagramSausages";
+import { Link } from "@tanstack/react-location";
 
 export const Copyright = styled.div`
   font-size: ${THEME.font.sizeSmall};
@@ -83,23 +81,19 @@ class WordLetter extends React.Component<{
   letter: string;
 }> {
   render() {
-    const {
-      characterWidth,
-      position,
-      left,
-      letter,
-    } = this.props;
+    const { characterWidth, position, left, letter } = this.props;
     return (
       <span
         style={{
-          transition: 'all 500ms ease-in-out',
-          display: 'block',
+          transition: "all 500ms ease-in-out",
+          display: "block",
           width: characterWidth,
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           transform: `translate(${position}px, 0)`,
           left: left,
-        }}>
+        }}
+      >
         {letter}
       </span>
     );
@@ -119,9 +113,11 @@ export class Word extends React.Component<{
     const mapping = getAnagramMapping(word, anagram);
     const wordWidth = this.props.wordWidth || 0;
     return (
-      <StyledWord style={{fontSize: this.props.fontSize, height: this.props.fontSize}}>
-        {word.split('').map((_, i) => {
-          const index = mapping[i]!
+      <StyledWord
+        style={{ fontSize: this.props.fontSize, height: this.props.fontSize }}
+      >
+        {word.split("").map((_, i) => {
+          const index = mapping[i]!;
           const position = index * this.props.characterWidth;
           const c2 = anagram[index];
           return (
@@ -140,13 +136,16 @@ export class Word extends React.Component<{
 }
 
 export function createShareLink(word: string, anagram: string) {
-  return `${FRONTEND_URL}/share?anagram=${encodeURIComponent(anagram)}&word=${encodeURIComponent(word)}`;;
+  return `${FRONTEND_URL}/share?anagram=${encodeURIComponent(
+    anagram
+  )}&word=${encodeURIComponent(word)}`;
 }
 
 export function calculateWidths(
-  word: string, anagram: string, fontSize: number
+  word: string,
+  anagram: string,
+  fontSize: number
 ) {
-
   const WIDTH_PER_PIXEL = 0.5992857143;
   const HEIGHT_PER_PIXEL = 1.13;
 
@@ -158,7 +157,7 @@ export function calculateWidths(
   const maxLength = Math.max(word.length, anagram.length);
   const width = maxLength * letterWidth;
 
-  const height = maxLength * letterHeight / 2;
+  const height = (maxLength * letterHeight) / 2;
 
   return {
     height,
@@ -179,16 +178,15 @@ interface AnagramVisualizerProps {
 }
 
 function splitWord(word: string) {
-  const wordIndexed: Array<[string, number]> = [...word]
-    .map((w, i) => {
-      return [w, i];
-    }) as any;
+  const wordIndexed: Array<[string, number]> = [...word].map((w, i) => {
+    return [w, i];
+  }) as any;
 
   const wordSplitted: Array<Array<[string, number]>> = [];
   let currentIndexedWord: Array<[string, number]> = [];
 
   for (const [w, i] of wordIndexed) {
-    if (w === ' ' && currentIndexedWord.length > 0) {
+    if (w === " " && currentIndexedWord.length > 0) {
       wordSplitted.push(currentIndexedWord);
       currentIndexedWord = [];
       continue;
@@ -201,36 +199,39 @@ function splitWord(word: string) {
   return wordSplitted;
 }
 
-class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
-  word: string;
-  anagram: string;
-  viewState: string;
-  anagramSplitted: [string, number][][];
-  containerPosition: {
-    x: number;
-    y: number;
-  };
-  wordDragState: {
-    activeIndex: number;
-    mouseDown: boolean;
-    isDragging: boolean;
-    initialX: number;
-    initialY: number;
-  };
-  wordPositions: {
-    x: number;
-    y: number;
-  }[]
-  wordOffsets: {
-    x: number;
-    y: number;
-  }[]
-}> {
+class AnagramVisualizer extends React.Component<
+  AnagramVisualizerProps,
+  {
+    word: string;
+    anagram: string;
+    viewState: string;
+    anagramSplitted: [string, number][][];
+    containerPosition: {
+      x: number;
+      y: number;
+    };
+    wordDragState: {
+      activeIndex: number;
+      mouseDown: boolean;
+      isDragging: boolean;
+      initialX: number;
+      initialY: number;
+    };
+    wordPositions: {
+      x: number;
+      y: number;
+    }[];
+    wordOffsets: {
+      x: number;
+      y: number;
+    }[];
+  }
+> {
   componentIsMounted: boolean = false;
   container: HTMLElement | null;
   constructor(props: AnagramVisualizerProps) {
     super(props);
-    this.container = null
+    this.container = null;
 
     this.resetState();
 
@@ -267,26 +268,26 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         x: 0,
         y: 0,
       },
-      viewState: this.props.viewState || 'normal',
+      viewState: this.props.viewState || "normal",
     };
   }
 
   componentDidMount() {
     this.componentIsMounted = true;
-    if (typeof document !== 'undefined') {
-      document.addEventListener('mousemove',this.onMouseMove);
-      document.addEventListener('mouseup', this.onMouseUp);
-      document.addEventListener('touchend', this.onTouchEnd);
-      document.addEventListener('touchmove', this.onTouchMove);
+    if (typeof document !== "undefined") {
+      document.addEventListener("mousemove", this.onMouseMove);
+      document.addEventListener("mouseup", this.onMouseUp);
+      document.addEventListener("touchend", this.onTouchEnd);
+      document.addEventListener("touchmove", this.onTouchMove);
     }
   }
   componentWillUnmount() {
     this.componentIsMounted = false;
-    if (typeof document !== 'undefined') {
-      document.removeEventListener('mousemove', this.onMouseMove);
-      document.removeEventListener('mouseup', this.onMouseMove);
-      document.removeEventListener('touchmove', this.onTouchMove);
-      document.removeEventListener('touchend', this.onTouchEnd);
+    if (typeof document !== "undefined") {
+      document.removeEventListener("mousemove", this.onMouseMove);
+      document.removeEventListener("mouseup", this.onMouseMove);
+      document.removeEventListener("touchmove", this.onTouchMove);
+      document.removeEventListener("touchend", this.onTouchEnd);
     }
   }
   setContainerRef(container: HTMLInputElement) {
@@ -303,19 +304,23 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     });
   }
   copyToClipboard() {
-    const input: HTMLInputElement = document.getElementById('link-input') as HTMLInputElement;
+    const input: HTMLInputElement = document.getElementById(
+      "link-input"
+    ) as HTMLInputElement;
     input.select();
     try {
-      document.execCommand('copy');
-    } catch(err) {
-      console.log('Copy did not work');
+      document.execCommand("copy");
+    } catch (err) {
+      console.log("Copy did not work");
     }
   }
   getWordPosition(index: number) {
-    return this.state.wordPositions[index] || {
-      offsetX: 0,
-      offsetY: 0,
-    }
+    return (
+      this.state.wordPositions[index] || {
+        offsetX: 0,
+        offsetY: 0,
+      }
+    );
   }
   onTouchStart(e: React.TouchEvent<HTMLElement>, wordIndex: number) {
     const touches = e.touches;
@@ -343,7 +348,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         mouseDown: true,
         initialX: pageX - wordOffset.x,
         initialY: pageY - wordOffset.y,
-      }
+      },
     });
   }
   onTouchEnd() {
@@ -360,7 +365,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         mouseDown: false,
         isDragging: false,
         activeIndex: -1,
-      }
+      },
     });
     const newAnagram = this.rearrangeAnagram();
     this.setState({
@@ -372,15 +377,13 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
 
     const fontSize = this.fontSize;
 
-    const {
-      letterWidth,
-    } = calculateWidths(word, anagram, fontSize);
+    const { letterWidth } = calculateWidths(word, anagram, fontSize);
 
     const wordPositions = [];
 
     let x = 0;
     for (const word of anagramSplitted) {
-      wordPositions.push({x, y: 0});
+      wordPositions.push({ x, y: 0 });
       // 1 is for the space
       x += (word.length + 1) * letterWidth;
     }
@@ -390,12 +393,12 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
         x: 0,
         y: 0,
       };
-    })
+    });
     return {
       wordOffsets,
       anagramSplitted,
       wordPositions,
-    }
+    };
   }
 
   onMouseMove(e: MouseEvent) {
@@ -414,7 +417,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     }
     const dragState = this.state.wordDragState;
     if (dragState.mouseDown) {
-
       if (!dragState.isDragging) {
         dragState.isDragging = true;
       }
@@ -424,17 +426,16 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       const offsetX = pageX - dragState.initialX;
       const offsetY = pageY - dragState.initialY;
 
-      wordPosition.x = offsetX,
-      wordPosition.y = offsetY,
-
-      this.setState({
-        wordDragState: {
-          ...dragState,
-          isDragging: true,
-        },
-        wordOffsets: this.state.wordOffsets,
-      })
-      this.rearrangeAnagram()
+      (wordPosition.x = offsetX),
+        (wordPosition.y = offsetY),
+        this.setState({
+          wordDragState: {
+            ...dragState,
+            isDragging: true,
+          },
+          wordOffsets: this.state.wordOffsets,
+        });
+      this.rearrangeAnagram();
     }
   }
 
@@ -448,17 +449,21 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       };
     });
 
-    const sortedWords = sortBy(wordsWithOffset, w => w.x);
+    const sortedWords = sortBy(wordsWithOffset, (w) => w.x);
 
-    const newAnagram = sortedWords.map(({index}) => {
-      const word = this.state.anagramSplitted[index];
-      return word.map(l => l[0]).join('');
-    }).join(' ');
+    const newAnagram = sortedWords
+      .map(({ index }) => {
+        const word = this.state.anagramSplitted[index];
+        return word.map((l) => l[0]).join("");
+      })
+      .join(" ");
 
     let x = 0;
-    const {
-      letterWidth,
-    } = calculateWidths(this.props.word, this.props.anagram, this.fontSize);
+    const { letterWidth } = calculateWidths(
+      this.props.word,
+      this.props.anagram,
+      this.fontSize
+    );
 
     const newPositions = [];
     for (const word of sortedWords) {
@@ -477,8 +482,8 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
       if (p.index !== this.state.wordDragState.activeIndex) {
         const oldPosition = this.state.wordPositions[p.index];
         const oldOffset = this.state.wordOffsets[p.index];
-        oldOffset.x =  p.x - oldPosition.x;
-        oldOffset.y =  p.y - oldPosition.y;
+        oldOffset.x = p.x - oldPosition.x;
+        oldOffset.y = p.y - oldPosition.y;
       }
     });
     this.setState({
@@ -486,44 +491,40 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     });
 
     return newAnagram;
-
   }
 
   setEditMode() {
     this.setState({
-      viewState: 'edit',
+      viewState: "edit",
     });
   }
 
   setNormalMode() {
     this.setState({
-      viewState: 'normal',
+      viewState: "normal",
     });
   }
 
   get fontSize() {
-    return Math.min(22, typeof window !== 'undefined' ? window.innerWidth / 20 : 14);
+    return Math.min(
+      22,
+      typeof window !== "undefined" ? window.innerWidth / 20 : 14
+    );
   }
 
   render() {
-
-    const isWindowUndefined = typeof window === 'undefined';
+    const isWindowUndefined = typeof window === "undefined";
     if (isWindowUndefined) {
       return null;
     }
 
-    let {word, anagram} = this.props;
-    let {word: currentWord, anagram: currentAnagram} = this.state;
+    let { word, anagram } = this.props;
+    let { word: currentWord, anagram: currentAnagram } = this.state;
 
     const fontSize = this.fontSize;
 
-    const {
-      width,
-      height,
-      strokeWidth,
-      letterHeight,
-      letterWidth,
-    } = calculateWidths(word, anagram, fontSize);
+    const { width, height, strokeWidth, letterHeight, letterWidth } =
+      calculateWidths(word, anagram, fontSize);
 
     const mapping = getAnagramMapping(word, anagram);
 
@@ -536,7 +537,6 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
     const letterOffsets = [];
 
     for (const word of anagramSplitted) {
-
       const wordPosition = this.state.wordPositions[wordIndex];
       const wordOffset = this.state.wordOffsets[wordIndex];
       // const top = wordPosition ? wordPosition.offsetY : 0;
@@ -546,16 +546,18 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
 
       for (const [, i] of word) {
         // reverse mapping
-        const mappingIndex =  mapping.indexOf(i);
-        letterOffsets[mappingIndex] = {x: leftOffset, y: top};
+        const mappingIndex = mapping.indexOf(i);
+        letterOffsets[mappingIndex] = { x: leftOffset, y: top };
       }
 
       const onMouseDown = ((wordIndex) => {
-        return (e: React.MouseEvent<HTMLElement, MouseEvent>) => this.onMouseDown(e, wordIndex)
+        return (e: React.MouseEvent<HTMLElement, MouseEvent>) =>
+          this.onMouseDown(e, wordIndex);
       })(wordIndex);
 
       const onTouchStart = ((wordIndex) => {
-        return (e: React.TouchEvent<HTMLElement>) => this.onTouchStart(e, wordIndex)
+        return (e: React.TouchEvent<HTMLElement>) =>
+          this.onTouchStart(e, wordIndex);
       })(wordIndex);
 
       wordComponents.push(
@@ -564,45 +566,48 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
           onTouchStart={onTouchStart}
           key={wordIndex}
           style={{
-            display: 'block',
+            display: "block",
             fontSize: fontSize,
             height: fontSize,
             width: word.length * letterWidth,
             paddingBottom: 30,
             paddingLeft: letterWidth / 2,
             paddingRight: letterWidth / 2,
-            position: 'absolute',
+            position: "absolute",
             top,
             left,
-            transform: `translate(${leftOffset}px, 0)`
+            transform: `translate(${leftOffset}px, 0)`,
           }}
         >
-          {
-            [...word].map(([w], j) => {
-
-              const letter = (
-                <WordLetter
-                  key={j}
-                  characterWidth={letterWidth}
-                  position={j * letterWidth}
-                  letter={w}
-                  left={0}
-                />
-              );
-              return letter;
-            })
-          }
+          {[...word].map(([w], j) => {
+            const letter = (
+              <WordLetter
+                key={j}
+                characterWidth={letterWidth}
+                position={j * letterWidth}
+                letter={w}
+                left={0}
+              />
+            );
+            return letter;
+          })}
         </MovableStyledWord>
       );
       wordIndex += 1;
     }
 
     return (
-      <div style={{display: 'flex', justifyContent: 'center'}}>
-        <Card style={{display: this.props.asBlock ? 'block' : 'inline-block', maxWidth: '100%', width: this.props.asBlock ? '100%' : 'auto'}}>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <Card
+          style={{
+            display: this.props.asBlock ? "block" : "inline-block",
+            maxWidth: "100%",
+            width: this.props.asBlock ? "100%" : "auto",
+          }}
+        >
           <WordContainer>
             <div>
-              <div style={{marginBottom: MARGIN_RAW.m2}}>
+              <div style={{ marginBottom: MARGIN_RAW.m2 }}>
                 <Word
                   fontSize={fontSize}
                   characterWidth={letterWidth}
@@ -624,7 +629,7 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
                 />
               </div>
               <div
-                style={{position: 'relative', height: letterHeight * 1.3}}
+                style={{ position: "relative", height: letterHeight * 1.3 }}
                 ref={this.setContainerRef}
               >
                 {wordComponents}
@@ -632,14 +637,18 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
             </div>
           </WordContainer>
           <ShareSection>
-            <div style={{marginTop: MARGIN_RAW.m3, marginBottom: MARGIN_RAW.m1}}>
+            <div
+              style={{ marginTop: MARGIN_RAW.m3, marginBottom: MARGIN_RAW.m1 }}
+            >
               {`Share it using this Link: `}
             </div>
-            <ShareLink target="_blank" href={LINK}>{LINK}</ShareLink>
+            <ShareLink target="_blank" href={LINK}>
+              {LINK}
+            </ShareLink>
             <br />
             <CopyInput readOnly id="link-input" type="text" value={LINK} />
           </ShareSection>
-          <div style={{marginTop: MARGIN_RAW.m3}}>
+          <div style={{ marginTop: MARGIN_RAW.m3 }}>
             {/* {this.state.viewState === 'edit' ? (
               <div style={{display: 'flex', alignItems: 'flex-end'}}>
                 <NormalButton active={true} onClick={this.setNormalMode}>{'Save'}</NormalButton>
@@ -652,24 +661,32 @@ class AnagramVisualizer extends React.Component<AnagramVisualizerProps, {
                 <span style={{paddingLeft: MARGIN_RAW.m2}}>{'When editing you can rearrange the words'}</span>
               </div>
             ) : null} */}
-            <span>{'You can '}<strong>{'rearrange'}</strong>{' the words by dragging the words.'}</span>
+            <span>
+              {"You can "}
+              <strong>{"rearrange"}</strong>
+              {" the words by dragging the words."}
+            </span>
           </div>
-          {this.props.close ? <SmallButton
-            onClick={this.props.close}
-            active={false}
-            style={{position: 'absolute', right: THEME.margins.m2, top: THEME.margins.m2}}
-          >
-            {'Close'}
-          </SmallButton> : null}
+          {this.props.close ? (
+            <SmallButton
+              onClick={this.props.close}
+              active={false}
+              style={{
+                position: "absolute",
+                right: THEME.margins.m2,
+                top: THEME.margins.m2,
+              }}
+            >
+              {"Close"}
+            </SmallButton>
+          ) : null}
           <Link to="/">
-            <Copyright>
-              {'anagrams.io'}
-            </Copyright>
+            <Copyright>{"anagrams.io"}</Copyright>
           </Link>
         </Card>
       </div>
     );
   }
-};
+}
 
 export default AnagramVisualizer;

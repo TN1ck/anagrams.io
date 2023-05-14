@@ -1,7 +1,7 @@
-import React from 'react';
-import styled from 'styled-components';
-import {THEME} from 'src/theme';
-import Lense from './Lense';
+import React from "react";
+import styled from "styled-components";
+import { THEME } from "src/theme";
+import Lense from "./Lense";
 
 export const SearchBarForm = styled.form`
   display: flex;
@@ -66,13 +66,7 @@ class SearchBar extends React.Component<{
   innerRef?: (dom: HTMLInputElement) => any;
 }> {
   render() {
-    const {
-      onSubmit,
-      onChange,
-      value,
-      disabled,
-      placeholder,
-    } = this.props;
+    const { onSubmit, onChange, value, disabled, placeholder } = this.props;
     return (
       <SearchBarForm onSubmit={onSubmit}>
         <SearchBarInput

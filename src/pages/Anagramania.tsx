@@ -68,7 +68,6 @@ const StyledCheckboxSquare = styled.div<{
   &:hover {
     cursor: pointer;
   }
-
 `;
 
 const StyledLabel = styled.label`
@@ -329,16 +328,16 @@ const AnagramaniaHeader = inject("store")(
             <InnerContainer>
               <TitleContainer>
                 <div style={{ position: "relative", top: -45, height: 150 }}>
-                <AnagramSausages
-                  word={word}
-                  anagram={anagram}
-                  height={(word.length * anagramVis.letterHeight) / 2 + 10}
-                  wordWidth={wordWidth}
-                  characterWidth={anagramVis.letterWidth}
-                  characterHeight={anagramVis.letterHeight}
-                  paddingTop={paddingTop}
-                  strokeWidth={anagramVis.strokeWidth}
-                />
+                  <AnagramSausages
+                    word={word}
+                    anagram={anagram}
+                    height={(word.length * anagramVis.letterHeight) / 2 + 10}
+                    wordWidth={wordWidth}
+                    characterWidth={anagramVis.letterWidth}
+                    characterHeight={anagramVis.letterHeight}
+                    paddingTop={paddingTop}
+                    strokeWidth={anagramVis.strokeWidth}
+                  />
                 </div>
                 <Title href="/">
                   <Word

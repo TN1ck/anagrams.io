@@ -1,22 +1,22 @@
-import styled from 'styled-components';
-import {THEME} from 'src/theme';
+import styled from "styled-components";
+import { THEME } from "src/theme";
 
 export const Title = styled.a`
-z-index: 1;
-position: relative;
-color: ${THEME.colors.foregroundText};
-font-weight: bold;
-font-size: ${THEME.font.sizeTitle};
-text-align: center;
-display: inline-block;
-padding: 0;
-padding-bottom: 8px;
-text-decoration: none;
-text-align: center;
+  z-index: 1;
+  position: relative;
+  color: ${THEME.colors.foregroundText};
+  font-weight: bold;
+  font-size: ${THEME.font.sizeTitle};
+  text-align: center;
+  display: inline-block;
+  padding: 0;
+  padding-bottom: 8px;
+  text-decoration: none;
+  text-align: center;
 
-@media (max-width: 899px) {
-  font-size: ${THEME.font.sizeTitleMobile};
-}
+  @media (max-width: 899px) {
+    font-size: ${THEME.font.sizeTitleMobile};
+  }
 `;
 
 export const SubTitle = styled.h2`
