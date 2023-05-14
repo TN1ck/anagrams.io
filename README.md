@@ -5,14 +5,13 @@ Due to the calculations happening client side, the whole search space can be exp
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/09b49293-2071-4ea9-b59a-dc569e40c53c/deploy-status)](https://app.netlify.com/sites/anagramsio/deploys)
 
+[anagrams.io-preview.webm](https://github.com/TN1ck/anagrams.io/assets/2116347/d08289e1-2613-4c03-8bbe-27975afee103)
+
 ## Getting started
 
 1. To run it you need node.js, see their guides on [how to install](https://nodejs.dev/en/learn/how-to-install-nodejs/).
-
 2. Run `npm install`
-
 3. Run `npm start` for local development
-
 4. Run `npm build` to create the production build in the `dist` folder. Use `npm run preview` to preview it.
 
 ## Technologies
