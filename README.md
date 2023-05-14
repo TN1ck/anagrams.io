@@ -1,7 +1,9 @@
 # anagrams.io
 
-Anagrams.io is a client side anagrams finder. The goal was to make it easy to find good anagrams for any word length.
+[Anagrams.io](https://anagrams.io) is a client side anagrams finder. The goal was to make it easy to find good anagrams for any word length.
 Due to the calculations happening client side, the whole search space can be explored.
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/09b49293-2071-4ea9-b59a-dc569e40c53c/deploy-status)](https://app.netlify.com/sites/anagramsio/deploys)
 
 ## Getting started
 
