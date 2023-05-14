@@ -10,7 +10,7 @@ import {
   useMatch,
 } from "@tanstack/react-location";
 
-import {injectGlobal} from 'styled-components';
+import {createGlobalStyle} from 'styled-components';
 import store from 'src/state';
 
 import {MARGIN_RAW, THEME} from './theme';
@@ -21,7 +21,7 @@ import About from './pages/About';
 import Styleguide from './pages/Styleguide';
 import Share from './pages/Share';
 
-injectGlobal`
+const GlobalStyle = createGlobalStyle`
   * {
     box-sizing: border-box;
   }
@@ -100,6 +100,7 @@ const App = () => {
       location={location}
       routes={routes}
     >
+      <GlobalStyle />
         <div>
           <div style={{
             position: 'absolute',

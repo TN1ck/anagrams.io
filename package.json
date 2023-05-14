@@ -1,7 +1,7 @@
 {
-  "name": "@anagramania/frontend",
+  "name": "anagrams.io",
   "version": "0.0.1",
-  "description": "Building a nice anagram solver",
+  "description": "A nice anagram solver",
   "main": "index.js",
   "scripts": {
     "start": "vite",
@@ -14,13 +14,8 @@
   "author": "Tom Nick, Taisia Tikhnovetskaya",
   "license": "MIT",
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "7.18.6",
-    "@babel/plugin-proposal-class-static-block": "7.21.0",
-    "@babel/plugin-proposal-decorators": "7.21.0",
     "@types/d3-interpolate": "3.0.1",
-    "@types/history": "4.6.2",
     "@types/lodash": "4.14.108",
-    "@types/node": "10.0.4",
     "@types/react": "18.2.6",
     "@types/react-dom": "18.2.4",
     "@types/react-modal": "3.16.0",
@@ -31,6 +26,7 @@
   },
   "dependencies": {
     "@tanstack/react-location": "^3.7.4",
+    "@types/styled-components": "^5.1.26",
     "d3-interpolate": "^3.0.1",
     "lodash": "4.17.10",
     "mobx": "6.6.2",
@@ -38,7 +34,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-modal": "3.16.1",
-    "styled-components": "3.2.6",
+    "styled-components": "5.3.10",
     "styled-theming": "2.2.0",
     "vite": "4.3.5",
     "vite-plugin-babel": "1.1.3"

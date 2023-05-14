@@ -167,7 +167,7 @@ const AnagramResults = inject('store')(observer(class AnagramResults extends Rea
     const noResultsYet = store.noResultsYet;
 
     return (
-      <AnagramResultsContainer innerRef={this.setRef}>
+      <AnagramResultsContainer ref={this.setRef}>
         {
           noResultsYet ? (
             <AnagramResult

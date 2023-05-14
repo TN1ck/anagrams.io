@@ -1,5 +1,6 @@
 import React from 'react';
 import {take} from 'lodash';
+import styled from 'styled-components'
 
 import * as anagram from 'src/anagram';
 import {THEME} from 'src/theme';
@@ -58,13 +59,13 @@ export class ResultVisualisation extends React.Component<{
   }
 }
 
-const AnagramResultGroupBestOf = AnagramResultGroup.extend`
+const AnagramResultGroupBestOf = styled(AnagramResultGroup)`
   position: relative;
   text-decoration: none;
   cursor: default;
 `;
 
-const CopyrightBestOf = Copyright.withComponent('a').extend`
+const CopyrightBestOf = styled(Copyright.withComponent('a'))`
   top: auto;
   bottom: ${THEME.margins.m2};
 `;

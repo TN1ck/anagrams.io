@@ -1,5 +1,4 @@
 import styled, {css} from 'styled-components';
-import {withProps} from 'src/utility';
 import {THEME} from 'src/theme';
 
 export const ShowAllButton = styled.button`
@@ -22,10 +21,10 @@ export const ShowAllButton = styled.button`
   }
 `;
 
-export const SmallButton = withProps<{
+export const SmallButton = styled.button<{
   active: boolean,
   useFontWeightHover?: boolean,
-}>()(styled.button)`
+}>`
   background: ${props => props.active ? THEME.colors.primary : 'none'};
   border: none;
   color: ${props => props.active ? THEME.colors.primaryText : THEME.colors.foregroundText};
@@ -43,10 +42,10 @@ export const SmallButton = withProps<{
   }
 `;
 
-export const NormalButton = withProps<{
+export const NormalButton = styled.button<{
   active: boolean,
   useFontWeightHover?: boolean,
-}>()(styled.button)`
+}>`
   background: ${THEME.colors.background};
   border: none;
   color: ${props => props.active ? THEME.colors.primaryText : THEME.colors.foregroundText};
@@ -65,9 +64,9 @@ export const NormalButton = withProps<{
   }
 `;
 
-export const MutedButton = withProps<{
+export const MutedButton = styled.button<{
   hovered?: boolean;
-}>()(styled.button)`
+}>`
   border: none;
   background: none;
   opacity: 0.2;

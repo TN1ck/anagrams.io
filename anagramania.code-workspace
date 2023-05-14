@@ -1,11 +1,6 @@
 {
-	"folders": [
-		{
-			"path": "ts-backend"
-		},
-		{
-			"path": "ts-frontend"
-		}
-	],
-	"settings": {}
+	"settings": {
+    "editor.formatOnSave": true,
+    "editor.bracketPairColorization.enabled": true,
+  }
 }

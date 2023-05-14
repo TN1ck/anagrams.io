@@ -1,122 +1,27 @@
-# anagramania
+# anagrams.io
 
-## Data Sources
+Anagrams.io is a client side anagrams finder. The goal was to make it easy to find good anagrams for any word length.
+Due to the calculations happening client side, the whole search space can be explored.
 
-### Words
-* https://github.com/hermitdave/FrequencyWords
-* http://www.aaabbb.de/WordList/WordList_en.php
+## Getting started
 
-### Countries
-* https://github.com/umpirsky/country-list
-* http://brilliantmaps.com/top-100-tourist-destinations/
+1. To run it you need node.js, see their guides on [how to install](https://nodejs.dev/en/learn/how-to-install-nodejs/).
 
-### People
-* https://www.biographyonline.net/people/famous-100.html
+2. Run `npm install`
 
-## Build
+3. Run `npm start` for local development
 
-```
-# backend
-cd ts-backend
-npm install
+4. Run `npm build` to create the production build in the `dist` folder. Use `npm run preview` to preview it.
 
-# frontend
-cd ts-frontend
-npm install
-npm run build
-```
+## Technologies
 
-## Deployment
+The project is quite old and is using some technologies I wouldn't use now, but it works.
 
-We use a mix of gitlab + digital ocean for deployment.
+1. React for the UI. This was written before hooks were a thing so component lifecycle is mostly done with classes and usage of now deprecated functionality.
+2. mobx for state management. The state manipulations are quite complex as we have to deal with a lot of anagrams calculated per second and want to keep it performant.
+3. Styled components for theming. It's not super consistent, there also inline styles here and there.
+4. Netlify for deployment.
 
-1. Setup the machine according to https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-16-04
+## Contributing
 
-```
-ssh root@your_server_ip
-# setup user
-adduser tom
-usermod -aG sudo tom
-su tom
-mkdir ~/.ssh
-chmod 700 ~/.ssh
-nano ~/.ssh/authorized_keys
-# paste your public key and crtl + x
-chmod 600 ~/.ssh/authorized_keys
-
-# setup firewall
-# show avalaible rules
-sudo ufw app list
-# allow ssh and enable
-sudo ufw allow OpenSSH
-sudo ufw enable
-sudo ufw status
-```
-
-2. Setup Nginx according to https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04
-
-```
-sudo apt-get update
-sudo apt-get install -y nginx
-# allow in firewall
-sudo ufw allow 'Nginx HTTP'
-sudo ufw allow 'Nginx HTTPS'
-# check status
-systemctl status nginx
-
-# some commands:
-sudo systemctl stop nginx
-sudo systemctl start nginx
-sudo systemctl restart nginx
-sudo systemctl reload nginx
-sudo nginx -t && sudo systemctl reload nginx
-```
-
-3. Setup domain to point to digital ocean
-
-```
-# Set nameservers to:
-ns1.digitalocean.com
-ns2.digitalocean.com
-ns3.digitalocean.com
-
-# Create a A-records in digital ocean with @, api, www as its hostnames
-
-```
-
-4. Set up ssl with Let's encrypt, according to: https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04
-
-```
-sudo add-apt-repository ppa:certbot/certbot
-sudo apt-get update
-sudo apt-get install -y python-certbot-nginx
-# change nginx config
-sudo nano /etc/nginx/sites-available/default
-# replace server_name _ with:
-server_name anagramania.io api.anagramania.io www.anagramania.io
-# reload nginx:
-sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d anagramania.io -d www.anagramania.io -d api.anagramania.io
-```
-
-5. Install Node etc according to:
-https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-16-04
-
-```
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt-get install -y nodejs
-sudo apt-get install -y build-essential
-# install pm2 to manage nodejs applications
-sudo npm install -g pm2
-# setup nginx as a reverse proxy server
-# ...
-```
-
-6. Setup the application
-
-```
-sudo mkdir /opt/apps
-sudo chown -R tom:tom /opt/apps
-cd /opt/apps
-git clone git@gitlab.com:TN1ck/anagramania.git
-```
+Fork & Make a pull request! Any contributions are welcome (especially improving the dictionaries).

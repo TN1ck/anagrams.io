@@ -69,7 +69,7 @@ export const StyledWord = styled.strong`
   user-select: none;
 `;
 
-export const MovableStyledWord = StyledWord.extend`
+export const MovableStyledWord = styled(StyledWord)`
   &:hover {
     cursor: move;
     background: ${THEME.colors.background};

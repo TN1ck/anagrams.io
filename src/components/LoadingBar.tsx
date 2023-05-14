@@ -1,12 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {withProps} from 'src/utility';
 import {THEME} from 'src/theme';
 
-const LoadingBar = withProps<{
-    progress: number;
-}>()(styled.div)`
+const LoadingBar = styled.div<{
+  progress: number;
+}>`
   position: relative;
   border: 1px solid rgba(0, 0, 0, 0.08);
   padding: ${THEME.margins.m1};

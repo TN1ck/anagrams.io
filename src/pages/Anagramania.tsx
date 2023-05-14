@@ -20,8 +20,6 @@ import {
   SearchBarForm,
 } from "src/components";
 
-import { withProps } from "src/utility";
-
 import { Word, calculateWidths } from "src/components/AnagramVisualizer";
 import AnagramSausages from "src/components/AnagramSausages";
 
@@ -45,9 +43,9 @@ const StyledCheckbox = styled.input`
   }
 `;
 
-const StyledCheckboxSquare = withProps<{
+const StyledCheckboxSquare = styled.div<{
   checked: boolean;
-}>()(styled.div)`
+}>`
   border-radius: ${THEME.borderRadius};
   position: absolute;
   top: 0;
@@ -154,9 +152,9 @@ const OptionsContainer = styled.div`
   flex-direction: column;
 `;
 
-const OptionsCollapse = withProps<{
+const OptionsCollapse = styled.div<{
   show: boolean;
-}>()(styled.div)`
+}>`
   width: 100%;
   display: ${(props) => (props.show ? "flex" : "none")};
   justify-content: center;

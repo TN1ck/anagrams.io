@@ -1,8 +1,8 @@
-import english90kDict from '../../dictionaries-new/english-90k.txt'
-import german600kDict from '../../dictionaries-new/german-600k.txt'
-import french300kDict from '../../dictionaries-new/french-300k.txt'
-import spanish70kDict from '../../dictionaries-new/spanish-70k.txt'
-import portuguese300kDict from '../../dictionaries-new/portuguese-300k.txt'
+import english90kDict from '../dictionaries/english-90k.txt'
+import german600kDict from '../dictionaries/german-600k.txt'
+import french300kDict from '../dictionaries/french-300k.txt'
+import spanish70kDict from '../dictionaries/spanish-70k.txt'
+import portuguese300kDict from '../dictionaries/portuguese-300k.txt'
 
 export interface LetterMapping {
   letter: string

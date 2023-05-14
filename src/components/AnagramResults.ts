@@ -1,7 +1,6 @@
 import styled, {css} from 'styled-components';
 import {AnagramResultState} from 'src/anagram';
 
-import {withProps} from 'src/utility';
 import {THEME, MARGIN_RAW} from 'src/theme';
 
 export const ResultContainer = styled.div`
@@ -32,10 +31,10 @@ export const AnagramResultRow = styled.div`
   float: left;
 `;
 
-export const AnagramResultGroup = withProps<{
-    state: AnagramResultState;
-    noResults: boolean;
-  }>()(styled.div)`
+export const AnagramResultGroup = styled.div<{
+  state: AnagramResultState;
+  noResults: boolean;
+}>`
     float: left;
     width: 300px;
     background: ${THEME.colors.foreground};
