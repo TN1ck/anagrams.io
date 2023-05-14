@@ -161,6 +161,20 @@ const App = () => {
                 {"About"}
               </SmallButton>
             </Link>
+            <a
+              href="https://github.com/TN1ck/anagrams.io"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {/* TODO: Do not put a button in a link.  */}
+              <SmallButton
+                active={false}
+                useFontWeightHover
+                style={{ fontWeight: "inherit" }}
+              >
+                {"Github"}
+              </SmallButton>
+            </a>
           </div>
 
           <Outlet />

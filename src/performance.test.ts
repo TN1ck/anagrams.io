@@ -14,7 +14,6 @@ export function testPerformanceOne(): Performance {
   const executed = new Date();
   const start = performance.now();
   const test = mockData.testOne;
-  // TODO
   const realSubanagrams = test.subanagrams.map((s) => {
     return { ...s, set: anagram.stringToBinary(s.set) };
   });
