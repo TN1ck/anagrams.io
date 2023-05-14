@@ -245,7 +245,9 @@ const AnagramaniaHeader = inject("store")(
         "anagrams.io",
         "so i anagram.",
         "roams again.",
-        "mango arias.",
+        "a maori sang.",
+        "a maria song.",
+        // "mango arias.",
         "anagrams.io",
       ];
       word: string = "anagrams.io";
@@ -400,7 +402,30 @@ const AnagramaniaHeader = inject("store")(
                     e.preventDefault();
                     requestAnagram();
                   }}
-                />
+                >
+                  {/* Is inside here so enter triggers a search. */}
+                  <OptionsCollapse show={store.showExclude}>
+                    <div
+                      style={{
+                        paddingRight: 45,
+                        marginTop: MARGIN_RAW.m2,
+                        width: "100%",
+                      }}
+                    >
+                      <SearchBarInput
+                        value={store.excludeWords}
+                        type="text"
+                        placeholder={"Words to be always included..."}
+                        onChange={(e) => store.setExcludeWords(e.target.value)}
+                      />
+                      <div style={{ marginTop: MARGIN_RAW.m1, color: "red" }}>
+                        {store.isExcludeInputValid
+                          ? ""
+                          : "The words you entered do not appear in the search query. You cannot search with these words."}
+                      </div>
+                    </div>
+                  </OptionsCollapse>
+                </SearchBarForm>
                 <StyledMappingContainer>
                   {dictionaryMapping.map((d) => {
                     return (
@@ -429,27 +454,6 @@ const AnagramaniaHeader = inject("store")(
                   })}
                 </StyledMappingContainer>
                 <ExcludeOptions />
-                <OptionsCollapse show={store.showExclude}>
-                    <div
-                      style={{
-                        paddingRight: 45,
-                        marginTop: MARGIN_RAW.m2,
-                        width: "100%",
-                      }}
-                    >
-                      <SearchBarInput
-                        value={store.excludeWords}
-                        type="text"
-                        placeholder={"Words to be always included..."}
-                        onChange={(e) => store.setExcludeWords(e.target.value)}
-                      />
-                      <div style={{ marginTop: MARGIN_RAW.m1, color: "red" }}>
-                        {store.isExcludeInputValid
-                          ? ""
-                          : "The words you entered do not appear in the search query. You cannot search with these words."}
-                      </div>
-                    </div>
-                  </OptionsCollapse>
               </HeaderContainer>
             </InnerContainer>
           </Header>

@@ -8,7 +8,6 @@ import {
   MutedButton,
   ResultContainer,
   AnagramResultGroup,
-  SmallButton,
 } from 'src/components';
 
 
@@ -42,10 +41,8 @@ export class ResultVisualisation extends React.Component<{
     const paddingTop = 10;
     const paddingBottom = 10;
 
-    const marginLeft = noMargin ? 0 : (('' + (index + 1)).length + 2) * letterWidth;
-
     return (
-      <div style={{marginLeft: marginLeft, marginTop: 2, marginBottom: -3}}>
+      <div style={{marginLeft: 0, marginTop: 2, marginBottom: -3}}>
         <AnagramSausages
           word={word}
           anagram={query}
@@ -145,16 +142,6 @@ export class ResultBestOf extends React.Component<ResultBestOfProps> {
             </div>
           </div>
 
-          {/* <div style={{textAlign: 'center'}}>
-            <SmallButton
-              onClick={(e) => {
-                this.props.share(wordAnagram, word);
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              active={false}>{'CHANGE & SHARE'}</SmallButton>
-          </div> */}
-
         </ResultContainer>
         {foundBy && <CopyrightBestOf
           // @ts-ignore
@@ -206,30 +193,41 @@ export class Result extends React.Component<ResultProps, ResultState> {
       <ResultContainer onClick={this.toggleExpanded}>
         <span style={{
           fontWeight: expanded ? 'bold' : 'normal',
-        }}>{(index + 1) + '. ' + word}</span>
-        <MutedButton hovered={expanded}>
+        }}>{word}</span>
+        <MutedButton hovered={expanded} style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+        }}>
           {expanded ? '-' : '+'}
         </MutedButton>
         {expanded && (
-          <div>
+          <div
+          onClick={(e) => {
+            this.props.share!(word, query);
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          >
             <ResultVisualisation
               word={word}
               query={query}
               index={index}
             />
-            <span style={{opacity: 0}}>{(index + 1) + '. '}</span>
             <span style={{
               fontWeight: expanded ? 'bold' : 'normal',
             }}>{query}</span>
-            <div style={{textAlign: 'right'}}>
-              <span style={{opacity: 0}}>{(index + 1) + '. '}</span>
-              <SmallButton
-                onClick={(e) => {
-                  this.props.share!(word, query);
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                active={false}>{'CHANGE & SHARE'}</SmallButton>
+              <MutedButton
+                style={{
+                position: 'absolute',
+                right: 0,
+                bottom: 0,
+              }}>
+                {'SHARE'}
+              </MutedButton>
+            <div style={{
+              marginTop: THEME.margins.m2,
+            }}>
             </div>
           </div>
         )}
@@ -332,10 +330,11 @@ class AnagramResult extends React.Component<AnagramResultProps, AnagramResultSta
         style={{
           width: columnWidth - 20,
           height,
+          display: height === 'auto' ? 'flex' : 'block',
         }}
       >
-        <div style={{position: 'relative'}}>
-          <strong style={{letterSpacing: '0.6px'}}>
+        <div style={{position: 'relative', 'width': "100%"}}>
+          <strong>
             {word}
           </strong>
           {/* <div style={{position: 'absolute', right: 0, top: 0}}>{counter}</div> */}

@@ -67,7 +67,9 @@ export const NormalButton = withProps<{
 
 export const MutedButton = withProps<{
   hovered?: boolean;
-}>()(styled.a)`
+}>()(styled.button)`
+  border: none;
+  background: none;
   opacity: 0.2;
   text-decoration: none;
   color: ${THEME.colors.foregroundText};

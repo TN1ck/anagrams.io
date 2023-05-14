@@ -1,7 +1,6 @@
 import styled, {css} from 'styled-components';
 import {AnagramResultState} from 'src/anagram';
 
-import {MutedButton} from './Buttons';
 import {withProps} from 'src/utility';
 import {THEME, MARGIN_RAW} from 'src/theme';
 
@@ -11,19 +10,9 @@ export const ResultContainer = styled.div`
   white-space: nowrap;
   margin-top: ${THEME.margins.m1};
 
-  & ${MutedButton} {
-      position: absolute;
-      top: 0;
-      right: 0;
-  }
-
   &:hover {
     cursor: pointer;
     font-weight: bold;
-    & ${MutedButton} {
-      opacity: 1;
-      font-weight: bold;
-    }
   }
 `;
 

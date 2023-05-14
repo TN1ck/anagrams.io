@@ -464,8 +464,8 @@ export class AnagramState {
     }, 100);
 
     const numberOfCPUs = getNumberOfCPUs();
-    // make sure there is one core left
-    const useCPUs = 1 || Math.max(numberOfCPUs - 1, 1);
+    // Let's take half of it, so we don't melt phones.
+    const useCPUs = Math.max(numberOfCPUs / 2, 1);
     console.log(`${numberOfCPUs} cores available. Using ${useCPUs}.`)
     this.workers = Array(useCPUs).fill(0).map((i) => {
       const worker = new Worker(new URL('./anagram.worker.ts', import.meta.url), {

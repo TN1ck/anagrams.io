@@ -77,10 +77,12 @@ const AnagramResultGroup = inject('store')(observer(class AnagramResultGroup ext
           </SubTitleContainer>
         )}
         {expandedGroup.map((g, i) => {
+          const expanded = firstGroup && i === 0;
           return (
-            <AnagramResultRow key={i}>
+            <AnagramResultRow key={i} style={{
+              display: expanded ? 'flex' : 'block',
+            }}>
               {g.map((d) => {
-                const expanded = firstGroup && i === 0;
                 const {word, list, counter} = d;
                 const maxLengthInGroup = Math.max(...g.map(a => a.list.length));
                 return (
