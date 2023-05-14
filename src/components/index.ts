@@ -20,4 +20,4 @@ export {
   AnagramResultRow,
   AnagramResultsContainer,
   ResultContainer,
-} from "./AnagramResults";
+} from "./AnagramResults.styled";

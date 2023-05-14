@@ -32,15 +32,15 @@ export function getNumberOfCPUs() {
   return navigator.hardwareConcurrency || 1;
 }
 
-//
-// Drawing cool paths
-// * M is the start point
-// * L draws a line to x/y
-// * A rx ry x-axis-rotation large-arc-flag sweep-flag x y
-// * Q x1 y1, x y (or q dx1 dy1, dx dy) - quadratic bezier curve where the slope is both the same
-// * Z close the path
-//
-
+/**
+ * Draws a path from x1/y1 to x2/y2 with an arc in the middle.
+ * @param x1 Start x
+ * @param y1 Start y
+ * @param x2 End x
+ * @param y2 End y
+ * @param yOffset The y offset of the arc
+ * @param arcRadius The radius of the arc
+ */
 export function drawPath(
   x1: number,
   y1: number,
@@ -57,6 +57,14 @@ export function drawPath(
     x1 > x2 ? Math.max(x1arc, intermediateX) : Math.min(x1arc, intermediateX);
   const x2intermediate =
     x1 > x2 ? Math.min(x2arc, intermediateX) : Math.max(x2arc, intermediateX);
+  //
+  // Drawing cool paths
+  // * M is the start point
+  // * L draws a line to x/y
+  // * A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+  // * Q x1 y1, x y (or q dx1 dy1, dx dy) - quadratic bezier curve where the slope is both the same
+  // * Z close the path
+  //
   return `
 M ${x1}, ${y1}
 L ${x1},${intermediateY}

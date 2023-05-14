@@ -26,7 +26,7 @@ ctx.addEventListener("message", (message) => {
 
   const { query, subanagrams, subanagram, nextWorkerIndex } = data;
   const anagramSolver = anagram.findAnagramSentencesForSubAnagram(
-    query,
+    anagram.stringToWord(query),
     subanagrams,
     subanagram
   );

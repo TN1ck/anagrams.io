@@ -25,7 +25,7 @@ import AnagramSausages from "src/components/AnagramSausages";
 
 import { AnagramState } from "../state";
 
-import AnagramResults from "src/molecules/AnagramResults";
+import AnagramResults from "src/components/AnagramResults";
 import { SmallButton } from "src/components";
 import ReactModal from "react-modal";
 

@@ -32,17 +32,17 @@ export const DICTIONARIES = [
       {
         letter: "ä",
         mapping: "a",
-        active: false,
+        active: true,
       },
       {
         letter: "ö",
         mapping: "o",
-        active: false,
+        active: true,
       },
       {
         letter: "ü",
         mapping: "u",
-        active: false,
+        active: true,
       },
       {
         letter: "ß",

@@ -1,14 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "mobx-react";
-import {
-  Link,
-  MakeGenerics,
-  Outlet,
-  ReactLocation,
-  Router,
-  useMatch,
-} from "@tanstack/react-location";
+import { Link, Outlet, ReactLocation, Router } from "@tanstack/react-location";
 
 import { createGlobalStyle } from "styled-components";
 import store from "src/state";

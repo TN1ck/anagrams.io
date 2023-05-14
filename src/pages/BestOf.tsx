@@ -1,7 +1,7 @@
 import React from "react";
 import * as Components from "../components";
 import { MARGIN_RAW, THEME } from "src/theme";
-import { ResultBestOf } from "src/molecules/AnagramResult";
+import { ResultBestOf } from "src/components/AnagramResult";
 
 const BEST_OF_DATA_ENGLISH = [
   {

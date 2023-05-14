@@ -5,7 +5,8 @@ import {
   computed,
   makeObservable,
 } from "mobx";
-import { min, max, groupBy, throttle } from "lodash";
+import throttle from "lodash/throttle";
+import groupBy from "lodash/groupBy";
 import * as anagram from "src/anagram";
 
 import { parseSearch } from "src/utility";
@@ -20,8 +21,6 @@ export enum AppState {
   done = "done",
   anagramViewer = "anagramViewer",
 }
-
-type VoidFunction = () => void;
 
 export async function getSubAnagrams(
   query: string,
@@ -96,7 +95,7 @@ export class AnagramState {
   groupedSpecialCache: { [key: string]: anagram.GroupedWordsDict } = {};
   groupedAnagramsCache: anagram.GroupedWordsDict = {};
 
-  updateState: (_.Cancelable & VoidFunction) | null;
+  updateState: _.DebouncedFunc<() => void> | null;
 
   constructor() {
     this.updateState = null;
@@ -292,8 +291,8 @@ export class AnagramState {
     const numberOfWordsPerSolution = solutions.map((s) => s.length);
     const numberOfWords = numberOfWordsPerSolution.reduce((a, b) => a + b, 0);
     const averageNumberOfWords = numberOfWords / solutions.length;
-    const minNumberOfWords = min(numberOfWordsPerSolution);
-    const maxNumberOfWords = max(numberOfWordsPerSolution);
+    const minNumberOfWords = Math.min(...numberOfWordsPerSolution);
+    const maxNumberOfWords = Math.max(...numberOfWordsPerSolution);
     const wordStats = {
       average: averageNumberOfWords,
       min: minNumberOfWords,

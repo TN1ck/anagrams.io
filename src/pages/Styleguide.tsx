@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import * as Components from "src/components";
-import AnagramResults from "src/molecules/AnagramResults";
+import AnagramResults from "src/components/AnagramResults";
 import { THEME } from "src/theme";
 
 const Card = styled.div`

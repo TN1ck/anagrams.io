@@ -1,18 +1,16 @@
+import { test, expect } from "vitest";
+
 import mockData from "./mock";
-import * as anagram from "../anagram";
+import * as anagram from "./anagram";
 
 export interface Performance {
   executed: string;
   start: number;
   end: number;
-  timeNeeded: number;
+  timeNeededInMilliSeconds: number;
 }
 
-export interface PerformanceWithSolutions extends Performance {
-  // solutions: anagram.AnagramSolution[];
-}
-
-export function testPerformanceOne(): PerformanceWithSolutions {
+export function testPerformanceOne(): Performance {
   const executed = new Date();
   const start = performance.now();
   const test = mockData.testOne;
@@ -21,7 +19,7 @@ export function testPerformanceOne(): PerformanceWithSolutions {
     return { ...s, set: anagram.stringToBinary(s.set) };
   });
   const generators = anagram.findAnagramSentences(
-    test.string,
+    anagram.stringToWord(test.string),
     realSubanagrams as any
   );
   generators.map(({ generator }) => {
@@ -34,6 +32,12 @@ export function testPerformanceOne(): PerformanceWithSolutions {
     executed: executed.toISOString(),
     start,
     end,
-    timeNeeded,
+    timeNeededInMilliSeconds: timeNeeded,
   };
 }
+
+test("testPerformanceOne", () => {
+  const performance = testPerformanceOne();
+  // Should not take longer that 10 seconds.
+  expect(performance.timeNeededInMilliSeconds).toBeLessThan(1 * 1000 * 10);
+});

@@ -1,11 +1,7 @@
 import { sortBy, drop, groupBy } from "lodash";
 
 // TODO: Use dictionaries to create the letter list.
-const ALPHABET = "abcdefghijklmnopqrstuvwxyzüäößéèêëàâôûùçîïœæñ";
-
-//
-// interfaces
-//
+export const ALPHABET = "abcdefghijklmnopqrstuvwxyzüäößéèêëàâôûùçîïœæñ";
 
 export interface BasicWord {
   set: Uint8Array;
@@ -29,8 +25,6 @@ export interface AnagramGeneratorStep {
   solutions: AnagramSolution[];
   numberOfPossibilitiesChecked: number;
 }
-
-// export type AnagramGenerator = IterableIterator<AnagramGeneratorStep>;
 
 export interface SubanagramSolver {
   subanagram: Word;
@@ -68,10 +62,12 @@ export interface AnagramGeneratorStepSerialized {
   numberOfPossibilitiesChecked: number;
 }
 
-//
-// functions
-//
-
+/**
+ * Map letters in str to the given mapping
+ * @param str string which we map
+ * @param mapping mapping which we use
+ * @returns mapped string
+ */
 export function mapLetters(
   str: string,
   mapping: Record<string, string>
@@ -85,6 +81,14 @@ export function mapLetters(
   return str;
 }
 
+/**
+ * Remove all letters from str that are not in the alphabet
+ *
+ * @param str string which we sanitize
+ * @param mapping mapping which we use
+ * @param removeSpaces if true, we also remove spaces
+ * @returns sanitized string
+ */
 export function sanitizeQuery(
   str: string,
   mapping: Record<string, string>,
@@ -102,10 +106,16 @@ export function sanitizeQuery(
   return str;
 }
 
-export function binaryToString(bin: Uint8Array) {
+/**
+ * Convert binary array to string
+ * @param bin binary array which we convert
+ * @param alphabet alphabet which we use
+ * @returns string
+ */
+export function binaryToString(bin: Uint8Array, alphabet = ALPHABET) {
   let word = "";
-  for (let i = 0; i < ALPHABET.length; i++) {
-    const letter = ALPHABET[i];
+  for (let i = 0; i < alphabet.length; i++) {
+    const letter = alphabet[i];
     const frequency = bin[i];
     for (let j = 0; j < frequency; j++) {
       word += letter;
@@ -114,30 +124,51 @@ export function binaryToString(bin: Uint8Array) {
   return word;
 }
 
-export function stringToBinary(str: string): Uint8Array {
-  const buffer = new ArrayBuffer(ALPHABET.length);
+/**
+ * Convert string to binary array
+ * @param str string which we convert
+ * @param alphabet alphabet which we use
+ * @returns binary array
+ */
+export function stringToBinary(str: string, alphabet = ALPHABET): Uint8Array {
+  const buffer = new ArrayBuffer(alphabet.length);
   const frequency = new Uint8Array(buffer);
   for (const l of str) {
-    const position = ALPHABET.indexOf(l);
+    const position = alphabet.indexOf(l);
     frequency[position] += 1;
   }
   return frequency;
 }
 
-export function stringToWord(str: string): SimpleWord {
-  // const sorted = str.split('').sort().join('');
+/**
+ * Convert string to word
+ * @param str string which we convert
+ * @param alphabet alphabet which we use
+ * @returns word
+ */
+export function stringToWord(str: string, alphabet = ALPHABET): SimpleWord {
   return {
-    set: stringToBinary(str),
+    set: stringToBinary(str, alphabet),
     word: str,
     index: -1,
     length: str.length,
   };
 }
 
-export function joinTwoBinary(bin1: Uint8Array, bin2: Uint8Array): Uint8Array {
-  const buffer = new ArrayBuffer(ALPHABET.length);
+/**
+ * Join all occurences of letters in bin1 with bin2 (bin1 + bin2)
+ *
+ * @param bin1 binary array which we join
+ * @param bin2 binary array which we join
+ * @returns binary array which is the result of joining bin1 and bin2
+ */
+export function mergeBinaries(bin1: Uint8Array, bin2: Uint8Array): Uint8Array {
+  if (bin1.length !== bin2.length) {
+    throw new Error("Given arrays must have the same length");
+  }
+  const buffer = new ArrayBuffer(bin1.length);
   const frequency = new Uint8Array(buffer);
-  for (let i = 0; i < ALPHABET.length; i++) {
+  for (let i = 0; i < bin1.length; i++) {
     frequency[i] = bin1[i] + bin2[i];
   }
   return frequency;
@@ -148,18 +179,28 @@ export function joinTwoBinary(bin1: Uint8Array, bin2: Uint8Array): Uint8Array {
  *
  * @param bin1 binary array from which we remove
  * @param bin2 binary array which we use to remove
+ * @returns binary array with removed letters
  */
 export function removeBinary(bin1: Uint8Array, bin2: Uint8Array): Uint8Array {
-  const buffer = new ArrayBuffer(ALPHABET.length);
+  if (bin1.length !== bin2.length) {
+    throw new Error("Given arrays must have the same length");
+  }
+  const buffer = new ArrayBuffer(bin1.length);
   const frequency = new Uint8Array(buffer);
-  for (let i = 0; i < ALPHABET.length; i++) {
+  for (let i = 0; i < bin1.length; i++) {
     frequency[i] = bin1[i] - bin2[i];
   }
   return frequency;
 }
 
+/**
+ * Check if bin1 is a subset of bin2
+ * @param bin1 binary array which we check
+ * @param bin2 binary array which we check
+ * @returns true if bin1 is a subset of bin2
+ */
 export function isBinarySubset(bin1: Uint8Array, bin2: Uint8Array): boolean {
-  for (let i = 0; i < ALPHABET.length; i++) {
+  for (let i = 0; i < bin1.length; i++) {
     if (bin1[i] > bin2[i]) {
       return false;
     }
@@ -167,28 +208,14 @@ export function isBinarySubset(bin1: Uint8Array, bin2: Uint8Array): boolean {
   return true;
 }
 
-export function isSubset(nStr1: string, nStr2: string): boolean {
-  const length1 = nStr1.length;
-  const length2 = nStr2.length;
-
-  let searchIndex = 0;
-  for (let i = 0; i < length2; i++) {
-    if (searchIndex >= length1) {
-      // we have a success!
-      return true;
-    }
-    const current1 = nStr1[searchIndex];
-    const current2 = nStr2[i];
-    if (current1 === current2) {
-      searchIndex += 1;
-    }
-  }
-  // when length2 === length1
-  return searchIndex === length1;
-}
-
-function isBinarySame(bin1: Uint8Array, bin2: Uint8Array): boolean {
-  for (let i = 0; i < ALPHABET.length; i++) {
+/**
+ * Check if bin1 and bin2 are the same
+ * @param bin1 binary array which we check
+ * @param bin2 binary array which we check
+ * @returns true if bin1 and bin2 are the same
+ */
+export function isBinarySame(bin1: Uint8Array, bin2: Uint8Array): boolean {
+  for (let i = 0; i < bin1.length; i++) {
     if (bin1[i] !== bin2[i]) {
       return false;
     }
@@ -196,13 +223,12 @@ function isBinarySame(bin1: Uint8Array, bin2: Uint8Array): boolean {
   return true;
 }
 
-export function findAnagrams(query: string, dictionary: Word[]): Word[] {
-  const nQuery = stringToWord(query);
-  return dictionary.filter((nStr) => {
-    return isBinarySame(nStr.set, nQuery.set);
-  });
-}
-
+/**
+ * Find all subanagrams of query in dictionary
+ * @param query query which we use
+ * @param dictionary dictionary which we use
+ * @returns subanagrams
+ */
 export function findSubAnagrams(
   query: string,
   dictionary: SimpleWord[]
@@ -213,35 +239,11 @@ export function findSubAnagrams(
   });
 }
 
-export function findSubAnagramsStrings(
-  query: string,
-  dictionary: string[]
-): string[] {
-  return dictionary.filter((nStr) => {
-    return isSubset(nStr, query);
-  });
-}
-
-export function sortWordList<T extends BasicWord>(wordList: T[]): T[] {
-  return sortBy(wordList, (w) => -w.length);
-}
-
-export function findSortedSubAnagrmns(
-  query: string,
-  dictionary: SimpleWord[]
-): BasicWord[] {
-  const _subanagrams = findSubAnagrams(query, dictionary);
-  // we like long words more
-  const sorted = sortWordList(_subanagrams);
-  const subanagrams: BasicWord[] = sorted.map((word, index) => {
-    return {
-      ...word,
-      index,
-    };
-  });
-  return subanagrams;
-}
-
+/**
+ * Group subanagrams by their set representation
+ * @param subanagrams subanagrams which we group
+ * @returns grouped subanagrams
+ */
 export function findSortedAndGroupedSubAnagrams(
   subanagrams: SimpleWord[]
 ): Word[] {
@@ -259,46 +261,20 @@ export function findSortedAndGroupedSubAnagrams(
   });
 }
 
-export function anagramIteratorStateFactory(unsolvedGenerators = []) {
-  const state: AnagramIteratorState = {
-    breakLoop: false,
-    counter: 0,
-    numberOfPossibilitiesChecked: 0,
-    unsolvedGenerators,
-    solvedGenerators: [],
-    currentGenerators: [],
-    solutions: [],
-  };
-  return state;
-}
-
-export function serializeAnagramIteratorStateFactor(
-  state: AnagramIteratorState
-): SerializedAnagramIteratorState {
-  const solutions = state.solutions.map((s) => [...s[0]].reverse());
-  return {
-    counter: state.counter,
-    numberOfPossibilitiesChecked: state.numberOfPossibilitiesChecked,
-    unsolvedSubanagrams: state.unsolvedGenerators.map(
-      (d) => d.subanagram.index
-    ),
-    solvedSubanagrams: state.solvedGenerators.map((d) => d.subanagram.index),
-    currentSubanagrams: state.currentGenerators.map((d) => d.subanagram.index),
-    // use numbers to reduce memory footprint
-    solutions,
-  };
-}
-
+/**
+ * Find all anagram sentences for the given query and subanagrams.
+ * @param query query which we use
+ * @param subanagrams subanagrams which we use
+ * @returns anagram sentences
+ */
 export function findAnagramSentencesForInitialStack(
-  query: string,
+  query: SimpleWord,
   initialStack: AnagramSolution[],
   subanagrams: Word[]
 ) {
-  const nQuery = stringToWord(query);
-  const queryLength = nQuery.word.length;
+  const queryLength = query.word.length;
   const calculateAnagrams = () => {
     let stack: AnagramSolution[] = initialStack;
-    // const solutions: AnagramSolution[] = [];
 
     let numberOfPossibilitiesChecked = initialStack.length;
 
@@ -310,8 +286,7 @@ export function findAnagramSentencesForInitialStack(
     while (stack.length !== 0 && numberOfSolutions < MAX_SOLUTIONS) {
       const current = stack.shift() as AnagramSolution;
 
-      if (isBinarySame(nQuery.set, current[1])) {
-        // solutions.push(current);
+      if (isBinarySame(query.set, current[1])) {
         newSolutions.push(current);
       } else {
         const charsMissing = queryLength - current[2];
@@ -329,13 +304,13 @@ export function findAnagramSentencesForInitialStack(
         const combinedWords = possibleSubanagrams.map((w) => {
           return {
             word: w,
-            combined: joinTwoBinary(current[1], w.set),
+            combined: mergeBinaries(current[1], w.set),
           };
         });
 
         // check if the result is still a subset
         const filterCombined = combinedWords.filter((cw) => {
-          return isBinarySubset(cw.combined, nQuery.set);
+          return isBinarySubset(cw.combined, query.set);
         });
 
         const newAnagramSolutions: AnagramSolution[] = filterCombined.map(
@@ -364,8 +339,15 @@ export function findAnagramSentencesForInitialStack(
   return calculateAnagrams;
 }
 
+/**
+ * Find all anagram sentences for the given query and subanagrams.
+ * @param query query which we use
+ * @param subanagrams subanagrams which we use
+ * @param subanagram subanagram which we use
+ * @returns anagram sentences
+ */
 export function findAnagramSentencesForSubAnagram(
-  query: string,
+  query: SimpleWord,
   subanagrams: Word[],
   subanagram: Word
 ): SubanagramSolver {
@@ -384,7 +366,7 @@ export function findAnagramSentencesForSubAnagram(
 }
 
 export function findAnagramSentences(
-  query: string,
+  query: SimpleWord,
   subanagrams: Word[]
 ): SubanagramSolver[] {
   const subanagramsGenerators = subanagrams.map((w) => {
@@ -449,7 +431,6 @@ export function groupWordsByStartWord(
       groups[word.word].counter += 1;
     }
   }
-
   return groups;
 }
 
@@ -464,6 +445,12 @@ export function isLetter(letter: string) {
   return ALPHABET.includes(letter.toLocaleLowerCase()) || letter === ".";
 }
 
+/**
+ * Get the mapping of the letters of w1 to the letters of w2
+ * @param w1 word 1
+ * @param w2 word 2
+ * @returns mapping
+ */
 export function getAnagramMapping(
   w1: string,
   w2: string
@@ -472,9 +459,6 @@ export function getAnagramMapping(
   w2 = w2.toLowerCase();
   const mapping: Record<string, number[]> = {};
   const resultMapping: (number | undefined)[] = [];
-  // let index1 = 0;
-  // let index2 = 0;
-  // let index = 0;
   for (let s of w1) {
     // if it's not a letter, ignore it
     if (!isLetter(s)) {
@@ -492,7 +476,6 @@ export function getAnagramMapping(
     const sInW2 = w2.indexOf(s, lastPosition);
     chars.push(sInW2);
     resultMapping.push(sInW2);
-    // index++;
   }
   return resultMapping;
 }
