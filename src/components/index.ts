@@ -21,3 +21,4 @@ export {
   AnagramResultsContainer,
   ResultContainer,
 } from "./AnagramResults.styled";
+export { default as LegalNotice } from "./LegalNotice";

@@ -8,6 +8,7 @@ import store from "src/state";
 
 import { MARGIN_RAW, THEME } from "./theme";
 import { Footer } from "./components";
+import { LegalNotice } from "./components";
 import { SmallButton } from "./components";
 import Anagramania from "./pages/Anagramania";
 import About from "./pages/About";
@@ -181,7 +182,8 @@ const App = () => {
           <Footer>
             <span>{"Made by "}</span>
             <a href="http://tn1ck.com">{"Tom Nick"}</a>{" "}
-            <span>{" & Taisia Tikhnovetskaya"}</span>
+            <span>{" & Taisia Tikhnovetskaya · "}</span>
+            <LegalNotice />
           </Footer>
         </div>
       </Router>
